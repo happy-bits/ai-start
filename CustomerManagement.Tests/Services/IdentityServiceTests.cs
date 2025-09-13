@@ -251,6 +251,68 @@ namespace CustomerManagement.Tests.Services
             Assert.Contains(result2.Errors, e => e.Code == "DuplicateRoleName");
         }
 
+        [Fact]
+        public async Task AdminCreateUserAndLogin_EndToEndTest()
+        {
+            // Arrange - Skapa Admin-rollen
+            await _roleManager.CreateAsync(new IdentityRole("Admin"));
+            await _roleManager.CreateAsync(new IdentityRole("User"));
+
+            // Skapa admin-användare
+            var admin = new ApplicationUser
+            {
+                UserName = "admin@example.com",
+                Email = "admin@example.com",
+                FirstName = "Admin",
+                LastName = "User"
+            };
+            await _userManager.CreateAsync(admin, "AdminPassword123!");
+            await _userManager.AddToRoleAsync(admin, "Admin");
+
+            // Act - Admin skapar en ny användare
+            var newUser = new ApplicationUser
+            {
+                UserName = "newuser@example.com",
+                Email = "newuser@example.com",
+                FirstName = "New",
+                LastName = "User"
+            };
+            var createResult = await _userManager.CreateAsync(newUser, "NewUserPassword123!");
+            await _userManager.AddToRoleAsync(newUser, "User");
+
+            // Assert - Verifiera att användaren skapades korrekt
+            Assert.True(createResult.Succeeded);
+            Assert.NotNull(newUser.Id);
+            
+            // Verifiera att användaren finns i databasen
+            var foundUser = await _userManager.FindByEmailAsync("newuser@example.com");
+            Assert.NotNull(foundUser);
+            Assert.Equal("New", foundUser.FirstName);
+            Assert.Equal("User", foundUser.LastName);
+
+            // Verifiera att användaren har User-roll
+            var userRoles = await _userManager.GetRolesAsync(foundUser);
+            Assert.Contains("User", userRoles);
+
+            // Act - Den nya användaren försöker logga in
+            var loginResult = await _userManager.CheckPasswordAsync(foundUser, "NewUserPassword123!");
+
+            // Assert - Verifiera att inloggningen fungerar
+            Assert.True(loginResult);
+
+            // Act - Testa att fel lösenord inte fungerar
+            var wrongPasswordResult = await _userManager.CheckPasswordAsync(foundUser, "WrongPassword");
+            Assert.False(wrongPasswordResult);
+
+            // Act - Verifiera att admin fortfarande kan logga in
+            var adminLoginResult = await _userManager.CheckPasswordAsync(admin, "AdminPassword123!");
+            Assert.True(adminLoginResult);
+
+            // Verifiera att admin har Admin-roll
+            var adminRoles = await _userManager.GetRolesAsync(admin);
+            Assert.Contains("Admin", adminRoles);
+        }
+
         public void Dispose()
         {
             _context?.Dispose();
