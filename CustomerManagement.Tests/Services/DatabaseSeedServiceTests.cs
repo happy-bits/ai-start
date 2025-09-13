@@ -184,10 +184,13 @@ namespace CustomerManagement.Tests.Services
 
             // Verifiera att kunderna har korrekt data
             var customer1 = user1Customers.First();
-            Assert.Equal("Test", customer1.FirstName);
-            Assert.Equal("Customer11", customer1.LastName); // user1 -> Customer11
-            Assert.Equal("customer11@test.com", customer1.Email);
-            Assert.Equal("070-1111111", customer1.Phone);
+            Assert.Equal("Anna", customer1.FirstName);
+            Assert.Equal("Andersson", customer1.LastName);
+            Assert.Equal("anna.andersson@example.com", customer1.Email);
+            Assert.Equal("070-1234567", customer1.Phone);
+            Assert.Equal("Storgatan 15", customer1.Address);
+            Assert.Equal("Stockholm", customer1.City);
+            Assert.Equal("11122", customer1.PostalCode);
         }
 
         [Fact]

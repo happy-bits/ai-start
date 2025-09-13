@@ -162,37 +162,46 @@ namespace CustomerManagement.Services
         private async Task CreateCustomersForUser(string userId, string userPrefix)
         {
             var userNumber = userPrefix[^1]; // Tar sista karaktären (1, 2, eller 3)
-            var customers = new[]
+            
+            // Olika namn och adresser baserat på användarnummer
+            var customerData = userNumber switch
             {
-                new Customer
+                '1' => new[]
                 {
-                    FirstName = "Test",
-                    LastName = $"Customer{userNumber}1",
-                    Email = $"customer{userNumber}1@test.com",
-                    Phone = $"070-{userNumber}111111",
-                    Address = $"Testgatan {userNumber}1",
-                    City = "Teststad",
-                    PostalCode = $"{userNumber}2345",
-                    Country = "Sverige",
-                    UserId = userId,
-                    CreatedAt = DateTime.UtcNow.AddDays(-10),
-                    UpdatedAt = DateTime.UtcNow.AddDays(-10)
+                    new { FirstName = "Anna", LastName = "Andersson", Email = "anna.andersson@example.com", Phone = "070-1234567", Address = "Storgatan 15", City = "Stockholm", PostalCode = "11122" },
+                    new { FirstName = "Erik", LastName = "Eriksson", Email = "erik.eriksson@example.com", Phone = "070-2345678", Address = "Vasagatan 8", City = "Stockholm", PostalCode = "11123" }
                 },
-                new Customer
+                '2' => new[]
                 {
-                    FirstName = "Demo",
-                    LastName = $"Customer{userNumber}2",
-                    Email = $"demo{userNumber}2@test.com",
-                    Phone = $"070-{userNumber}222222",
-                    Address = $"Demogatan {userNumber}2",
-                    City = "Demostad",
-                    PostalCode = $"{userNumber}5432",
-                    Country = "Sverige",
-                    UserId = userId,
-                    CreatedAt = DateTime.UtcNow.AddDays(-5),
-                    UpdatedAt = DateTime.UtcNow.AddDays(-5)
+                    new { FirstName = "Maria", LastName = "Gustavsson", Email = "maria.gustavsson@example.com", Phone = "070-3456789", Address = "Kungsgatan 42", City = "Göteborg", PostalCode = "41119" },
+                    new { FirstName = "Lars", LastName = "Larsson", Email = "lars.larsson@example.com", Phone = "070-4567890", Address = "Avenyn 12", City = "Göteborg", PostalCode = "41120" }
+                },
+                '3' => new[]
+                {
+                    new { FirstName = "Sofia", LastName = "Johansson", Email = "sofia.johansson@example.com", Phone = "070-5678901", Address = "Stortorget 3", City = "Malmö", PostalCode = "21122" },
+                    new { FirstName = "Johan", LastName = "Nilsson", Email = "johan.nilsson@example.com", Phone = "070-6789012", Address = "Lilla Torg 7", City = "Malmö", PostalCode = "21123" }
+                },
+                _ => new[]
+                {
+                    new { FirstName = "Test", LastName = "Testsson", Email = "test@example.com", Phone = "070-0000000", Address = "Testgatan 1", City = "Teststad", PostalCode = "00000" },
+                    new { FirstName = "Demo", LastName = "Demoss", Email = "demo@example.com", Phone = "070-1111111", Address = "Demogatan 1", City = "Demostad", PostalCode = "11111" }
                 }
             };
+
+            var customers = customerData.Select(data => new Customer
+            {
+                FirstName = data.FirstName,
+                LastName = data.LastName,
+                Email = data.Email,
+                Phone = data.Phone,
+                Address = data.Address,
+                City = data.City,
+                PostalCode = data.PostalCode,
+                Country = "Sverige",
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow.AddDays(-10),
+                UpdatedAt = DateTime.UtcNow.AddDays(-10)
+            }).ToArray();
 
             foreach (var customer in customers)
             {
