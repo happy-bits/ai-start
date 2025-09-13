@@ -1,0 +1,227 @@
+---
+description: Kommandon
+globs:
+alwaysApply: true
+---
+
+# Kommandon 
+
+## Analys & Planering
+
+`-reason`
+Analysera problem och ge detaljerad förklaring.
+Fokusera på problemförståelse.
+Skriv i ett kodfönster vilka mappar och filer du föreslår ska skapas eller ändras.
+Ändra ingen kod.
+
+`-reason3`
+Analysera problem och ger tre olika lösningsförslag.
+Fokus på problemförståelse.
+Ändra ingen kod.
+
+`-question`
+Analysera problem noggrant.
+Beskriv hur du tolkar problemet.
+Ändra ingen kod och föreslå ingen lösning än.
+Ställ tre frågor till användaren för förstå uppgiften bättre.
+Numrera frågorna: 1, 2, 3.
+Om användaren väljer att inte svara på ett fråga så välj själv hur uppgiften ska tolkas.
+
+`-where`
+Vilka filer och mappar är relevanta för sammanhanget? 
+Ändra ingen kod och föreslå ingen lösning än.
+
+`-steps`
+Skapa numrerad handlingsplan där det framgår vad som ska göras och vilka steg som är klara:
+```
+✅ 1. Slutfört steg
+🖋️ 2. Pågående steg
+```
+`-steps3`
+Dela upp uppgiften i 3-5 steg, där varje steg kan verifieras av en slutanvändare. Förklara hur steget kan verifieras.
+
+`-steps-back`
+Det senaste steget är inte ännu klart. Uppdatera steget till 🖋️ istället för ✅.
+
+`-test`
+Beskriv kortfattat hur jag kan verifiera koduppdateringen.
+
+`-commit`
+Skapa ett commit-meddelande utifrån kodförändringen på detta format:
+[feat/fix/style/chore/refactor]: [Beskrivning på svenska, en mening, max 100 tecken, första bokstaven ska vara stor, använd presens]
+
+Exempel:
+fix: Visa datum som tidzon Stockholm
+
+Om kodförändringarna passar som en commit så skriv
+✅ Passar som en commit
+Annars skriv
+⚠️ Rekommenderar att dela upp i flera commits p.g.a [...]
+
+Anropa inga verktyg.
+
+`-summary`
+Sammanfatta vad vi kommit fram till.
+Ändra vad vi kommit fram till.
+
+## Debugging
+
+`-debug-css`
+ Modifiera CSS-koden tillfälligt för att identifiera problemet:
+- T.ex lägg till ramar i olika färger och storlekar
+- Lägg till en kommentar med '🤡' nära förändringen, så att vi lätt kan hitta ändringen
+- När problemet är löst kommer vi ta bort dessa CSS-förändringar
+
+`-debug-log`
+För att underlätta felsökning, lägg till loggning på flera ställen:
+- Lägg till loggning på servern och inled varje meddlande med '🤡'
+- Lägg till loggning på klienten och inled varje meddlande med '🤡'
+
+`-debug-log-remove`
+Ta bort alla tillfälliga debug-loggar (sök efter '🤡')
+
+## Implementation
+
+`-code [x]`
+Implementera specificerat steg. 
+Om [x] utelämnas, implementera nästa steg i ordningen.
+Beskriv hur jag kan verifiera att implementationen stämmer.
+
+`-tdd [x]`
+Implementera med Test Driven Utveckling.
+Om [x] utelämnas, implementera nästa steg i ordningen.
+Börja med att skapa test. Bekräfta att testat failar. Beskriv sedan hur testet fungerar.
+Implementering ingenting förutom testerna.
+Ta inte bort något befintligt test.
+Fråga mig sedan: "Vill du att jag implementerar detta?"
+
+
+`-code-unit [x]`
+Implementera specificerat steg.
+Om [x] utelämnas, implementeras nästa steg i ordningen.
+Skapa enhetstest för att verifiera implementationen.
+
+`-debug-see`
+Jag bifogar ett fel. 
+Ser du felet? 
+Beskriv hur du tolkar felet.
+Ändra ingen kod.
+
+`-bug`
+
+Användaren vill rapportera om en bugg.
+
+Följ dessa steg, ställ en fråga i taget:
+
+1) Fråga vad användare gör
+2) Fråga vad som hände
+3) Fråga vad förväntades
+
+Skapa en markdownfil under mappen "Buggrapport" som beskriver buggen tydligt
+
+Fråga sedan användaren om buggen ska lösas
+
+## Prompt
+
+`-prompt-better`
+
+I min tidigare fråga bad jag dig utföra en uppgift, men du missade en detalj, vilket du sedan korrigerade.
+
+Hur skulle jag ha formulerat instruktionen för att säkerställa att du förstod uppgiften korrekt från början? 
+
+## Refaktorering
+
+`-analyze-readable`
+Analysera om koden kan göra enklare att läsa och förstå.
+Ändra ingen kod.
+
+`-analyze-reuse`
+Analysera om koden kan göras mer modulär och återanvändningsbar.
+Ändra ingen kod.
+
+`-analyze-duplication`
+Analysera koden utifrån duplicering. 
+Finns det kod som är duplicerad eller gör samma sak? 
+Ändra ingen kod.
+
+`-analyze-consistency`
+Analysera koden utifrån om den är konsistens.
+Ändra ingen kod.
+
+`-analyze-dead`
+Identifiera oanvänd kod.
+T.ex oanvända funktioner och klasser, överflödiga importer.
+Ändra ingen kod
+
+## Mallar
+
+`-template`
+Skapa en markdownfil summary.md som beskriver uppgiften och hur du löste den. Syftet är att instruktionen ska fungera som stöd för en AI-assistent i framtiden, vid lösning av liknande problem. Följ nedanstående mall:
+```
+# Rubrik
+
+## Typ av ändring
+- [ ] Feature
+- [ ] Buggfix
+- [ ] Refaktorering
+- [ ] Dokumentation
+- [ ] Annat
+
+## Beskrivning
+En kort sammanfattning av vad ändringen innebär (1 mening)
+
+## Detaljer
+- Lista över specifika ändringar
+- En punkt per ändring
+- Fokusera på vad som gjorts och varför
+
+## Relaterade filer
+- Lista över ändrade filer
+- Ange fullständiga sökvägar
+
+```
+
+`-script`
+Generera ett skript, en funktion med parameterar, som kan användas för att generera liknande kod i framtiden. 
+
+`-script3`
+Generera ett skript, en funktion med parameterar, som kan användas för att generera liknande kod i framtiden.  
+Ge först tre olika förslag.
+
+
+## Dokumentation
+
+`-diagram-er`
+Skapa ett ER-diagram i mermaid-format, svara i ett kodblock.
+
+`-overview`
+
+Analysera hela projektet. Skapa en översikt över projektet och lägg svaret i en ny fil `overview.md` med följande innehåll:
+
+```markdown
+# Projektets namn
+
+## Syfte
+
+Beskriv med max 3 meningar
+
+## Struktur
+
+Beskriv med max 3 meningar
+
+Skapa ett mermaid-diagram (graph TD) som visar systemarkitekturen med klienten överst
+
+## Komponenter
+
+Beskriv de viktigaste komponenterna
+
+## Tekniska val
+
+Lista med tekniker
+
+## Utvecklingsmiljö
+
+## Verktyg och Paket
+Lista med verktyg och paket
+```
+
