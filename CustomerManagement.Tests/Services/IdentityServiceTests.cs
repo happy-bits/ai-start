@@ -231,6 +231,7 @@ namespace CustomerManagement.Tests.Services
             // Assert
             Assert.True(result.Succeeded);
             var updatedUser = await _userManager.FindByIdAsync(user.Id);
+            Assert.NotNull(updatedUser);
             Assert.Equal("Updated", updatedUser.FirstName);
         }
 
