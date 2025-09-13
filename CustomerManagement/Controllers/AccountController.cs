@@ -163,6 +163,16 @@ namespace CustomerManagement.Controllers
                 return NotFound();
             }
 
+            // Säkerhetskontroll: Admin kan inte redigera andra admin (men kan redigera sig själv)
+            var currentUserId = _userManager.GetUserId(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var isTargetAdmin = userRoles.Contains("Admin");
+
+            if (isTargetAdmin && user.Id != currentUserId)
+            {
+                return Forbid();
+            }
+
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? "User";
 
@@ -190,6 +200,16 @@ namespace CustomerManagement.Controllers
                 if (user == null)
                 {
                     return NotFound();
+                }
+
+                // Säkerhetskontroll: Admin kan inte redigera andra admin (men kan redigera sig själv)
+                var currentUserId = _userManager.GetUserId(User);
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var isTargetAdmin = userRoles.Contains("Admin");
+
+                if (isTargetAdmin && user.Id != currentUserId)
+                {
+                    return Forbid();
                 }
 
                 // Uppdatera användardata
@@ -230,6 +250,49 @@ namespace CustomerManagement.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Säkerhetskontroll: Admin kan inte ta bort andra admin eller sig själv
+            var currentUserId = _userManager.GetUserId(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var isTargetAdmin = userRoles.Contains("Admin");
+
+            if (isTargetAdmin)
+            {
+                return Forbid();
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("ManageUsers");
+            }
+
+            // Om borttagning misslyckades, lägg till felmeddelanden
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            // Redirect tillbaka till ManageUsers med felmeddelanden
+            return RedirectToAction("ManageUsers");
         }
 
         private IActionResult RedirectToLocal(string? returnUrl)

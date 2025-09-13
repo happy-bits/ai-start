@@ -526,6 +526,10 @@ namespace CustomerManagement.Tests.Controllers
             SetupAuthenticatedUser("admin1", true);
             _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
                 .ReturnsAsync(existingUser);
+            _mockUserManager.Setup(m => m.GetUserId(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
+                .Returns("admin1");
+            _mockUserManager.Setup(m => m.GetRolesAsync(existingUser))
+                .ReturnsAsync(new List<string> { "User" });
             _mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(IdentityResult.Failed(errors.ToArray()));
 
@@ -537,6 +541,248 @@ namespace CustomerManagement.Tests.Controllers
             Assert.Equal(model, viewResult.Model);
             Assert.True(_controller.ModelState.ContainsKey(string.Empty));
         }
+
+        [Fact]
+        public async Task EditUser_Get_ShouldReturnForbidden_WhenTryingToEditAnotherAdmin()
+        {
+            // Arrange
+            var adminUserId = "admin123";
+            var targetAdmin = new ApplicationUser
+            {
+                Id = adminUserId,
+                FirstName = "Target",
+                LastName = "Admin",
+                Email = "targetadmin@example.com"
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(adminUserId))
+                .ReturnsAsync(targetAdmin);
+            _mockUserManager.Setup(m => m.GetRolesAsync(targetAdmin))
+                .ReturnsAsync(new List<string> { "Admin" });
+
+            // Act
+            var result = await _controller.EditUser(adminUserId);
+
+            // Assert
+            var forbiddenResult = Assert.IsType<ForbidResult>(result);
+        }
+
+        [Fact]
+        public async Task EditUser_Get_ShouldReturnView_WhenTryingToEditSelf()
+        {
+            // Arrange
+            var currentAdminId = "admin1";
+            var currentAdmin = new ApplicationUser
+            {
+                Id = currentAdminId,
+                FirstName = "Current",
+                LastName = "Admin",
+                Email = "admin1@test.com"
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(currentAdminId))
+                .ReturnsAsync(currentAdmin);
+            _mockUserManager.Setup(m => m.GetUserId(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
+                .Returns("admin1");
+            _mockUserManager.Setup(m => m.GetRolesAsync(currentAdmin))
+                .ReturnsAsync(new List<string> { "Admin" });
+
+            // Act
+            var result = await _controller.EditUser(currentAdminId);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<EditUserViewModel>(viewResult.Model);
+            Assert.Equal(currentAdminId, model.Id);
+            Assert.Equal("Current", model.FirstName);
+            Assert.Equal("Admin", model.LastName);
+            Assert.Equal("admin1@test.com", model.Email);
+            Assert.Equal("Admin", model.Role);
+        }
+
+        [Fact]
+        public async Task EditUser_Post_ShouldReturnForbidden_WhenTryingToEditAnotherAdmin()
+        {
+            // Arrange
+            var model = new EditUserViewModel
+            {
+                Id = "admin123",
+                FirstName = "Updated",
+                LastName = "Admin",
+                Email = "updatedadmin@example.com",
+                Role = "Admin"
+            };
+
+            var targetAdmin = new ApplicationUser
+            {
+                Id = "admin123",
+                FirstName = "Target",
+                LastName = "Admin",
+                Email = "targetadmin@example.com"
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
+                .ReturnsAsync(targetAdmin);
+            _mockUserManager.Setup(m => m.GetRolesAsync(targetAdmin))
+                .ReturnsAsync(new List<string> { "Admin" });
+
+            // Act
+            var result = await _controller.EditUser(model);
+
+            // Assert
+            var forbiddenResult = Assert.IsType<ForbidResult>(result);
+        }
+
+        [Fact]
+        public async Task EditUser_Post_ShouldUpdateUser_WhenTryingToEditSelf()
+        {
+            // Arrange
+            var model = new EditUserViewModel
+            {
+                Id = "admin1",
+                FirstName = "Updated",
+                LastName = "Admin",
+                Email = "updatedadmin@example.com",
+                PhoneNumber = "070-1234567",
+                Role = "Admin"
+            };
+
+            var currentAdmin = new ApplicationUser
+            {
+                Id = "admin1",
+                FirstName = "Current",
+                LastName = "Admin",
+                Email = "admin1@test.com",
+                PhoneNumber = "070-9876543"
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
+                .ReturnsAsync(currentAdmin);
+            _mockUserManager.Setup(m => m.GetUserId(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
+                .Returns("admin1");
+            _mockUserManager.Setup(m => m.GetRolesAsync(currentAdmin))
+                .ReturnsAsync(new List<string> { "Admin" });
+            _mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
+                .ReturnsAsync(IdentityResult.Success);
+
+            // Act
+            var result = await _controller.EditUser(model);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("ManageUsers", redirectResult.ActionName);
+
+            _mockUserManager.Verify(m => m.UpdateAsync(It.Is<ApplicationUser>(u => 
+                u.FirstName == model.FirstName && 
+                u.LastName == model.LastName &&
+                u.Email == model.Email &&
+                u.PhoneNumber == model.PhoneNumber)), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteUser_ShouldDeleteUser_WhenUserIsNotAdmin()
+        {
+            // Arrange
+            var userId = "user123";
+            var user = new ApplicationUser
+            {
+                Id = userId,
+                FirstName = "Test",
+                LastName = "User",
+                Email = "test@example.com"
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+                .ReturnsAsync(user);
+            _mockUserManager.Setup(m => m.GetRolesAsync(user))
+                .ReturnsAsync(new List<string> { "User" });
+            _mockUserManager.Setup(m => m.DeleteAsync(user))
+                .ReturnsAsync(IdentityResult.Success);
+
+            // Act
+            var result = await _controller.DeleteUser(userId);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("ManageUsers", redirectResult.ActionName);
+
+            _mockUserManager.Verify(m => m.DeleteAsync(user), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteUser_ShouldReturnNotFound_WhenUserNotFound()
+        {
+            // Arrange
+            var userId = "nonexistent";
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+                .ReturnsAsync((ApplicationUser?)null);
+
+            // Act
+            var result = await _controller.DeleteUser(userId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteUser_ShouldReturnForbidden_WhenTryingToDeleteAnotherAdmin()
+        {
+            // Arrange
+            var adminUserId = "admin123";
+            var targetAdmin = new ApplicationUser
+            {
+                Id = adminUserId,
+                FirstName = "Target",
+                LastName = "Admin",
+                Email = "targetadmin@example.com"
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(adminUserId))
+                .ReturnsAsync(targetAdmin);
+            _mockUserManager.Setup(m => m.GetRolesAsync(targetAdmin))
+                .ReturnsAsync(new List<string> { "Admin" });
+
+            // Act
+            var result = await _controller.DeleteUser(adminUserId);
+
+            // Assert
+            var forbiddenResult = Assert.IsType<ForbidResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteUser_ShouldReturnForbidden_WhenTryingToDeleteSelf()
+        {
+            // Arrange
+            var currentAdminId = "admin1";
+            var currentAdmin = new ApplicationUser
+            {
+                Id = currentAdminId,
+                FirstName = "Current",
+                LastName = "Admin",
+                Email = "admin1@test.com"
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(currentAdminId))
+                .ReturnsAsync(currentAdmin);
+            _mockUserManager.Setup(m => m.GetRolesAsync(currentAdmin))
+                .ReturnsAsync(new List<string> { "Admin" });
+
+            // Act
+            var result = await _controller.DeleteUser(currentAdminId);
+
+            // Assert
+            var forbiddenResult = Assert.IsType<ForbidResult>(result);
+        }
+
 
         private void SetupControllerContext()
         {
