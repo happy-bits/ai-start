@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CustomerManagement.Services
 {
-    public class DatabaseSeedService
+    public class DatabaseSeedService : IDatabaseSeedService
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;

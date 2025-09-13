@@ -6,3 +6,133 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+@if (ViewBag.ShowDeveloperTools == true)
+{
+    <div class="row mt-5">
+        <div class="col-md-8 offset-md-2">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">🛠️ Utvecklarverktyg</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Databas</h6>
+                            <button id="recreateDbBtn" class="btn btn-danger btn-sm mb-3">
+                                🔄 Återskapa databas med testdata
+                            </button>
+                            <div id="dbResult" class="alert" style="display: none;"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Snabb inloggning</h6>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm login-btn" data-email="admin1@test.com">
+                                    👤 Logga in som Admin1
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm login-btn" data-email="admin2@test.com">
+                                    👤 Logga in som Admin2
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm login-btn" data-email="user1@test.com">
+                                    👤 Logga in som User1
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm login-btn" data-email="user2@test.com">
+                                    👤 Logga in som User2
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm login-btn" data-email="user3@test.com">
+                                    👤 Logga in som User3
+                                </button>
+                            </div>
+                            <div id="loginResult" class="alert mt-2" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Databasåterskapning
+            document.getElementById('recreateDbBtn').addEventListener('click', function() {
+                const btn = this;
+                const resultDiv = document.getElementById('dbResult');
+                
+                btn.disabled = true;
+                btn.innerHTML = '⏳ Återskapar...';
+                
+                fetch('/DeveloperTools/RecreateDatabase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resultDiv.className = 'alert ' + (data.success ? 'alert-success' : 'alert-danger');
+                    resultDiv.textContent = data.message;
+                    resultDiv.style.display = 'block';
+                })
+                .catch(error => {
+                    resultDiv.className = 'alert alert-danger';
+                    resultDiv.textContent = 'Ett fel inträffade: ' + error.message;
+                    resultDiv.style.display = 'block';
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '🔄 Återskapa databas med testdata';
+                });
+            });
+
+            // Snabb inloggning
+            document.querySelectorAll('.login-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const email = this.dataset.email;
+                    const resultDiv = document.getElementById('loginResult');
+                    
+                    console.log('🤡 Försöker logga in som:', email);
+                    
+                    this.disabled = true;
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '⏳ Loggar in...';
+                    
+                    fetch('/DeveloperTools/LoginAs', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        },
+                        body: JSON.stringify(email)
+                    })
+                    .then(response => {
+                        console.log('🤡 Response status:', response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('🤡 Response data:', data);
+                        resultDiv.className = 'alert ' + (data.success ? 'alert-success' : 'alert-danger');
+                        resultDiv.textContent = data.message;
+                        resultDiv.style.display = 'block';
+                        
+                        if (data.success) {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('🤡 Fetch error:', error);
+                        resultDiv.className = 'alert alert-danger';
+                        resultDiv.textContent = 'Ett fel inträffade: ' + error.message;
+                        resultDiv.style.display = 'block';
+                    })
+                    .finally(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalText;
+                    });
+                });
+            });
+        });
+    </script>
+}
