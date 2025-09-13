@@ -123,6 +123,16 @@
                     <dd class="col-sm-7">
                         <small>@Model.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</small>
                     </dd>
+                    
+                    @if (User.IsInRole("Admin") && Model.User != null)
+                    {
+                        <dt class="col-sm-5">Skapad av:</dt>
+                        <dd class="col-sm-7">
+                            <span class="badge bg-info">@Model.User.FirstName @Model.User.LastName</span>
+                            <br>
+                            <small class="text-muted">@Model.User.Email</small>
+                        </dd>
+                    }
                 </dl>
             </div>
         </div>

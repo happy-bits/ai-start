@@ -60,26 +60,18 @@ namespace CustomerManagement.Controllers
         {
             try
             {
-                _logger.LogInformation("🤡 LoginAs anropad med email: {Email}", email);
-                
                 var user = await _userManager.FindByEmailAsync(email);
-                _logger.LogInformation("🤡 User hittad: {UserFound}, UserId: {UserId}", user != null, user?.Id);
-                
                 if (user == null)
                 {
-                    _logger.LogWarning("🤡 Användare hittades inte: {Email}", email);
                     return Json(new { success = false, message = "Användare hittades inte" });
                 }
 
-                _logger.LogInformation("🤡 Försöker logga in användare: {UserId}", user.Id);
                 await _signInManager.SignInAsync(user, false);
-                _logger.LogInformation("🤡 Inloggning lyckades för: {Email}", email);
-                
                 return Json(new { success = true, message = $"Inloggad som {email}" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "🤡 Fel vid inloggning som {Email}: {ErrorMessage}", email, ex.Message);
+                _logger.LogError(ex, "Fel vid inloggning som {Email}", email);
                 return Json(new { success = false, message = "Fel vid inloggning" });
             }
         }

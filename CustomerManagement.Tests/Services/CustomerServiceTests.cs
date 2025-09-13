@@ -135,6 +135,33 @@ namespace CustomerManagement.Tests.Services
         }
 
         [Fact]
+        public async Task GetAllCustomersForAdminAsync_ShouldIncludeUserData()
+        {
+            // Act
+            var result = await _customerService.GetAllCustomersForAdminAsync();
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            
+            // Kontrollera att User-data är inkluderad
+            var customer1 = result.First(c => c.FirstName == "Anna");
+            Assert.NotNull(customer1.User);
+            Assert.Equal("User", customer1.User.FirstName);
+            Assert.Equal("One", customer1.User.LastName);
+            Assert.Equal("user1@example.com", customer1.User.Email);
+            
+            var customer2 = result.First(c => c.FirstName == "Erik");
+            Assert.NotNull(customer2.User);
+            Assert.Equal("User", customer2.User.FirstName);
+            Assert.Equal("One", customer2.User.LastName);
+            
+            var customer3 = result.First(c => c.FirstName == "Maria");
+            Assert.NotNull(customer3.User);
+            Assert.Equal("User", customer3.User.FirstName);
+            Assert.Equal("Two", customer3.User.LastName);
+        }
+
+        [Fact]
         public async Task GetCustomerByIdAsync_ShouldReturnCustomerForCorrectUser()
         {
             // Act
@@ -167,6 +194,21 @@ namespace CustomerManagement.Tests.Services
             Assert.NotNull(result);
             Assert.Equal("Maria", result.FirstName);
             Assert.Equal("Gustavsson", result.LastName);
+        }
+
+        [Fact]
+        public async Task GetCustomerByIdForAdminAsync_ShouldIncludeUserData()
+        {
+            // Act
+            var result = await _customerService.GetCustomerByIdForAdminAsync(1);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Anna", result.FirstName);
+            Assert.NotNull(result.User);
+            Assert.Equal("User", result.User.FirstName);
+            Assert.Equal("One", result.User.LastName);
+            Assert.Equal("user1@example.com", result.User.Email);
         }
 
         [Fact]

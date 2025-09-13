@@ -75,6 +75,44 @@ namespace CustomerManagement.Tests.Controllers
         }
 
         [Fact]
+        public async Task Index_ShouldReturnCustomersWithUserData_WhenUserIsAdmin()
+        {
+            // Arrange
+            var userId = "admin1";
+            var user1 = new ApplicationUser { Id = "user1", FirstName = "User", LastName = "One", Email = "user1@example.com" };
+            var user2 = new ApplicationUser { Id = "user2", FirstName = "User", LastName = "Two", Email = "user2@example.com" };
+            
+            var customers = new List<Customer>
+            {
+                new Customer { Id = 1, FirstName = "Test", LastName = "Customer1", Email = "test1@example.com", UserId = "user1", User = user1 },
+                new Customer { Id = 2, FirstName = "Test", LastName = "Customer2", Email = "test2@example.com", UserId = "user2", User = user2 }
+            };
+
+            SetupAuthenticatedUser(userId, true);
+            _mockCustomerService.Setup(s => s.GetAllCustomersForAdminAsync())
+                .ReturnsAsync(customers);
+
+            // Act
+            var result = await _controller.Index();
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<IEnumerable<Customer>>(viewResult.Model);
+            Assert.Equal(2, model.Count());
+            
+            // Kontrollera att User-data finns
+            var customer1 = model.First(c => c.Id == 1);
+            Assert.NotNull(customer1.User);
+            Assert.Equal("User", customer1.User.FirstName);
+            Assert.Equal("One", customer1.User.LastName);
+            
+            var customer2 = model.First(c => c.Id == 2);
+            Assert.NotNull(customer2.User);
+            Assert.Equal("User", customer2.User.FirstName);
+            Assert.Equal("Two", customer2.User.LastName);
+        }
+
+        [Fact]
         public async Task Index_ShouldReturnUnauthorized_WhenUserIsNotAuthenticated()
         {
             // Arrange
@@ -157,6 +195,39 @@ namespace CustomerManagement.Tests.Controllers
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<Customer>(viewResult.Model);
             Assert.Equal(1, model.Id);
+        }
+
+        [Fact]
+        public async Task Details_ShouldReturnCustomerWithUserData_WhenUserIsAdmin()
+        {
+            // Arrange
+            var userId = "admin1";
+            var user = new ApplicationUser { Id = "user1", FirstName = "User", LastName = "One", Email = "user1@example.com" };
+            var customer = new Customer 
+            { 
+                Id = 1, 
+                FirstName = "Test", 
+                LastName = "Customer", 
+                Email = "test@example.com", 
+                UserId = "user1",
+                User = user
+            };
+
+            SetupAuthenticatedUser(userId, true);
+            _mockCustomerService.Setup(s => s.GetCustomerByIdForAdminAsync(1))
+                .ReturnsAsync(customer);
+
+            // Act
+            var result = await _controller.Details(1);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsType<Customer>(viewResult.Model);
+            Assert.Equal(1, model.Id);
+            Assert.NotNull(model.User);
+            Assert.Equal("User", model.User.FirstName);
+            Assert.Equal("One", model.User.LastName);
+            Assert.Equal("user1@example.com", model.User.Email);
         }
 
         [Fact]

@@ -91,8 +91,6 @@
                     const email = this.dataset.email;
                     const resultDiv = document.getElementById('loginResult');
                     
-                    console.log('🤡 Försöker logga in som:', email);
-                    
                     this.disabled = true;
                     const originalText = this.innerHTML;
                     this.innerHTML = '⏳ Loggar in...';
@@ -105,12 +103,8 @@
                         },
                         body: JSON.stringify(email)
                     })
-                    .then(response => {
-                        console.log('🤡 Response status:', response.status);
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
-                        console.log('🤡 Response data:', data);
                         resultDiv.className = 'alert ' + (data.success ? 'alert-success' : 'alert-danger');
                         resultDiv.textContent = data.message;
                         resultDiv.style.display = 'block';
@@ -122,7 +116,6 @@
                         }
                     })
                     .catch(error => {
-                        console.error('🤡 Fetch error:', error);
                         resultDiv.className = 'alert alert-danger';
                         resultDiv.textContent = 'Ett fel inträffade: ' + error.message;
                         resultDiv.style.display = 'block';
