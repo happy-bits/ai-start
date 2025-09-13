@@ -38,6 +38,10 @@ namespace CustomerManagement.Tests.Services
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+            // Registrera IdentityService och CustomerService
+            services.AddScoped<CustomerManagement.Services.IdentityService>();
+            services.AddScoped<CustomerManagement.Services.ICustomerService, CustomerManagement.Services.CustomerService>();
+
             _serviceProvider = services.BuildServiceProvider();
             _context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
             _userManager = _serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -311,6 +315,423 @@ namespace CustomerManagement.Tests.Services
             // Verifiera att admin har Admin-roll
             var adminRoles = await _userManager.GetRolesAsync(admin);
             Assert.Contains("Admin", adminRoles);
+        }
+
+        [Fact]
+        public async Task IdentityService_CreateUserAsync_ShouldReturnTrue_WhenUserIsCreatedSuccessfully()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            var user = new ApplicationUser
+            {
+                UserName = "identitytest@example.com",
+                Email = "identitytest@example.com",
+                FirstName = "Identity",
+                LastName = "Test"
+            };
+
+            // Act
+            var result = await identityService.CreateUserAsync(user, "IdentityTest123!");
+
+            // Assert
+            Assert.True(result);
+            
+            var createdUser = await identityService.FindUserByEmailAsync("identitytest@example.com");
+            Assert.NotNull(createdUser);
+            Assert.Equal("Identity", createdUser.FirstName);
+        }
+
+        [Fact]
+        public async Task IdentityService_CreateUserAsync_ShouldReturnFalse_WhenUserCreationFails()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            var user = new ApplicationUser
+            {
+                UserName = "invalid-email", // Invalid email format
+                Email = "invalid-email",
+                FirstName = "Invalid",
+                LastName = "User"
+            };
+
+            // Act
+            var result = await identityService.CreateUserAsync(user, "weak"); // Weak password
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task IdentityService_CreateRoleAsync_ShouldReturnTrue_WhenRoleIsCreatedSuccessfully()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+
+            // Act
+            var result = await identityService.CreateRoleAsync("TestRole");
+
+            // Assert
+            Assert.True(result);
+            
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var roleExists = await roleManager.RoleExistsAsync("TestRole");
+            Assert.True(roleExists);
+        }
+
+        [Fact]
+        public async Task IdentityService_AssignRoleToUserAsync_ShouldReturnTrue_WhenRoleIsAssignedSuccessfully()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            // Skapa användare och roll
+            var user = new ApplicationUser { UserName = "roletest@example.com", Email = "roletest@example.com" };
+            await identityService.CreateUserAsync(user, "RoleTest123!");
+            await identityService.CreateRoleAsync("TestAssignRole");
+            
+            var createdUser = await identityService.FindUserByEmailAsync("roletest@example.com");
+
+            // Act
+            var result = await identityService.AssignRoleToUserAsync(createdUser!.Id, "TestAssignRole");
+
+            // Assert
+            Assert.True(result);
+            
+            var userRoles = await identityService.GetUserRolesAsync(createdUser.Id);
+            Assert.Contains("TestAssignRole", userRoles);
+        }
+
+        [Fact]
+        public async Task IdentityService_AssignRoleToUserAsync_ShouldReturnFalse_WhenUserDoesNotExist()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            await identityService.CreateRoleAsync("TestRole");
+
+            // Act
+            var result = await identityService.AssignRoleToUserAsync("nonexistent-user-id", "TestRole");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task IdentityService_RemoveRoleFromUserAsync_ShouldReturnTrue_WhenRoleIsRemovedSuccessfully()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            // Skapa användare, roll och tilldela rollen
+            var user = new ApplicationUser { UserName = "removetest@example.com", Email = "removetest@example.com" };
+            await identityService.CreateUserAsync(user, "RemoveTest123!");
+            await identityService.CreateRoleAsync("RemoveTestRole");
+            
+            var createdUser = await identityService.FindUserByEmailAsync("removetest@example.com");
+            await identityService.AssignRoleToUserAsync(createdUser!.Id, "RemoveTestRole");
+
+            // Act
+            var result = await identityService.RemoveRoleFromUserAsync(createdUser.Id, "RemoveTestRole");
+
+            // Assert
+            Assert.True(result);
+            
+            var userRoles = await identityService.GetUserRolesAsync(createdUser.Id);
+            Assert.DoesNotContain("RemoveTestRole", userRoles);
+        }
+
+        [Fact]
+        public async Task IdentityService_GetUserRolesAsync_ShouldReturnEmptyList_WhenUserDoesNotExist()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+
+            // Act
+            var roles = await identityService.GetUserRolesAsync("nonexistent-user-id");
+
+            // Assert
+            Assert.Empty(roles);
+        }
+
+        [Fact]
+        public async Task IdentityService_IsUserInRoleAsync_ShouldReturnTrue_WhenUserHasRole()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            var user = new ApplicationUser { UserName = "rolecheck@example.com", Email = "rolecheck@example.com" };
+            await identityService.CreateUserAsync(user, "RoleCheck123!");
+            await identityService.CreateRoleAsync("CheckRole");
+            
+            var createdUser = await identityService.FindUserByEmailAsync("rolecheck@example.com");
+            await identityService.AssignRoleToUserAsync(createdUser!.Id, "CheckRole");
+
+            // Act
+            var result = await identityService.IsUserInRoleAsync(createdUser.Id, "CheckRole");
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task IdentityService_IsUserInRoleAsync_ShouldReturnFalse_WhenUserDoesNotHaveRole()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            var user = new ApplicationUser { UserName = "norole@example.com", Email = "norole@example.com" };
+            await identityService.CreateUserAsync(user, "NoRole123!");
+            await identityService.CreateRoleAsync("SomeRole");
+            
+            var createdUser = await identityService.FindUserByEmailAsync("norole@example.com");
+
+            // Act
+            var result = await identityService.IsUserInRoleAsync(createdUser!.Id, "SomeRole");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task IdentityService_FindUserByEmailAsync_ShouldReturnNull_WhenUserDoesNotExist()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+
+            // Act
+            var user = await identityService.FindUserByEmailAsync("nonexistent@example.com");
+
+            // Assert
+            Assert.Null(user);
+        }
+
+        [Fact]
+        public async Task IdentityService_FindUserByIdAsync_ShouldReturnNull_WhenUserDoesNotExist()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+
+            // Act
+            var user = await identityService.FindUserByIdAsync("nonexistent-id");
+
+            // Assert
+            Assert.Null(user);
+        }
+
+        [Fact]
+        public async Task IdentityService_ValidatePasswordAsync_ShouldReturnTrue_WhenPasswordIsCorrect()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            var user = new ApplicationUser { UserName = "validate@example.com", Email = "validate@example.com" };
+            await identityService.CreateUserAsync(user, "ValidatePass123!");
+            
+            var createdUser = await identityService.FindUserByEmailAsync("validate@example.com");
+
+            // Act
+            var result = await identityService.ValidatePasswordAsync(createdUser!, "ValidatePass123!");
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task IdentityService_ValidatePasswordAsync_ShouldReturnFalse_WhenPasswordIsIncorrect()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            var user = new ApplicationUser { UserName = "validate2@example.com", Email = "validate2@example.com" };
+            await identityService.CreateUserAsync(user, "ValidatePass123!");
+            
+            var createdUser = await identityService.FindUserByEmailAsync("validate2@example.com");
+
+            // Act
+            var result = await identityService.ValidatePasswordAsync(createdUser!, "WrongPassword");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task IdentityService_UpdateUserAsync_ShouldReturnTrue_WhenUserIsUpdatedSuccessfully()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            var user = new ApplicationUser { UserName = "update@example.com", Email = "update@example.com", FirstName = "Original" };
+            await identityService.CreateUserAsync(user, "UpdateTest123!");
+            
+            var createdUser = await identityService.FindUserByEmailAsync("update@example.com");
+            createdUser!.FirstName = "Updated";
+
+            // Act
+            var result = await identityService.UpdateUserAsync(createdUser);
+
+            // Assert
+            Assert.True(result);
+            
+            var updatedUser = await identityService.FindUserByEmailAsync("update@example.com");
+            Assert.Equal("Updated", updatedUser!.FirstName);
+        }
+
+        [Fact]
+        public async Task IdentityService_DeleteUserAsync_ShouldReturnTrue_WhenUserIsDeletedSuccessfully()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            var user = new ApplicationUser { UserName = "delete@example.com", Email = "delete@example.com" };
+            await identityService.CreateUserAsync(user, "DeleteTest123!");
+            
+            var createdUser = await identityService.FindUserByEmailAsync("delete@example.com");
+
+            // Act
+            var result = await identityService.DeleteUserAsync(createdUser!.Id);
+
+            // Assert
+            Assert.True(result);
+            
+            var deletedUser = await identityService.FindUserByEmailAsync("delete@example.com");
+            Assert.Null(deletedUser);
+        }
+
+        [Fact]
+        public async Task IdentityService_DeleteUserAsync_ShouldReturnFalse_WhenUserDoesNotExist()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+
+            // Act
+            var result = await identityService.DeleteUserAsync("nonexistent-id");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task IdentityService_GetAllUsersAsync_ShouldReturnAllUsers()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            
+            await identityService.CreateUserAsync(new ApplicationUser { UserName = "user1@all.com", Email = "user1@all.com" }, "User1Pass123!");
+            await identityService.CreateUserAsync(new ApplicationUser { UserName = "user2@all.com", Email = "user2@all.com" }, "User2Pass123!");
+
+            // Act
+            var users = await identityService.GetAllUsersAsync();
+
+            // Assert
+            var userList = users.ToList();
+            Assert.True(userList.Count >= 2);
+            Assert.Contains(userList, u => u.Email == "user1@all.com");
+            Assert.Contains(userList, u => u.Email == "user2@all.com");
+        }
+
+        [Fact]
+        public async Task IdentityService_InitializeRolesAsync_ShouldCreateAdminAndUserRoles()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            // Act
+            var result = await identityService.InitializeRolesAsync();
+
+            // Assert
+            Assert.True(result);
+            
+            var adminRoleExists = await roleManager.RoleExistsAsync("Admin");
+            var userRoleExists = await roleManager.RoleExistsAsync("User");
+            
+            Assert.True(adminRoleExists);
+            Assert.True(userRoleExists);
+        }
+
+        [Fact]
+        public async Task IdentityService_GetAllCustomersAsync_ShouldReturnCustomersForUser()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            
+            var user = new ApplicationUser { UserName = "customer@example.com", Email = "customer@example.com" };
+            await identityService.CreateUserAsync(user, "CustomerTest123!");
+            var createdUser = await identityService.FindUserByEmailAsync("customer@example.com");
+            
+            // Lägg till kunder
+            var customers = new[]
+            {
+                new Customer { FirstName = "Customer1", LastName = "Test", Email = "c1@test.com", UserId = createdUser!.Id },
+                new Customer { FirstName = "Customer2", LastName = "Test", Email = "c2@test.com", UserId = createdUser.Id }
+            };
+            
+            context.Customers.AddRange(customers);
+            await context.SaveChangesAsync();
+
+            // Act
+            var result = await identityService.GetAllCustomersAsync(createdUser.Id);
+
+            // Assert
+            var customerList = result.ToList();
+            Assert.Equal(2, customerList.Count);
+            Assert.Contains(customerList, c => c.FirstName == "Customer1");
+            Assert.Contains(customerList, c => c.FirstName == "Customer2");
+        }
+
+        [Fact]
+        public async Task IdentityService_SetCustomersUserIdToNullAsync_ShouldSetUserIdToNull()
+        {
+            // Arrange
+            using var scope = _serviceProvider.CreateScope();
+            var identityService = scope.ServiceProvider.GetRequiredService<CustomerManagement.Services.IdentityService>();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            
+            var user = new ApplicationUser { UserName = "nulltest@example.com", Email = "nulltest@example.com" };
+            await identityService.CreateUserAsync(user, "NullTest123!");
+            var createdUser = await identityService.FindUserByEmailAsync("nulltest@example.com");
+            
+            // Lägg till kunder
+            var customers = new[]
+            {
+                new Customer { FirstName = "NullCustomer1", LastName = "Test", Email = "nc1@test.com", UserId = createdUser!.Id },
+                new Customer { FirstName = "NullCustomer2", LastName = "Test", Email = "nc2@test.com", UserId = createdUser.Id }
+            };
+            
+            context.Customers.AddRange(customers);
+            await context.SaveChangesAsync();
+
+            // Act
+            await identityService.SetCustomersUserIdToNullAsync(createdUser.Id);
+
+            // Assert
+            var updatedCustomers = await context.Customers
+                .Where(c => c.Email.StartsWith("nc"))
+                .ToListAsync();
+            
+            Assert.All(updatedCustomers, c => Assert.Null(c.UserId));
         }
 
         public void Dispose()

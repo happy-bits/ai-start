@@ -68,3 +68,6 @@ app.MapControllerRoute(
 
 
 app.Run();
+
+// Gör Program tillgänglig för integrationstester
+public partial class Program { }

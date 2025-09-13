@@ -381,6 +381,146 @@ namespace CustomerManagement.Tests.Services
             Assert.Null(deletedCustomer);
         }
 
+        [Fact]
+        public async Task SetCustomersUserIdToNullAsync_ShouldSetUserIdToNull_ForAllCustomersOfUser()
+        {
+            // Arrange
+            var userId = "user123";
+            var otherUserId = "user456";
+            
+            var customers = new[]
+            {
+                new Customer { FirstName = "Customer1", LastName = "Test", Email = "c1@test.com", UserId = userId },
+                new Customer { FirstName = "Customer2", LastName = "Test", Email = "c2@test.com", UserId = userId },
+                new Customer { FirstName = "Customer3", LastName = "Test", Email = "c3@test.com", UserId = otherUserId },
+                new Customer { FirstName = "Customer4", LastName = "Test", Email = "c4@test.com", UserId = null } // Already null
+            };
+            
+            _context.Customers.AddRange(customers);
+            await _context.SaveChangesAsync();
+
+            // Act
+            await _customerService.SetCustomersUserIdToNullAsync(userId);
+
+            // Assert
+            var updatedCustomers = await _context.Customers.ToListAsync();
+            
+            // Kunder som tillhörde userId ska nu ha UserId = null
+            var userCustomers = updatedCustomers.Where(c => c.Email.StartsWith("c1@") || c.Email.StartsWith("c2@")).ToList();
+            Assert.All(userCustomers, c => Assert.Null(c.UserId));
+            
+            // Andra användares kunder ska vara opåverkade
+            var otherUserCustomer = updatedCustomers.First(c => c.Email == "c3@test.com");
+            Assert.Equal(otherUserId, otherUserCustomer.UserId);
+            
+            // Redan null-kunder ska förbli opåverkade
+            var nullCustomer = updatedCustomers.First(c => c.Email == "c4@test.com");
+            Assert.Null(nullCustomer.UserId);
+        }
+
+        [Fact]
+        public async Task SetCustomersUserIdToNullAsync_ShouldUpdateTimestamp_WhenSettingUserIdToNull()
+        {
+            // Arrange
+            var userId = "user123";
+            var originalTime = DateTime.UtcNow.AddDays(-1);
+            
+            var customer = new Customer 
+            { 
+                FirstName = "Test", 
+                LastName = "Customer", 
+                Email = "test@example.com", 
+                UserId = userId,
+                UpdatedAt = originalTime
+            };
+            
+            _context.Customers.Add(customer);
+            await _context.SaveChangesAsync();
+            
+            var beforeUpdate = DateTime.UtcNow;
+
+            // Act
+            await _customerService.SetCustomersUserIdToNullAsync(userId);
+
+            // Assert
+            var updatedCustomer = await _context.Customers.FirstAsync(c => c.Email == "test@example.com");
+            Assert.Null(updatedCustomer.UserId);
+            Assert.True(updatedCustomer.UpdatedAt >= beforeUpdate);
+            Assert.True(updatedCustomer.UpdatedAt > originalTime);
+        }
+
+        [Fact]
+        public async Task SetCustomersUserIdToNullAsync_ShouldDoNothing_WhenUserHasNoCustomers()
+        {
+            // Arrange
+            var userId = "user-with-no-customers";
+            var otherUserId = "user-with-customers";
+            
+            var customer = new Customer 
+            { 
+                FirstName = "Other", 
+                LastName = "Customer", 
+                Email = "other@example.com", 
+                UserId = otherUserId 
+            };
+            
+            _context.Customers.Add(customer);
+            await _context.SaveChangesAsync();
+
+            // Act
+            await _customerService.SetCustomersUserIdToNullAsync(userId);
+
+            // Assert
+            var unchangedCustomer = await _context.Customers.FirstAsync(c => c.Email == "other@example.com");
+            Assert.Equal(otherUserId, unchangedCustomer.UserId);
+        }
+
+        [Fact]
+        public async Task SetCustomersUserIdToNullAsync_ShouldHandleEmptyUserId()
+        {
+            // Arrange
+            var customer = new Customer 
+            { 
+                FirstName = "Test", 
+                LastName = "Customer", 
+                Email = "test@example.com", 
+                UserId = "user123" 
+            };
+            
+            _context.Customers.Add(customer);
+            await _context.SaveChangesAsync();
+
+            // Act
+            await _customerService.SetCustomersUserIdToNullAsync("");
+
+            // Assert - Ingen kund ska påverkas av tom userId
+            var unchangedCustomer = await _context.Customers.FirstAsync(c => c.Email == "test@example.com");
+            Assert.Equal("user123", unchangedCustomer.UserId);
+        }
+
+        [Fact]
+        public async Task SetCustomersUserIdToNullAsync_ShouldHandleNullUserId()
+        {
+            // Arrange
+            var customer = new Customer 
+            { 
+                FirstName = "Test", 
+                LastName = "Customer", 
+                Email = "test@example.com", 
+                UserId = "user123" 
+            };
+            
+            _context.Customers.Add(customer);
+            await _context.SaveChangesAsync();
+
+            // Act
+            await _customerService.SetCustomersUserIdToNullAsync(null!);
+
+            // Assert - Ingen kund ska påverkas av null userId
+            var unchangedCustomer = await _context.Customers.FirstAsync(c => c.Email == "test@example.com");
+            Assert.Equal("user123", unchangedCustomer.UserId);
+        }
+
         public void Dispose()
         {
             _context.Dispose();
