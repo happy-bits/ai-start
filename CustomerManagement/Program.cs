@@ -33,6 +33,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 // Registrera services
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
+builder.Services.AddScoped<DatabaseSeedService>();
 
 var app = builder.Build();
 
