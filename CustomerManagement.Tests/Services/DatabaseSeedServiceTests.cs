@@ -102,9 +102,9 @@ namespace CustomerManagement.Tests.Services
             Assert.NotNull(admin1);
             Assert.NotNull(admin2);
             Assert.Equal("Admin1", admin1.FirstName);
-            Assert.Equal("Admin", admin1.LastName);
+            Assert.Equal("Andersson", admin1.LastName);
             Assert.Equal("Admin2", admin2.FirstName);
-            Assert.Equal("Admin", admin2.LastName);
+            Assert.Equal("Andersson", admin2.LastName);
 
             // Verifiera att de har Admin-roll
             var admin1Roles = await _userManager.GetRolesAsync(admin1);
@@ -134,11 +134,11 @@ namespace CustomerManagement.Tests.Services
             Assert.NotNull(user2);
             Assert.NotNull(user3);
             Assert.Equal("User1", user1.FirstName);
-            Assert.Equal("User", user1.LastName);
+            Assert.Equal("Uggla", user1.LastName);
             Assert.Equal("User2", user2.FirstName);
-            Assert.Equal("User", user2.LastName);
+            Assert.Equal("Uggla", user2.LastName);
             Assert.Equal("User3", user3.FirstName);
-            Assert.Equal("User", user3.LastName);
+            Assert.Equal("Uggla", user3.LastName);
 
             // Verifiera att de har User-roll
             var user1Roles = await _userManager.GetRolesAsync(user1);

@@ -80,8 +80,8 @@ namespace CustomerManagement.Services
         {
             var adminUsers = new[]
             {
-                new { Email = "admin1@test.com", FirstName = "Admin1", LastName = "Admin", Password = "Admin123!" },
-                new { Email = "admin2@test.com", FirstName = "Admin2", LastName = "Admin", Password = "Admin123!" }
+                new { Email = "admin1@test.com", FirstName = "Admin1", LastName = "Andersson", Password = "Admin123!" },
+                new { Email = "admin2@test.com", FirstName = "Admin2", LastName = "Andersson", Password = "Admin123!" }
             };
 
             foreach (var admin in adminUsers)
@@ -110,9 +110,9 @@ namespace CustomerManagement.Services
         {
             var regularUsers = new[]
             {
-                new { Email = "user1@test.com", FirstName = "User1", LastName = "User", Password = "User123!" },
-                new { Email = "user2@test.com", FirstName = "User2", LastName = "User", Password = "User123!" },
-                new { Email = "user3@test.com", FirstName = "User3", LastName = "User", Password = "User123!" }
+                new { Email = "user1@test.com", FirstName = "User1", LastName = "Uggla", Password = "User123!" },
+                new { Email = "user2@test.com", FirstName = "User2", LastName = "Uggla", Password = "User123!" },
+                new { Email = "user3@test.com", FirstName = "User3", LastName = "Uggla", Password = "User123!" }
             };
 
             foreach (var regular in regularUsers)
