@@ -64,7 +64,7 @@
     <script>
         function viewUser(userId) {
             // Implementera visa användare
-            alert('Visa användare: ' + userId);
+            // alert('Visa användare: ' + userId);
         }
         
         function editUser(userId) {
@@ -72,11 +72,10 @@
         }
         
         function deleteUser(userId) {
-            if (confirm('Är du säker på att du vill ta bort denna användare?')) {
-                // Skapa ett formulär för att skicka POST-förfrågan
-                var form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '@Url.Action("DeleteUser", "Account")';
+            // Skapa ett formulär för att skicka POST-förfrågan
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '@Url.Action("DeleteUser", "Account")';
                 
                 // Lägg till anti-forgery token
                 var token = document.querySelector('input[name="__RequestVerificationToken"]');
@@ -98,7 +97,6 @@
                 // Skicka formuläret
                 document.body.appendChild(form);
                 form.submit();
-            }
         }
     </script>
 }

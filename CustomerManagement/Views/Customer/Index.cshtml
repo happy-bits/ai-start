@@ -120,9 +120,7 @@
             const deleteLinks = document.querySelectorAll('a[href*="Delete"]');
             deleteLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
-                    if (!confirm('Är du säker på att du vill ta bort denna kund? Denna åtgärd kan inte ångras.')) {
-                        e.preventDefault();
-                    }
+                    // Ta bort preventDefault så att länken fungerar direkt
                 });
             });
         });
