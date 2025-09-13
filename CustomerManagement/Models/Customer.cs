@@ -39,8 +39,7 @@ namespace CustomerManagement.Models
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // Foreign key till ApplicationUser
-        [Required]
-        public string UserId { get; set; } = string.Empty;
+        public string? UserId { get; set; }
 
         // Navigation property
         public ApplicationUser? User { get; set; }

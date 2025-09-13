@@ -7,11 +7,13 @@ namespace CustomerManagement.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ICustomerService _customerService;
 
-        public IdentityService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public IdentityService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ICustomerService customerService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _customerService = customerService;
         }
 
         public async Task<bool> CreateUserAsync(ApplicationUser user, string password)
@@ -119,6 +121,16 @@ namespace CustomerManagement.Services
             {
                 return false;
             }
+        }
+
+        public async Task<IEnumerable<Customer>> GetAllCustomersAsync(string userId)
+        {
+            return await _customerService.GetAllCustomersAsync(userId);
+        }
+
+        public async Task SetCustomersUserIdToNullAsync(string userId)
+        {
+            await _customerService.SetCustomersUserIdToNullAsync(userId);
         }
     }
 }

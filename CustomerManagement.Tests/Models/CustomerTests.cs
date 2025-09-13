@@ -15,7 +15,7 @@ namespace CustomerManagement.Tests.Models
             Assert.NotNull(customer.FirstName);
             Assert.NotNull(customer.LastName);
             Assert.NotNull(customer.Email);
-            Assert.NotNull(customer.UserId);
+            // UserId kan vara null nu
             Assert.True(customer.CreatedAt > DateTime.MinValue);
             Assert.True(customer.UpdatedAt > DateTime.MinValue);
         }
@@ -104,7 +104,7 @@ namespace CustomerManagement.Tests.Models
         [InlineData("", "Andersson", "anna@example.com", "user123")]
         [InlineData("Anna", "", "anna@example.com", "user123")]
         [InlineData("Anna", "Andersson", "", "user123")]
-        [InlineData("Anna", "Andersson", "anna@example.com", "")]
+        // UserId är inte längre required, så vi tar bort det testet
         public void Customer_ShouldRequireEssentialFields(string firstName, string lastName, string email, string userId)
         {
             // Arrange

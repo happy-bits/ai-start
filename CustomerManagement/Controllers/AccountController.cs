@@ -278,6 +278,14 @@ namespace CustomerManagement.Controllers
                 return Forbid();
             }
 
+            // Kontrollera om användaren har kunder innan borttagning
+            var customers = await _identityService.GetAllCustomersAsync(id);
+            if (customers.Any())
+            {
+                // Sätt kundernas UserId till null innan användaren tas bort
+                await _identityService.SetCustomersUserIdToNullAsync(id);
+            }
+
             var result = await _userManager.DeleteAsync(user);
 
             if (result.Succeeded)

@@ -36,7 +36,7 @@ namespace CustomerManagement.Data
                 entity.HasOne<ApplicationUser>(c => c.User)
                     .WithMany()
                     .HasForeignKey(c => c.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }

@@ -17,5 +17,7 @@ namespace CustomerManagement.Services
         Task<bool> DeleteUserAsync(string userId);
         Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
         Task<bool> InitializeRolesAsync();
+        Task<IEnumerable<Customer>> GetAllCustomersAsync(string userId);
+        Task SetCustomersUserIdToNullAsync(string userId);
     }
 }

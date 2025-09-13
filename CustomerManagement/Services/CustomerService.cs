@@ -125,5 +125,20 @@ namespace CustomerManagement.Services
         {
             return await _context.Customers.AnyAsync(c => c.Id == id && c.UserId == userId);
         }
+
+        public async Task SetCustomersUserIdToNullAsync(string userId)
+        {
+            var customers = await _context.Customers
+                .Where(c => c.UserId == userId)
+                .ToListAsync();
+
+            foreach (var customer in customers)
+            {
+                customer.UserId = null;
+                customer.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

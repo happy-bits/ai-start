@@ -15,5 +15,6 @@ namespace CustomerManagement.Services
         Task<bool> DeleteCustomerForAdminAsync(int id);
         Task<bool> CustomerExistsAsync(int id);
         Task<bool> CustomerBelongsToUserAsync(int id, string userId);
+        Task SetCustomersUserIdToNullAsync(string userId);
     }
 }

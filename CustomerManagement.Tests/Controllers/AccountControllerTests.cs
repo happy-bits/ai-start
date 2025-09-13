@@ -810,6 +810,86 @@ namespace CustomerManagement.Tests.Controllers
             _controller.Url = urlHelper.Object;
         }
 
+        // Nya tester för att verifiera att kunder får UserId = null när användare tas bort
+        [Fact]
+        public async Task DeleteUser_ShouldSetCustomerUserIdToNull_WhenUserHasCustomers()
+        {
+            // Arrange
+            SetupAuthenticatedUser("admin1", true);
+            var userId = "user123";
+            var user = new ApplicationUser
+            {
+                Id = userId,
+                FirstName = "Test",
+                LastName = "User",
+                Email = "test@example.com"
+            };
+
+            // Mock kunder som tillhör användaren
+            var customers = new List<Customer>
+            {
+                new Customer { Id = 1, FirstName = "Customer1", LastName = "One", Email = "c1@example.com", UserId = userId },
+                new Customer { Id = 2, FirstName = "Customer2", LastName = "Two", Email = "c2@example.com", UserId = userId }
+            };
+
+            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+                .ReturnsAsync(user);
+            _mockUserManager.Setup(m => m.GetRolesAsync(user))
+                .ReturnsAsync(new List<string> { "User" });
+            _mockUserManager.Setup(m => m.DeleteAsync(user))
+                .ReturnsAsync(IdentityResult.Success);
+
+            // Mock IdentityService för att hantera kunder
+            _mockIdentityService.Setup(s => s.GetAllCustomersAsync(userId))
+                .ReturnsAsync(customers);
+
+            // Act
+            var result = await _controller.DeleteUser(userId);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("ManageUsers", redirectResult.ActionName);
+
+            // Verifiera att IdentityService anropas för att uppdatera kundernas UserId till null
+            _mockIdentityService.Verify(s => s.SetCustomersUserIdToNullAsync(userId), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteUser_ShouldNotCallIdentityService_WhenUserHasNoCustomers()
+        {
+            // Arrange
+            SetupAuthenticatedUser("admin1", true);
+            var userId = "user123";
+            var user = new ApplicationUser
+            {
+                Id = userId,
+                FirstName = "Test",
+                LastName = "User",
+                Email = "test@example.com"
+            };
+
+            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+                .ReturnsAsync(user);
+            _mockUserManager.Setup(m => m.GetRolesAsync(user))
+                .ReturnsAsync(new List<string> { "User" });
+            _mockUserManager.Setup(m => m.DeleteAsync(user))
+                .ReturnsAsync(IdentityResult.Success);
+
+            // Mock IdentityService för att returnera tom lista
+            _mockIdentityService.Setup(s => s.GetAllCustomersAsync(userId))
+                .ReturnsAsync(new List<Customer>());
+
+            // Act
+            var result = await _controller.DeleteUser(userId);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("ManageUsers", redirectResult.ActionName);
+
+            // Verifiera att IdentityService INTE anropas för att uppdatera kundernas UserId
+            _mockIdentityService.Verify(s => s.SetCustomersUserIdToNullAsync(userId), Times.Never);
+        }
+
         private void SetupAuthenticatedUser(string userId, bool isAdmin)
         {
             var claims = new List<Claim>
