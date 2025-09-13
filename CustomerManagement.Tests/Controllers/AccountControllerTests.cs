@@ -358,6 +358,186 @@ namespace CustomerManagement.Tests.Controllers
             Assert.True(_controller.ModelState.ContainsKey(string.Empty));
         }
 
+        [Fact]
+        public async Task EditUser_Get_ShouldReturnView_WhenUserIsAdmin()
+        {
+            // Arrange
+            var userId = "user123";
+            var user = new ApplicationUser
+            {
+                Id = userId,
+                FirstName = "Test",
+                LastName = "User",
+                Email = "test@example.com",
+                PhoneNumber = "070-1234567"
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+                .ReturnsAsync(user);
+            _mockUserManager.Setup(m => m.GetRolesAsync(user))
+                .ReturnsAsync(new List<string> { "User" });
+
+            // Act
+            var result = await _controller.EditUser(userId);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<EditUserViewModel>(viewResult.Model);
+            Assert.Equal(userId, model.Id);
+            Assert.Equal("Test", model.FirstName);
+            Assert.Equal("User", model.LastName);
+            Assert.Equal("test@example.com", model.Email);
+            Assert.Equal("070-1234567", model.PhoneNumber);
+            Assert.Equal("User", model.Role);
+        }
+
+        [Fact]
+        public async Task EditUser_Get_ShouldReturnNotFound_WhenUserNotFound()
+        {
+            // Arrange
+            var userId = "nonexistent";
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+                .ReturnsAsync((ApplicationUser?)null);
+
+            // Act
+            var result = await _controller.EditUser(userId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task EditUser_Post_ShouldUpdateUser_WhenModelIsValid()
+        {
+            // Arrange
+            var model = new EditUserViewModel
+            {
+                Id = "user123",
+                FirstName = "Updated",
+                LastName = "User",
+                Email = "updated@example.com",
+                PhoneNumber = "070-9876543",
+                Role = "User"
+            };
+
+            var existingUser = new ApplicationUser
+            {
+                Id = "user123",
+                FirstName = "Original",
+                LastName = "User",
+                Email = "original@example.com",
+                PhoneNumber = "070-1234567"
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
+                .ReturnsAsync(existingUser);
+            _mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
+                .ReturnsAsync(IdentityResult.Success);
+            _mockUserManager.Setup(m => m.GetRolesAsync(existingUser))
+                .ReturnsAsync(new List<string> { "User" });
+            _mockUserManager.Setup(m => m.RemoveFromRolesAsync(existingUser, It.IsAny<IEnumerable<string>>()))
+                .ReturnsAsync(IdentityResult.Success);
+            _mockUserManager.Setup(m => m.AddToRoleAsync(existingUser, model.Role))
+                .ReturnsAsync(IdentityResult.Success);
+
+            // Act
+            var result = await _controller.EditUser(model);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("ManageUsers", redirectResult.ActionName);
+
+            _mockUserManager.Verify(m => m.UpdateAsync(It.Is<ApplicationUser>(u => 
+                u.FirstName == model.FirstName && 
+                u.LastName == model.LastName &&
+                u.Email == model.Email &&
+                u.PhoneNumber == model.PhoneNumber)), Times.Once);
+        }
+
+        [Fact]
+        public async Task EditUser_Post_ShouldReturnView_WhenModelIsInvalid()
+        {
+            // Arrange
+            var model = new EditUserViewModel();
+            _controller.ModelState.AddModelError("Email", "Required");
+
+            // Act
+            var result = await _controller.EditUser(model);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal(model, viewResult.Model);
+        }
+
+        [Fact]
+        public async Task EditUser_Post_ShouldReturnNotFound_WhenUserNotFound()
+        {
+            // Arrange
+            var model = new EditUserViewModel
+            {
+                Id = "nonexistent",
+                FirstName = "Test",
+                LastName = "User",
+                Email = "test@example.com",
+                Role = "User"
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
+                .ReturnsAsync((ApplicationUser?)null);
+
+            // Act
+            var result = await _controller.EditUser(model);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task EditUser_Post_ShouldReturnView_WhenUpdateFails()
+        {
+            // Arrange
+            var model = new EditUserViewModel
+            {
+                Id = "user123",
+                FirstName = "Updated",
+                LastName = "User",
+                Email = "updated@example.com",
+                Role = "User"
+            };
+
+            var existingUser = new ApplicationUser
+            {
+                Id = "user123",
+                FirstName = "Original",
+                LastName = "User",
+                Email = "original@example.com"
+            };
+
+            var errors = new List<IdentityError>
+            {
+                new IdentityError { Code = "DuplicateEmail", Description = "Email already exists" }
+            };
+
+            SetupAuthenticatedUser("admin1", true);
+            _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
+                .ReturnsAsync(existingUser);
+            _mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
+                .ReturnsAsync(IdentityResult.Failed(errors.ToArray()));
+
+            // Act
+            var result = await _controller.EditUser(model);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal(model, viewResult.Model);
+            Assert.True(_controller.ModelState.ContainsKey(string.Empty));
+        }
+
         private void SetupControllerContext()
         {
             var httpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext();

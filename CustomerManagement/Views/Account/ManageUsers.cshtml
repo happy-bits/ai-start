@@ -68,8 +68,7 @@
         }
         
         function editUser(userId) {
-            // Implementera redigera användare
-            alert('Redigera användare: ' + userId);
+            window.location.href = '@Url.Action("EditUser", "Account")' + '?id=' + userId;
         }
         
         function deleteUser(userId) {

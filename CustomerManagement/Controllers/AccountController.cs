@@ -148,6 +148,90 @@ namespace CustomerManagement.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditUser(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault() ?? "User";
+
+            var model = new EditUserViewModel
+            {
+                Id = user.Id,
+                FirstName = user.FirstName ?? string.Empty,
+                LastName = user.LastName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                PhoneNumber = user.PhoneNumber,
+                Role = role
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.Id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                // Uppdatera användardata
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.Email = model.Email;
+                user.UserName = model.Email; // UserName ska matcha Email
+                user.PhoneNumber = model.PhoneNumber;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    // Uppdatera roll om den har ändrats
+                    var currentRoles = await _userManager.GetRolesAsync(user);
+                    var currentRole = currentRoles.FirstOrDefault();
+
+                    if (currentRole != model.Role)
+                    {
+                        // Ta bort alla befintliga roller
+                        if (currentRoles.Any())
+                        {
+                            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                        }
+
+                        // Lägg till ny roll
+                        await _userManager.AddToRoleAsync(user, model.Role);
+                    }
+
+                    return RedirectToAction("ManageUsers");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+
+            return View(model);
+        }
+
         private IActionResult RedirectToLocal(string? returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
