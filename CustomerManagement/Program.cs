@@ -32,8 +32,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 // Registrera services
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IIdentityService, IdentityService>();
 
 var app = builder.Build();
+
+// Initialisera roller vid applikationsstart
+using (var scope = app.Services.CreateScope())
+{
+    var identityService = scope.ServiceProvider.GetRequiredService<IIdentityService>();
+    await identityService.InitializeRolesAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
