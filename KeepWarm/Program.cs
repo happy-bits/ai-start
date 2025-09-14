@@ -34,6 +34,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<IDatabaseSeedService, DatabaseSeedService>();
+builder.Services.AddScoped<IInteractionService, InteractionService>();
 
 var app = builder.Build();
 
