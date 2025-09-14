@@ -75,6 +75,28 @@ find "$CURRENT_DIR" -type f \( \
 
 echo "- Ersatte alla förekomster av 'CustomerManagement' med '$TARGET_NAME'"
 
+# Rensa build-artefakter för att undvika konflikter
+echo "Rensar build-artefakter..."
+
+if [ -d "$CURRENT_DIR/$TARGET_NAME/obj" ]; then
+    rm -rf "$CURRENT_DIR/$TARGET_NAME/obj"
+    echo "- Tog bort $TARGET_NAME/obj"
+fi
+
+if [ -d "$CURRENT_DIR/$TARGET_NAME.Tests/obj" ]; then
+    rm -rf "$CURRENT_DIR/$TARGET_NAME.Tests/obj"
+    echo "- Tog bort $TARGET_NAME.Tests/obj"
+fi
+
+# Återställ NuGet-paket efter rensning
+echo "Återställer NuGet-paket..."
+dotnet restore > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo "- NuGet-paket återställda"
+else
+    echo "- Varning: Problem med att återställa NuGet-paket"
+fi
+
 echo ""
 echo "Projektet har döpts om till: $TARGET_NAME"
 
@@ -86,4 +108,5 @@ echo "- Projektmappar omdöpta: CustomerManagement → $TARGET_NAME, CustomerMan
 echo "- Solution-fil omdöpt: ai-start.sln → $TARGET_NAME.sln"
 echo "- Projektfiler omdöpta: CustomerManagement.csproj → $TARGET_NAME.csproj, CustomerManagement.Tests.csproj → $TARGET_NAME.Tests.csproj"
 echo "- Namespace ersatt: CustomerManagement → $TARGET_NAME"
+echo "- Build-artefakter rensade och NuGet-paket återställda"
 echo "- Totalt antal filer i projektet: $(find "$CURRENT_DIR" -type f | wc -l)"
