@@ -1,0 +1,109 @@
+@model KeepWarm.Models.Interaction
+
+@{
+    ViewData["Title"] = "Ta bort interaktion";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Bekräfta borttagning</h4>
+                <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Tillbaka
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <h5 class="alert-heading">Varning!</h5>
+                    <p>Du är på väg att ta bort denna interaktion permanent. Denna åtgärd kan inte ångras.</p>
+                </div>
+                
+                <h5>Interaktionsinformation</h5>
+                <dl class="row">
+                    <dt class="col-sm-3">Interaktionstyp:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge bg-primary">@Model.InteractionType</span>
+                    </dd>
+                    
+                    <dt class="col-sm-3">Beskrivning:</dt>
+                    <dd class="col-sm-9">@Model.Description</dd>
+                    
+                    <dt class="col-sm-3">Datum:</dt>
+                    <dd class="col-sm-9">
+                        <strong>@Model.InteractionDate.ToString("yyyy-MM-dd HH:mm")</strong>
+                    </dd>
+                    
+                    <dt class="col-sm-3">Kund:</dt>
+                    <dd class="col-sm-9">
+                        <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId">
+                            @Model.Customer?.FirstName @Model.Customer?.LastName
+                        </a>
+                    </dd>
+                </dl>
+                
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Ta bort interaktion
+                        </button>
+                        <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Avbryt
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Systeminformation</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-5">Interaktions-ID:</dt>
+                    <dd class="col-sm-7"><code>@Model.Id</code></dd>
+                    
+                    <dt class="col-sm-5">Skapad:</dt>
+                    <dd class="col-sm-7">
+                        <small>@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                    </dd>
+                    
+                    <dt class="col-sm-5">Senast uppdaterad:</dt>
+                    <dd class="col-sm-7">
+                        <small>@Model.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                    </dd>
+                    
+                    <dt class="col-sm-5">Skapad av:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-info">@Model.User?.FirstName @Model.User?.LastName</span>
+                        <br>
+                        <small class="text-muted">@Model.User?.Email</small>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">Alternativ</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Istället för att ta bort interaktionen kan du:
+                </p>
+                <ul class="text-muted">
+                    <li>Redigera beskrivningen</li>
+                    <li>Uppdatera datumet</li>
+                    <li>Ändra interaktionstypen</li>
+                </ul>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">
+                    <i class="bi bi-pencil"></i> Redigera istället
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

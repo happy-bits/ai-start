@@ -11,11 +11,13 @@ namespace KeepWarm.Controllers
     public class CustomerController : Controller
     {
         private readonly ICustomerService _customerService;
+        private readonly IInteractionService _interactionService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public CustomerController(ICustomerService customerService, UserManager<ApplicationUser> userManager)
+        public CustomerController(ICustomerService customerService, IInteractionService interactionService, UserManager<ApplicationUser> userManager)
         {
             _customerService = customerService;
+            _interactionService = interactionService;
             _userManager = userManager;
         }
 
@@ -68,6 +70,14 @@ namespace KeepWarm.Controllers
             {
                 return NotFound();
             }
+
+            // Hämta interaktioner för kunden
+            var interactions = await _interactionService.GetInteractionsByCustomerIdAsync(id);
+            var orderedInteractions = interactions.OrderByDescending(i => i.InteractionDate);
+
+            // Lägg till interaktionsdata i ViewData
+            ViewData["Interactions"] = orderedInteractions;
+            ViewData["InteractionCount"] = interactions.Count();
 
             return View(customer);
         }

@@ -102,6 +102,73 @@
                 </div>
             </div>
         </div>
+        
+        @{
+            var interactions = ViewData["Interactions"] as IEnumerable<KeepWarm.Models.Interaction>;
+            var interactionCount = ViewData["InteractionCount"] as int? ?? 0;
+        }
+        
+        @if (interactions != null && interactions.Any())
+        {
+            <div class="card mt-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Interaktioner (@interactionCount)</h5>
+                    <a asp-controller="Interaction" asp-action="Create" asp-route-customerId="@Model.Id" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-circle"></i> Ny interaktion
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        @foreach (var interaction in interactions.Take(5))
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">
+                                        <span class="badge bg-primary me-2">@interaction.InteractionType</span>
+                                        @interaction.InteractionDate.ToString("yyyy-MM-dd HH:mm")
+                                    </div>
+                                    <div class="text-muted small mt-1">@interaction.Description</div>
+                                </div>
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-controller="Interaction" asp-action="Details" asp-route-id="@interaction.Id" 
+                                       class="btn btn-outline-primary" title="Visa detaljer">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-controller="Interaction" asp-action="Edit" asp-route-id="@interaction.Id" 
+                                       class="btn btn-outline-warning" title="Redigera">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (interactionCount > 5)
+                    {
+                        <div class="text-center mt-3">
+                            <small class="text-muted">Visar de 5 senaste interaktionerna av totalt @interactionCount</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card mt-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Interaktioner</h5>
+                    <a asp-controller="Interaction" asp-action="Create" asp-route-customerId="@Model.Id" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-circle"></i> Ny interaktion
+                    </a>
+                </div>
+                <div class="card-body text-center">
+                    <div class="text-muted">
+                        <i class="bi bi-chat-dots" style="font-size: 3rem;"></i>
+                        <p class="mt-3">Inga interaktioner registrerade än</p>
+                        <p class="small">Klicka på "Ny interaktion" för att börja logga kontakt med denna kund.</p>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
     
     <div class="col-md-4">
@@ -143,6 +210,9 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
+                    <a asp-controller="Interaction" asp-action="Create" asp-route-customerId="@Model.Id" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Ny interaktion
+                    </a>
                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
                         <i class="bi bi-pencil"></i> Redigera kund
                     </a>

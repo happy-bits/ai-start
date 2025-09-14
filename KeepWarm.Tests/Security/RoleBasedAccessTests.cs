@@ -38,7 +38,7 @@ namespace KeepWarm.Tests.Security
             _mockCustomerService = new Mock<ICustomerService>();
 
             _accountController = new AccountController(_mockUserManager.Object, _mockSignInManager.Object, _mockIdentityService.Object);
-            _customerController = new CustomerController(_mockCustomerService.Object, _mockUserManager.Object);
+            _customerController = new CustomerController(_mockCustomerService.Object, new Mock<IInteractionService>().Object, _mockUserManager.Object);
         }
 
         [Fact]

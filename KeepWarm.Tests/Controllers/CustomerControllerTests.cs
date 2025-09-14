@@ -23,7 +23,7 @@ namespace KeepWarm.Tests.Controllers
             _mockUserManager = new Mock<UserManager<ApplicationUser>>(
                 store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
 
-            _controller = new CustomerController(_mockCustomerService.Object, _mockUserManager.Object);
+            _controller = new CustomerController(_mockCustomerService.Object, new Mock<IInteractionService>().Object, _mockUserManager.Object);
         }
 
         [Fact]
