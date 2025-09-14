@@ -1,0 +1,118 @@
+@model KeepWarm.Models.Customer
+
+@{
+    ViewData["Title"] = "Ta bort kund";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h2 class="text-center mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Ta bort kund
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">Varning!</h4>
+                    <p>Du är på väg att ta bort kunden <strong>@Model.FirstName @Model.LastName</strong> permanent.</p>
+                    <hr>
+                    <p class="mb-0">Denna åtgärd kan inte ångras. Alla data för denna kund kommer att försvinna.</p>
+                </div>
+                
+                <h5>Kundinformation som kommer att tas bort:</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Namn:</dt>
+                            <dd class="col-sm-8">@Model.FirstName @Model.LastName</dd>
+                            
+                            <dt class="col-sm-4">E-post:</dt>
+                            <dd class="col-sm-8">@Model.Email</dd>
+                            
+                            <dt class="col-sm-4">Telefon:</dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.Phone))
+                                {
+                                    @Model.Phone
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Inte angivet</span>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Adress:</dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.Address))
+                                {
+                                    @Model.Address
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Inte angivet</span>
+                                }
+                            </dd>
+                            
+                            <dt class="col-sm-4">Stad:</dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.City))
+                                {
+                                    @Model.City
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Inte angivet</span>
+                                }
+                            </dd>
+                            
+                            <dt class="col-sm-4">Land:</dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.Country))
+                                {
+                                    @Model.Country
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Inte angivet</span>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Systeminformation</h6>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-3">Kund-ID:</dt>
+                            <dd class="col-sm-3"><code>@Model.Id</code></dd>
+                            
+                            <dt class="col-sm-3">Skapad:</dt>
+                            <dd class="col-sm-3">
+                                <small>@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary me-md-2">
+                        <i class="bi bi-arrow-left"></i> Avbryt
+                    </a>
+                    <form asp-action="Delete" method="post" class="d-inline">
+                        <input type="hidden" asp-for="Id" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Ta bort permanent
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
