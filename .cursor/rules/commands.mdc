@@ -64,6 +64,10 @@ Anropa inga verktyg.
 Sammanfatta vad vi kommit fram till.
 Ändra vad vi kommit fram till.
 
+`-userstories`
+Analysera vad som ännu inte är implementerat
+Skriv tre userstories som är lämpliga att börja med
+
 ## Debugging
 
 `-debug-css`
