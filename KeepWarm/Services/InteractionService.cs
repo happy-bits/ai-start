@@ -1,4 +1,5 @@
 using KeepWarm.Data;
+using KeepWarm.Helpers;
 using KeepWarm.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +18,10 @@ namespace KeepWarm.Services
         {
             try
             {
-                interaction.CreatedAt = DateTime.UtcNow;
-                interaction.UpdatedAt = DateTime.UtcNow;
+                // Formatera datum till minutprecision
+                interaction.InteractionDate = DateTimeHelper.FormatToMinutePrecision(interaction.InteractionDate);
+                interaction.CreatedAt = DateTimeHelper.FormatToMinutePrecision(DateTime.UtcNow);
+                interaction.UpdatedAt = DateTimeHelper.FormatToMinutePrecision(DateTime.UtcNow);
 
                 _context.Interactions.Add(interaction);
                 await _context.SaveChangesAsync();
@@ -58,7 +61,10 @@ namespace KeepWarm.Services
         {
             try
             {
-                interaction.UpdatedAt = DateTime.UtcNow;
+                // Formatera datum till minutprecision
+                interaction.InteractionDate = DateTimeHelper.FormatToMinutePrecision(interaction.InteractionDate);
+                interaction.UpdatedAt = DateTimeHelper.FormatToMinutePrecision(DateTime.UtcNow);
+                
                 _context.Interactions.Update(interaction);
                 await _context.SaveChangesAsync();
                 return true;

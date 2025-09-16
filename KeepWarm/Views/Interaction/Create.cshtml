@@ -1,4 +1,5 @@
 @model KeepWarm.Controllers.ViewModels.InteractionCreateViewModel
+@using KeepWarm.Helpers
 
 @{
     ViewData["Title"] = "Skapa ny interaktion";
@@ -40,7 +41,8 @@
                     
                     <div class="form-group mb-3">
                         <label asp-for="InteractionDate" class="form-label">Datum *</label>
-                        <input asp-for="InteractionDate" type="datetime-local" class="form-control" required />
+                        <input asp-for="InteractionDate" type="datetime-local" class="form-control" required 
+                               value="@DateTimeHelper.FormatForDateTimeLocalInput(Model.InteractionDate)" />
                         <span asp-validation-for="InteractionDate" class="text-danger"></span>
                     </div>
                     

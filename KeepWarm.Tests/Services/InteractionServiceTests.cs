@@ -57,6 +57,43 @@ namespace KeepWarm.Tests.Services
         }
 
         [Fact]
+        public async Task CreateInteractionAsync_ShouldFormatDateTimeToMinutePrecision()
+        {
+            // Arrange
+            var customer = new Customer
+            {
+                Id = 1,
+                FirstName = "Test",
+                LastName = "Customer",
+                Email = "test@example.com",
+                UserId = "user123"
+            };
+            _context.Customers.Add(customer);
+            await _context.SaveChangesAsync();
+
+            var interaction = new Interaction
+            {
+                CustomerId = 1,
+                UserId = "user123",
+                InteractionType = "Telefonsamtal",
+                Description = "Test beskrivning",
+                InteractionDate = new DateTime(2024, 1, 15, 14, 30, 45, 123) // Med sekunder och millisekunder
+            };
+
+            // Act
+            var result = await _service.CreateInteractionAsync(interaction);
+
+            // Assert
+            Assert.True(result);
+            var createdInteraction = await _context.Interactions.FirstOrDefaultAsync();
+            Assert.NotNull(createdInteraction);
+            Assert.Equal(0, createdInteraction.InteractionDate.Second);
+            Assert.Equal(0, createdInteraction.InteractionDate.Millisecond);
+            Assert.Equal(14, createdInteraction.InteractionDate.Hour);
+            Assert.Equal(30, createdInteraction.InteractionDate.Minute);
+        }
+
+        [Fact]
         public async Task GetInteractionsByCustomerIdAsync_ShouldReturnCorrectInteractions()
         {
             // Arrange
@@ -148,6 +185,37 @@ namespace KeepWarm.Tests.Services
             Assert.True(result);
             var updatedInteraction = await _context.Interactions.FindAsync(interaction.Id);
             Assert.Equal("Uppdaterad beskrivning", updatedInteraction!.Description);
+        }
+
+        [Fact]
+        public async Task UpdateInteractionAsync_ShouldFormatDateTimeToMinutePrecision()
+        {
+            // Arrange
+            var customer = new Customer { Id = 1, FirstName = "Test", LastName = "Customer", Email = "test@example.com", UserId = "user123" };
+            _context.Customers.Add(customer);
+
+            var interaction = new Interaction
+            {
+                CustomerId = 1,
+                UserId = "user123",
+                InteractionType = "Telefonsamtal",
+                Description = "Original beskrivning",
+                InteractionDate = new DateTime(2024, 1, 15, 14, 30, 0)
+            };
+            _context.Interactions.Add(interaction);
+            await _context.SaveChangesAsync();
+
+            // Act
+            interaction.InteractionDate = new DateTime(2024, 1, 15, 16, 45, 30, 500); // Med sekunder och millisekunder
+            var result = await _service.UpdateInteractionAsync(interaction);
+
+            // Assert
+            Assert.True(result);
+            var updatedInteraction = await _context.Interactions.FindAsync(interaction.Id);
+            Assert.Equal(0, updatedInteraction!.InteractionDate.Second);
+            Assert.Equal(0, updatedInteraction.InteractionDate.Millisecond);
+            Assert.Equal(16, updatedInteraction.InteractionDate.Hour);
+            Assert.Equal(45, updatedInteraction.InteractionDate.Minute);
         }
 
         [Fact]

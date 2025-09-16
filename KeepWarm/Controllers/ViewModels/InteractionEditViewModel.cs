@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using KeepWarm.Helpers;
 
 namespace KeepWarm.Controllers.ViewModels
 {
@@ -18,7 +19,7 @@ namespace KeepWarm.Controllers.ViewModels
         public string Description { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Datum är obligatoriskt")]
-        public DateTime InteractionDate { get; set; } = DateTime.Now;
+        public DateTime InteractionDate { get; set; } = DateTimeHelper.FormatToMinutePrecision(DateTime.Now);
 
         // Lista med tillgängliga interaktionstyper
         public List<string> AvailableInteractionTypes => new List<string>

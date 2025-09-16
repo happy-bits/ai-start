@@ -1,4 +1,5 @@
 using KeepWarm.Controllers.ViewModels;
+using KeepWarm.Helpers;
 using KeepWarm.Models;
 using KeepWarm.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +26,7 @@ namespace KeepWarm.Controllers
             var model = new InteractionCreateViewModel
             {
                 CustomerId = customerId,
-                InteractionDate = DateTime.Now
+                InteractionDate = DateTimeHelper.FormatToMinutePrecision(DateTime.Now)
             };
 
             return View(model);
@@ -49,7 +50,7 @@ namespace KeepWarm.Controllers
                     UserId = userId,
                     InteractionType = model.InteractionType,
                     Description = model.Description,
-                    InteractionDate = model.InteractionDate
+                    InteractionDate = DateTimeHelper.FormatToMinutePrecision(model.InteractionDate)
                 };
 
                 var result = await _interactionService.CreateInteractionAsync(interaction);
@@ -94,7 +95,7 @@ namespace KeepWarm.Controllers
                 CustomerId = interaction.CustomerId,
                 InteractionType = interaction.InteractionType,
                 Description = interaction.Description,
-                InteractionDate = interaction.InteractionDate
+                InteractionDate = DateTimeHelper.FormatToMinutePrecision(interaction.InteractionDate)
             };
 
             return View(model);
@@ -126,7 +127,7 @@ namespace KeepWarm.Controllers
 
                 existingInteraction.InteractionType = model.InteractionType;
                 existingInteraction.Description = model.Description;
-                existingInteraction.InteractionDate = model.InteractionDate;
+                existingInteraction.InteractionDate = DateTimeHelper.FormatToMinutePrecision(model.InteractionDate);
 
                 var result = await _interactionService.UpdateInteractionAsync(existingInteraction);
                 if (result)
