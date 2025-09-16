@@ -2,6 +2,7 @@ using KeepWarm.Controllers;
 using KeepWarm.Controllers.ViewModels;
 using KeepWarm.Models;
 using KeepWarm.Services;
+using KeepWarm.Tests.TestHelpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -9,21 +10,18 @@ using System.Security.Claims;
 
 namespace KeepWarm.Tests.Controllers
 {
-    public class CustomerControllerTests
+    public class CustomerControllerTests : ControllerTestBase<CustomerController>
     {
         private readonly Mock<ICustomerService> _mockCustomerService;
-        private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
+        private readonly Mock<IInteractionService> _mockInteractionService;
         private readonly CustomerController _controller;
 
         public CustomerControllerTests()
         {
             _mockCustomerService = new Mock<ICustomerService>();
-            
-            var store = new Mock<IUserStore<ApplicationUser>>();
-            _mockUserManager = new Mock<UserManager<ApplicationUser>>(
-                store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
+            _mockInteractionService = new Mock<IInteractionService>();
 
-            _controller = new CustomerController(_mockCustomerService.Object, new Mock<IInteractionService>().Object, _mockUserManager.Object);
+            _controller = new CustomerController(_mockCustomerService.Object, _mockInteractionService.Object, MockUserManager.Object);
         }
 
         [Fact]
@@ -31,13 +29,9 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var userId = "user1";
-            var customers = new List<Customer>
-            {
-                new Customer { Id = 1, FirstName = "Test", LastName = "Customer1", Email = "test1@example.com", UserId = userId },
-                new Customer { Id = 2, FirstName = "Test", LastName = "Customer2", Email = "test2@example.com", UserId = userId }
-            };
+            var customers = TestDataFactory.CreateCustomers(2, userId);
 
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.GetAllCustomersAsync(userId))
                 .ReturnsAsync(customers);
 
@@ -45,8 +39,7 @@ namespace KeepWarm.Tests.Controllers
             var result = await _controller.Index();
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsAssignableFrom<IEnumerable<Customer>>(viewResult.Model);
+            var model = AssertViewWithCollection<Customer>(result);
             Assert.Equal(2, model.Count());
         }
 
@@ -54,14 +47,12 @@ namespace KeepWarm.Tests.Controllers
         public async Task Index_ShouldReturnAllCustomers_WhenUserIsAdmin()
         {
             // Arrange
-            var userId = "admin1";
-            var customers = new List<Customer>
-            {
-                new Customer { Id = 1, FirstName = "Test", LastName = "Customer1", Email = "test1@example.com", UserId = "user1" },
-                new Customer { Id = 2, FirstName = "Test", LastName = "Customer2", Email = "test2@example.com", UserId = "user2" }
-            };
+            var adminId = "admin1";
+            var customer1 = TestDataFactory.CreateCustomer("Customer1", userId: "user1");
+            var customer2 = TestDataFactory.CreateCustomer("Customer2", userId: "user2");
+            var customers = new List<Customer> { customer1, customer2 };
 
-            SetupAuthenticatedUser(userId, true);
+            SetupAuthenticatedUser(_controller, adminId, isAdmin: true);
             _mockCustomerService.Setup(s => s.GetAllCustomersForAdminAsync())
                 .ReturnsAsync(customers);
 
@@ -69,8 +60,7 @@ namespace KeepWarm.Tests.Controllers
             var result = await _controller.Index();
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsAssignableFrom<IEnumerable<Customer>>(viewResult.Model);
+            var model = AssertViewWithCollection<Customer>(result);
             Assert.Equal(2, model.Count());
         }
 
@@ -88,7 +78,7 @@ namespace KeepWarm.Tests.Controllers
                 new Customer { Id = 2, FirstName = "Test", LastName = "Customer2", Email = "test2@example.com", UserId = "user2", User = user2 }
             };
 
-            SetupAuthenticatedUser(userId, true);
+            SetupAuthenticatedUser(_controller, userId, isAdmin: true);
             _mockCustomerService.Setup(s => s.GetAllCustomersForAdminAsync())
                 .ReturnsAsync(customers);
 
@@ -116,7 +106,7 @@ namespace KeepWarm.Tests.Controllers
         public async Task Index_ShouldReturnUnauthorized_WhenUserIsNotAuthenticated()
         {
             // Arrange
-            _mockUserManager.Setup(m => m.GetUserId(It.IsAny<ClaimsPrincipal>()))
+            MockUserManager.Setup(m => m.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns((string?)null);
 
             // Act
@@ -131,16 +121,9 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var userId = "user1";
-            var customer = new Customer 
-            { 
-                Id = 1, 
-                FirstName = "Test", 
-                LastName = "Customer", 
-                Email = "test@example.com", 
-                UserId = userId 
-            };
+            var customer = TestDataFactory.CreateCustomer("Test", "Customer", userId: userId, id: 1);
 
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.GetCustomerByIdAsync(1, userId))
                 .ReturnsAsync(customer);
 
@@ -148,8 +131,7 @@ namespace KeepWarm.Tests.Controllers
             var result = await _controller.Details(1);
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsType<Customer>(viewResult.Model);
+            var model = AssertViewWithModel<Customer>(result);
             Assert.Equal(1, model.Id);
             Assert.Equal("Test", model.FirstName);
         }
@@ -159,7 +141,7 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var userId = "user1";
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.GetCustomerByIdAsync(999, userId))
                 .ReturnsAsync((Customer?)null);
 
@@ -184,7 +166,7 @@ namespace KeepWarm.Tests.Controllers
                 UserId = "user1" 
             };
 
-            SetupAuthenticatedUser(userId, true);
+            SetupAuthenticatedUser(_controller, userId, isAdmin: true);
             _mockCustomerService.Setup(s => s.GetCustomerByIdForAdminAsync(1))
                 .ReturnsAsync(customer);
 
@@ -213,7 +195,7 @@ namespace KeepWarm.Tests.Controllers
                 User = user
             };
 
-            SetupAuthenticatedUser(userId, true);
+            SetupAuthenticatedUser(_controller, userId, isAdmin: true);
             _mockCustomerService.Setup(s => s.GetCustomerByIdForAdminAsync(1))
                 .ReturnsAsync(customer);
 
@@ -245,28 +227,18 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var userId = "user1";
-            var model = new CustomerCreateViewModel
-            {
-                FirstName = "New",
-                LastName = "Customer",
-                Email = "new@example.com",
-                Phone = "070-1234567",
-                Address = "Test Street 1",
-                City = "Test City",
-                PostalCode = "12345",
-                Country = "Sverige"
-            };
+            var model = TestDataFactory.CreateCustomerCreateViewModel("New", "Customer", "new@example.com");
+            var createdCustomer = TestDataFactory.CreateCustomer("New", "Customer", id: 1);
 
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.CreateCustomerAsync(It.IsAny<Customer>()))
-                .ReturnsAsync(new Customer { Id = 1 });
+                .ReturnsAsync(createdCustomer);
 
             // Act
             var result = await _controller.Create(model);
 
             // Assert
-            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);
+            AssertRedirectToAction(result, "Index");
             
             _mockCustomerService.Verify(s => s.CreateCustomerAsync(It.Is<Customer>(c => 
                 c.FirstName == "New" && 
@@ -304,7 +276,7 @@ namespace KeepWarm.Tests.Controllers
                 UserId = userId 
             };
 
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.GetCustomerByIdAsync(1, userId))
                 .ReturnsAsync(customer);
 
@@ -323,7 +295,7 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var userId = "user1";
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.GetCustomerByIdAsync(999, userId))
                 .ReturnsAsync((Customer?)null);
 
@@ -354,7 +326,7 @@ namespace KeepWarm.Tests.Controllers
 
             var updatedCustomer = new Customer { Id = 1, FirstName = "Updated", UserId = userId };
 
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.UpdateCustomerAsync(It.IsAny<Customer>(), userId))
                 .ReturnsAsync(updatedCustomer);
 
@@ -377,7 +349,7 @@ namespace KeepWarm.Tests.Controllers
             // Arrange
             var userId = "user1";
             var model = new CustomerEditViewModel { Id = 999 };
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.UpdateCustomerAsync(It.IsAny<Customer>(), userId))
                 .ReturnsAsync((Customer?)null);
 
@@ -402,7 +374,7 @@ namespace KeepWarm.Tests.Controllers
                 UserId = userId 
             };
 
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.GetCustomerByIdAsync(1, userId))
                 .ReturnsAsync(customer);
 
@@ -420,7 +392,7 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var userId = "user1";
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.DeleteCustomerAsync(1, userId))
                 .ReturnsAsync(true);
 
@@ -439,7 +411,7 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var userId = "user1";
-            SetupAuthenticatedUser(userId, false);
+            SetupAuthenticatedUser(_controller, userId);
             _mockCustomerService.Setup(s => s.DeleteCustomerAsync(999, userId))
                 .ReturnsAsync(false);
 
@@ -465,7 +437,7 @@ namespace KeepWarm.Tests.Controllers
 
             var updatedCustomer = new Customer { Id = 1, FirstName = "Admin Updated" };
 
-            SetupAuthenticatedUser(userId, true);
+            SetupAuthenticatedUser(_controller, userId, isAdmin: true);
             _mockCustomerService.Setup(s => s.UpdateCustomerForAdminAsync(It.IsAny<Customer>()))
                 .ReturnsAsync(updatedCustomer);
 
@@ -481,32 +453,5 @@ namespace KeepWarm.Tests.Controllers
                 c.FirstName == "Admin Updated")), Times.Once);
         }
 
-        private void SetupAuthenticatedUser(string userId, bool isAdmin)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Name, "test@example.com")
-            };
-
-            if (isAdmin)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
-            }
-
-            var identity = new ClaimsIdentity(claims, "TestAuthType");
-            var claimsPrincipal = new ClaimsPrincipal(identity);
-
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
-                {
-                    User = claimsPrincipal
-                }
-            };
-
-            _mockUserManager.Setup(m => m.GetUserId(It.IsAny<ClaimsPrincipal>()))
-                .Returns(userId);
-        }
     }
 }

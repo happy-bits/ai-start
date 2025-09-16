@@ -1,6 +1,7 @@
 using KeepWarm.Controllers;
 using KeepWarm.Models;
 using KeepWarm.Services;
+using KeepWarm.Tests.TestHelpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -10,42 +11,21 @@ using System.Text.Json;
 
 namespace KeepWarm.Tests.Controllers
 {
-    public class DeveloperToolsControllerTests
+    public class DeveloperToolsControllerTests : ControllerTestBase<DeveloperToolsController>
     {
         private readonly Mock<IDatabaseSeedService> _mockSeedService;
-        private readonly Mock<SignInManager<ApplicationUser>> _mockSignInManager;
-        private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
-        private readonly Mock<IConfiguration> _mockConfiguration;
-        private readonly Mock<ILogger<DeveloperToolsController>> _mockLogger;
         private readonly DeveloperToolsController _controller;
 
         public DeveloperToolsControllerTests()
         {
             _mockSeedService = new Mock<IDatabaseSeedService>();
-            
-            var store = new Mock<IUserStore<ApplicationUser>>();
-            _mockUserManager = new Mock<UserManager<ApplicationUser>>(
-                store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
-
-            var contextAccessor = new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
-            var claimsFactory = new Mock<IUserClaimsPrincipalFactory<ApplicationUser>>();
-            var optionsAccessor = new Mock<Microsoft.Extensions.Options.IOptions<IdentityOptions>>();
-            var logger = new Mock<Microsoft.Extensions.Logging.ILogger<SignInManager<ApplicationUser>>>();
-            var schemes = new Mock<Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider>();
-
-            _mockSignInManager = new Mock<SignInManager<ApplicationUser>>(
-                _mockUserManager.Object, contextAccessor.Object, claimsFactory.Object, 
-                optionsAccessor.Object, logger.Object, schemes.Object, null!);
-
-            _mockConfiguration = new Mock<IConfiguration>();
-            _mockLogger = new Mock<ILogger<DeveloperToolsController>>();
 
             _controller = new DeveloperToolsController(
                 _mockSeedService.Object,
-                _mockSignInManager.Object,
-                _mockUserManager.Object,
-                _mockConfiguration.Object,
-                _mockLogger.Object);
+                MockSignInManager.Object,
+                MockUserManager.Object,
+                MockConfiguration.Object,
+                MockLogger.Object);
         }
 
         [Fact]
@@ -129,7 +109,7 @@ namespace KeepWarm.Tests.Controllers
             Assert.Equal("Ett oväntat fel inträffade", message);
 
             // Verifiera att fel loggades
-            _mockLogger.Verify(
+            MockLogger.Verify(
                 x => x.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
@@ -144,16 +124,11 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var email = "test@example.com";
-            var user = new ApplicationUser
-            {
-                Id = "user123",
-                Email = email,
-                UserName = email
-            };
+            var user = TestDataFactory.CreateUser(email, id: "user123");
 
-            _mockUserManager.Setup(m => m.FindByEmailAsync(email))
+            MockUserManager.Setup(m => m.FindByEmailAsync(email))
                 .ReturnsAsync(user);
-            _mockSignInManager.Setup(m => m.SignInAsync(user, false, null))
+            MockSignInManager.Setup(m => m.SignInAsync(user, false, null))
                 .Returns(Task.CompletedTask);
 
             // Act
@@ -165,8 +140,8 @@ namespace KeepWarm.Tests.Controllers
             Assert.True(success);
             Assert.Equal($"Inloggad som {email}", message);
 
-            _mockUserManager.Verify(m => m.FindByEmailAsync(email), Times.Once);
-            _mockSignInManager.Verify(m => m.SignInAsync(user, false, null), Times.Once);
+            MockUserManager.Verify(m => m.FindByEmailAsync(email), Times.Once);
+            MockSignInManager.Verify(m => m.SignInAsync(user, false, null), Times.Once);
         }
 
         [Fact]
@@ -174,7 +149,7 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var email = "nonexistent@example.com";
-            _mockUserManager.Setup(m => m.FindByEmailAsync(email))
+            MockUserManager.Setup(m => m.FindByEmailAsync(email))
                 .ReturnsAsync((ApplicationUser?)null);
 
             // Act
@@ -186,8 +161,8 @@ namespace KeepWarm.Tests.Controllers
             Assert.False(success);
             Assert.Equal("Användare hittades inte", message);
 
-            _mockUserManager.Verify(m => m.FindByEmailAsync(email), Times.Once);
-            _mockSignInManager.Verify(m => m.SignInAsync(It.IsAny<ApplicationUser>(), It.IsAny<bool>(), null), Times.Never);
+            MockUserManager.Verify(m => m.FindByEmailAsync(email), Times.Once);
+            MockSignInManager.Verify(m => m.SignInAsync(It.IsAny<ApplicationUser>(), It.IsAny<bool>(), null), Times.Never);
         }
 
         [Fact]
@@ -195,7 +170,7 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var email = "test@example.com";
-            _mockUserManager.Setup(m => m.FindByEmailAsync(email))
+            MockUserManager.Setup(m => m.FindByEmailAsync(email))
                 .ThrowsAsync(new Exception("Database error"));
 
             // Act
@@ -208,7 +183,7 @@ namespace KeepWarm.Tests.Controllers
             Assert.Equal("Fel vid inloggning", message);
 
             // Verifiera att fel loggades
-            _mockLogger.Verify(
+            MockLogger.Verify(
                 x => x.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
@@ -232,10 +207,10 @@ namespace KeepWarm.Tests.Controllers
 
             foreach (var email in validEmails)
             {
-                var user = new ApplicationUser { Id = "user123", Email = email, UserName = email };
-                _mockUserManager.Setup(m => m.FindByEmailAsync(email))
+                var user = TestDataFactory.CreateUser(email, id: "user123");
+                MockUserManager.Setup(m => m.FindByEmailAsync(email))
                     .ReturnsAsync(user);
-                _mockSignInManager.Setup(m => m.SignInAsync(user, false, null))
+                MockSignInManager.Setup(m => m.SignInAsync(user, false, null))
                     .Returns(Task.CompletedTask);
 
                 // Act
@@ -280,18 +255,18 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var email = "test@example.com";
-            var user = new ApplicationUser { Id = "user123", Email = email, UserName = email };
+            var user = TestDataFactory.CreateUser(email, id: "user123");
 
-            _mockUserManager.Setup(m => m.FindByEmailAsync(email))
+            MockUserManager.Setup(m => m.FindByEmailAsync(email))
                 .ReturnsAsync(user);
-            _mockSignInManager.Setup(m => m.SignInAsync(user, false, null))
+            MockSignInManager.Setup(m => m.SignInAsync(user, false, null))
                 .Returns(Task.CompletedTask);
 
             // Act
             await _controller.LoginAs(email);
 
             // Assert
-            _mockSignInManager.Verify(m => m.SignInAsync(
+            MockSignInManager.Verify(m => m.SignInAsync(
                 It.Is<ApplicationUser>(u => u.Email == email),
                 false, // isPersistent should be false
                 null   // authenticationMethod should be null
