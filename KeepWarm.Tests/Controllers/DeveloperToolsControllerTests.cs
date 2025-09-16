@@ -13,15 +13,12 @@ namespace KeepWarm.Tests.Controllers
 {
     public class DeveloperToolsControllerTests : ControllerTestBase<DeveloperToolsController>
     {
-        private readonly Mock<IDatabaseSeedService> _mockSeedService;
         private readonly DeveloperToolsController _controller;
 
         public DeveloperToolsControllerTests()
         {
-            _mockSeedService = new Mock<IDatabaseSeedService>();
-
             _controller = new DeveloperToolsController(
-                _mockSeedService.Object,
+                MockDatabaseSeedService.Object,
                 MockSignInManager.Object,
                 MockUserManager.Object,
                 MockConfiguration.Object,
@@ -32,9 +29,9 @@ namespace KeepWarm.Tests.Controllers
         public async Task RecreateDatabase_ShouldReturnSuccess_WhenBothOperationsSucceed()
         {
             // Arrange
-            _mockSeedService.Setup(s => s.RecreateDatabaseAsync())
+            MockDatabaseSeedService.Setup(s => s.RecreateDatabaseAsync())
                 .ReturnsAsync(true);
-            _mockSeedService.Setup(s => s.SeedTestDataAsync())
+            MockDatabaseSeedService.Setup(s => s.SeedTestDataAsync())
                 .ReturnsAsync(true);
 
             // Act
@@ -46,15 +43,15 @@ namespace KeepWarm.Tests.Controllers
             Assert.True(success);
             Assert.Equal("Databas återskapad och testdata tillagd!", message);
 
-            _mockSeedService.Verify(s => s.RecreateDatabaseAsync(), Times.Once);
-            _mockSeedService.Verify(s => s.SeedTestDataAsync(), Times.Once);
+            MockDatabaseSeedService.Verify(s => s.RecreateDatabaseAsync(), Times.Once);
+            MockDatabaseSeedService.Verify(s => s.SeedTestDataAsync(), Times.Once);
         }
 
         [Fact]
         public async Task RecreateDatabase_ShouldReturnError_WhenRecreateFails()
         {
             // Arrange
-            _mockSeedService.Setup(s => s.RecreateDatabaseAsync())
+            MockDatabaseSeedService.Setup(s => s.RecreateDatabaseAsync())
                 .ReturnsAsync(false);
 
             // Act
@@ -66,17 +63,17 @@ namespace KeepWarm.Tests.Controllers
             Assert.False(success);
             Assert.Equal("Fel vid återskapning av databas", message);
 
-            _mockSeedService.Verify(s => s.RecreateDatabaseAsync(), Times.Once);
-            _mockSeedService.Verify(s => s.SeedTestDataAsync(), Times.Never);
+            MockDatabaseSeedService.Verify(s => s.RecreateDatabaseAsync(), Times.Once);
+            MockDatabaseSeedService.Verify(s => s.SeedTestDataAsync(), Times.Never);
         }
 
         [Fact]
         public async Task RecreateDatabase_ShouldReturnError_WhenSeedFails()
         {
             // Arrange
-            _mockSeedService.Setup(s => s.RecreateDatabaseAsync())
+            MockDatabaseSeedService.Setup(s => s.RecreateDatabaseAsync())
                 .ReturnsAsync(true);
-            _mockSeedService.Setup(s => s.SeedTestDataAsync())
+            MockDatabaseSeedService.Setup(s => s.SeedTestDataAsync())
                 .ReturnsAsync(false);
 
             // Act
@@ -88,15 +85,15 @@ namespace KeepWarm.Tests.Controllers
             Assert.False(success);
             Assert.Equal("Fel vid tillägg av testdata", message);
 
-            _mockSeedService.Verify(s => s.RecreateDatabaseAsync(), Times.Once);
-            _mockSeedService.Verify(s => s.SeedTestDataAsync(), Times.Once);
+            MockDatabaseSeedService.Verify(s => s.RecreateDatabaseAsync(), Times.Once);
+            MockDatabaseSeedService.Verify(s => s.SeedTestDataAsync(), Times.Once);
         }
 
         [Fact]
         public async Task RecreateDatabase_ShouldReturnError_WhenExceptionThrown()
         {
             // Arrange
-            _mockSeedService.Setup(s => s.RecreateDatabaseAsync())
+            MockDatabaseSeedService.Setup(s => s.RecreateDatabaseAsync())
                 .ThrowsAsync(new Exception("Database error"));
 
             // Act

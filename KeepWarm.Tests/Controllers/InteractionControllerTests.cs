@@ -1,54 +1,24 @@
 using KeepWarm.Controllers;
 using KeepWarm.Controllers.ViewModels;
 using KeepWarm.Models;
-using KeepWarm.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+using KeepWarm.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using System.Security.Claims;
 
 namespace KeepWarm.Tests.Controllers
 {
-    public class InteractionControllerTests
+    public class InteractionControllerTests : ControllerTestBase<InteractionController>
     {
-        private readonly Mock<IInteractionService> _mockInteractionService;
-        private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
         private readonly InteractionController _controller;
 
         public InteractionControllerTests()
         {
-            _mockInteractionService = new Mock<IInteractionService>();
+            _controller = new InteractionController(MockInteractionService.Object, MockUserManager.Object);
             
-            var userStore = new Mock<IUserStore<ApplicationUser>>();
-            _mockUserManager = new Mock<UserManager<ApplicationUser>>(
-                userStore.Object, 
-                new Mock<IOptions<IdentityOptions>>().Object,
-                new Mock<IPasswordHasher<ApplicationUser>>().Object,
-                new List<IUserValidator<ApplicationUser>>(),
-                new List<IPasswordValidator<ApplicationUser>>(),
-                new Mock<ILookupNormalizer>().Object,
-                new Mock<IdentityErrorDescriber>().Object,
-                new Mock<IServiceProvider>().Object,
-                new Mock<ILogger<UserManager<ApplicationUser>>>().Object);
-
-            _controller = new InteractionController(_mockInteractionService.Object, _mockUserManager.Object);
-            
-            // Setup controller context with user
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, "user123"),
-                new Claim(ClaimTypes.Name, "test@example.com")
-            }, "TestAuthenticationType"));
-            
-            _controller.ControllerContext = new ControllerContext()
-            {
-                HttpContext = new DefaultHttpContext() { User = user }
-            };
-            
+            // Setup autentiserad användare
+            SetupAuthenticatedUser(_controller, "user123");
             _controller.TempData = new Mock<ITempDataDictionary>().Object;
         }
 
@@ -73,7 +43,7 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var userId = "user123";
-            _mockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns(userId);
 
             var model = new InteractionCreateViewModel
@@ -84,7 +54,7 @@ namespace KeepWarm.Tests.Controllers
                 InteractionDate = new DateTime(2024, 1, 15, 14, 30, 0)
             };
 
-            _mockInteractionService.Setup(x => x.CreateInteractionAsync(It.IsAny<Interaction>()))
+            MockInteractionService.Setup(x => x.CreateInteractionAsync(It.IsAny<Interaction>()))
                 .ReturnsAsync(true);
 
             // Act
@@ -97,7 +67,7 @@ namespace KeepWarm.Tests.Controllers
             Assert.NotNull(redirectResult.RouteValues);
             Assert.Equal(1, redirectResult.RouteValues["id"]);
 
-            _mockInteractionService.Verify(x => x.CreateInteractionAsync(It.Is<Interaction>(i =>
+            MockInteractionService.Verify(x => x.CreateInteractionAsync(It.Is<Interaction>(i =>
                 i.CustomerId == 1 &&
                 i.UserId == userId &&
                 i.InteractionType == "Telefonsamtal" &&
@@ -133,7 +103,7 @@ namespace KeepWarm.Tests.Controllers
             var interactionId = 1;
             var userId = "user123";
             
-            _mockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns(userId);
 
             var interaction = new Interaction
@@ -146,7 +116,7 @@ namespace KeepWarm.Tests.Controllers
                 InteractionDate = new DateTime(2024, 1, 15, 14, 30, 0)
             };
 
-            _mockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
+            MockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
                 .ReturnsAsync(interaction);
 
             // Act
@@ -168,10 +138,10 @@ namespace KeepWarm.Tests.Controllers
             var interactionId = 999;
             var userId = "user123";
             
-            _mockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns(userId);
             
-            _mockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
+            MockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
                 .ReturnsAsync((Interaction?)null);
 
             // Act
@@ -186,7 +156,7 @@ namespace KeepWarm.Tests.Controllers
         {
             // Arrange
             var userId = "user123";
-            _mockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns(userId);
 
             var model = new InteractionEditViewModel
@@ -207,9 +177,9 @@ namespace KeepWarm.Tests.Controllers
                 Description = "Original beskrivning"
             };
 
-            _mockInteractionService.Setup(x => x.GetInteractionByIdAsync(1))
+            MockInteractionService.Setup(x => x.GetInteractionByIdAsync(1))
                 .ReturnsAsync(existingInteraction);
-            _mockInteractionService.Setup(x => x.UpdateInteractionAsync(It.IsAny<Interaction>()))
+            MockInteractionService.Setup(x => x.UpdateInteractionAsync(It.IsAny<Interaction>()))
                 .ReturnsAsync(true);
 
             // Act
@@ -222,7 +192,7 @@ namespace KeepWarm.Tests.Controllers
             Assert.NotNull(redirectResult.RouteValues);
             Assert.Equal(1, redirectResult.RouteValues["id"]);
 
-            _mockInteractionService.Verify(x => x.UpdateInteractionAsync(It.Is<Interaction>(i =>
+            MockInteractionService.Verify(x => x.UpdateInteractionAsync(It.Is<Interaction>(i =>
                 i.Id == 1 &&
                 i.InteractionType == "Mail" &&
                 i.Description == "Uppdaterad beskrivning"
@@ -236,7 +206,7 @@ namespace KeepWarm.Tests.Controllers
             var interactionId = 1;
             var userId = "user123";
             
-            _mockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns(userId);
 
             var interaction = new Interaction
@@ -249,7 +219,7 @@ namespace KeepWarm.Tests.Controllers
                 Customer = new Customer { Id = 1, FirstName = "Test", LastName = "Customer" }
             };
 
-            _mockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
+            MockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
                 .ReturnsAsync(interaction);
 
             // Act
@@ -268,7 +238,7 @@ namespace KeepWarm.Tests.Controllers
             var interactionId = 1;
             var userId = "user123";
             
-            _mockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns(userId);
 
             var interaction = new Interaction
@@ -280,9 +250,9 @@ namespace KeepWarm.Tests.Controllers
                 Description = "Test beskrivning"
             };
 
-            _mockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
+            MockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
                 .ReturnsAsync(interaction);
-            _mockInteractionService.Setup(x => x.DeleteInteractionAsync(interactionId))
+            MockInteractionService.Setup(x => x.DeleteInteractionAsync(interactionId))
                 .ReturnsAsync(true);
 
             // Act
@@ -295,7 +265,7 @@ namespace KeepWarm.Tests.Controllers
             Assert.NotNull(redirectResult.RouteValues);
             Assert.Equal(1, redirectResult.RouteValues["id"]);
 
-            _mockInteractionService.Verify(x => x.DeleteInteractionAsync(interactionId), Times.Once);
+            MockInteractionService.Verify(x => x.DeleteInteractionAsync(interactionId), Times.Once);
         }
 
         [Fact]
@@ -305,10 +275,10 @@ namespace KeepWarm.Tests.Controllers
             var interactionId = 999;
             var userId = "user123";
             
-            _mockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns(userId);
             
-            _mockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
+            MockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
                 .ReturnsAsync((Interaction?)null);
 
             // Act
@@ -325,7 +295,7 @@ namespace KeepWarm.Tests.Controllers
             var interactionId = 1;
             var userId = "user123";
             
-            _mockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns(userId);
 
             var interaction = new Interaction
@@ -339,7 +309,7 @@ namespace KeepWarm.Tests.Controllers
                 User = new ApplicationUser { Id = "user123", FirstName = "Test", LastName = "User" }
             };
 
-            _mockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
+            MockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
                 .ReturnsAsync(interaction);
 
             // Act
@@ -358,10 +328,10 @@ namespace KeepWarm.Tests.Controllers
             var interactionId = 999;
             var userId = "user123";
             
-            _mockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns(userId);
             
-            _mockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
+            MockInteractionService.Setup(x => x.GetInteractionByIdAsync(interactionId))
                 .ReturnsAsync((Interaction?)null);
 
             // Act

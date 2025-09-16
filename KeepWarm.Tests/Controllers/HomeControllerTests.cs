@@ -1,34 +1,27 @@
 using KeepWarm.Controllers;
 using KeepWarm.Models;
+using KeepWarm.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Moq;
 using System.Diagnostics;
 
 namespace KeepWarm.Tests.Controllers
 {
-    public class HomeControllerTests
+    public class HomeControllerTests : ControllerTestBase<HomeController>
     {
-        private readonly Mock<ILogger<HomeController>> _mockLogger;
-        private readonly Mock<IConfiguration> _mockConfiguration;
         private readonly HomeController _controller;
 
         public HomeControllerTests()
         {
-            _mockLogger = new Mock<ILogger<HomeController>>();
-            _mockConfiguration = new Mock<IConfiguration>();
-            _controller = new HomeController(_mockLogger.Object, _mockConfiguration.Object);
+            _controller = new HomeController(MockLogger.Object, MockConfiguration.Object);
         }
 
         [Fact]
         public void Index_ShouldReturnView()
         {
             // Arrange
-            var configSection = new Mock<IConfigurationSection>();
-            configSection.Setup(x => x.Value).Returns("false");
-            _mockConfiguration.Setup(c => c.GetSection("DeveloperTools:Enabled"))
-                .Returns(configSection.Object);
+            SetupConfiguration("DeveloperTools:Enabled", "false");
 
             // Act
             var result = _controller.Index();
@@ -42,10 +35,7 @@ namespace KeepWarm.Tests.Controllers
         public void Index_ShouldShowDeveloperTools_WhenEnabled()
         {
             // Arrange
-            var configSection = new Mock<IConfigurationSection>();
-            configSection.Setup(x => x.Value).Returns("true");
-            _mockConfiguration.Setup(c => c.GetSection("DeveloperTools:Enabled"))
-                .Returns(configSection.Object);
+            SetupConfiguration("DeveloperTools:Enabled", "true");
 
             // Act
             var result = _controller.Index();
@@ -59,10 +49,7 @@ namespace KeepWarm.Tests.Controllers
         public void Index_ShouldNotShowDeveloperTools_WhenDisabled()
         {
             // Arrange
-            var configSection = new Mock<IConfigurationSection>();
-            configSection.Setup(x => x.Value).Returns("false");
-            _mockConfiguration.Setup(c => c.GetSection("DeveloperTools:Enabled"))
-                .Returns(configSection.Object);
+            SetupConfiguration("DeveloperTools:Enabled", "false");
 
             // Act
             var result = _controller.Index();

@@ -1,7 +1,7 @@
 using KeepWarm.Controllers;
 using KeepWarm.Controllers.ViewModels;
 using KeepWarm.Models;
-using KeepWarm.Services;
+using KeepWarm.Tests.TestHelpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -9,31 +9,13 @@ using System.Security.Claims;
 
 namespace KeepWarm.Tests.Controllers
 {
-    public class AccountControllerTests
+    public class AccountControllerTests : ControllerTestBase<AccountController>
     {
-        private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
-        private readonly Mock<SignInManager<ApplicationUser>> _mockSignInManager;
-        private readonly Mock<IIdentityService> _mockIdentityService;
         private readonly AccountController _controller;
 
         public AccountControllerTests()
         {
-            var store = new Mock<IUserStore<ApplicationUser>>();
-            _mockUserManager = new Mock<UserManager<ApplicationUser>>(
-                store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
-
-            var contextAccessor = new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
-            var claimsFactory = new Mock<IUserClaimsPrincipalFactory<ApplicationUser>>();
-            var optionsAccessor = new Mock<Microsoft.Extensions.Options.IOptions<IdentityOptions>>();
-            var logger = new Mock<Microsoft.Extensions.Logging.ILogger<SignInManager<ApplicationUser>>>();
-            var schemes = new Mock<Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider>();
-
-            _mockSignInManager = new Mock<SignInManager<ApplicationUser>>(
-                _mockUserManager.Object, contextAccessor.Object, claimsFactory.Object, optionsAccessor.Object, logger.Object, schemes.Object, null!);
-
-            _mockIdentityService = new Mock<IIdentityService>();
-
-            _controller = new AccountController(_mockUserManager.Object, _mockSignInManager.Object, _mockIdentityService.Object);
+            _controller = new AccountController(MockUserManager.Object, MockSignInManager.Object, MockIdentityService.Object);
         }
 
         [Fact]
@@ -68,9 +50,9 @@ namespace KeepWarm.Tests.Controllers
                 LastName = model.LastName
             };
 
-            _mockUserManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), model.Password))
+            MockUserManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), model.Password))
                 .ReturnsAsync(IdentityResult.Success);
-            _mockUserManager.Setup(m => m.AddToRoleAsync(It.IsAny<ApplicationUser>(), "User"))
+            MockUserManager.Setup(m => m.AddToRoleAsync(It.IsAny<ApplicationUser>(), "User"))
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
@@ -81,11 +63,11 @@ namespace KeepWarm.Tests.Controllers
             Assert.Equal("Index", redirectResult.ActionName);
             Assert.Equal("Home", redirectResult.ControllerName);
 
-            _mockUserManager.Verify(m => m.CreateAsync(It.Is<ApplicationUser>(u => 
+            MockUserManager.Verify(m => m.CreateAsync(It.Is<ApplicationUser>(u => 
                 u.Email == model.Email && 
                 u.FirstName == model.FirstName && 
                 u.LastName == model.LastName), model.Password), Times.Once);
-            _mockUserManager.Verify(m => m.AddToRoleAsync(It.IsAny<ApplicationUser>(), "User"), Times.Once);
+            MockUserManager.Verify(m => m.AddToRoleAsync(It.IsAny<ApplicationUser>(), "User"), Times.Once);
         }
 
         [Fact]
@@ -121,7 +103,7 @@ namespace KeepWarm.Tests.Controllers
                 new IdentityError { Code = "DuplicateEmail", Description = "Email already exists" }
             };
 
-            _mockUserManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), model.Password))
+            MockUserManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), model.Password))
                 .ReturnsAsync(IdentityResult.Failed(errors.ToArray()));
 
             // Act
@@ -170,7 +152,7 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupControllerContext();
-            _mockSignInManager.Setup(m => m.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false))
+            MockSignInManager.Setup(m => m.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false))
                 .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
 
             // Act
@@ -195,7 +177,7 @@ namespace KeepWarm.Tests.Controllers
             var returnUrl = "/Customer/Index";
 
             SetupControllerContextWithLocalUrl();
-            _mockSignInManager.Setup(m => m.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false))
+            MockSignInManager.Setup(m => m.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false))
                 .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
 
             // Act
@@ -217,7 +199,7 @@ namespace KeepWarm.Tests.Controllers
                 RememberMe = false
             };
 
-            _mockSignInManager.Setup(m => m.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false))
+            MockSignInManager.Setup(m => m.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false))
                 .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Failed);
 
             // Act
@@ -233,7 +215,7 @@ namespace KeepWarm.Tests.Controllers
         public async Task Logout_ShouldRedirectToHome()
         {
             // Arrange
-            _mockSignInManager.Setup(m => m.SignOutAsync())
+            MockSignInManager.Setup(m => m.SignOutAsync())
                 .Returns(Task.CompletedTask);
 
             // Act
@@ -256,7 +238,7 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockIdentityService.Setup(s => s.GetAllUsersAsync())
+            MockIdentityService.Setup(s => s.GetAllUsersAsync())
                 .ReturnsAsync(users);
 
             // Act
@@ -294,9 +276,9 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), model.Password))
+            MockUserManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), model.Password))
                 .ReturnsAsync(IdentityResult.Success);
-            _mockUserManager.Setup(m => m.AddToRoleAsync(It.IsAny<ApplicationUser>(), "User"))
+            MockUserManager.Setup(m => m.AddToRoleAsync(It.IsAny<ApplicationUser>(), "User"))
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
@@ -306,11 +288,11 @@ namespace KeepWarm.Tests.Controllers
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("ManageUsers", redirectResult.ActionName);
 
-            _mockUserManager.Verify(m => m.CreateAsync(It.Is<ApplicationUser>(u => 
+            MockUserManager.Verify(m => m.CreateAsync(It.Is<ApplicationUser>(u => 
                 u.Email == model.Email && 
                 u.FirstName == model.FirstName && 
                 u.LastName == model.LastName), model.Password), Times.Once);
-            _mockUserManager.Verify(m => m.AddToRoleAsync(It.IsAny<ApplicationUser>(), "User"), Times.Once);
+            MockUserManager.Verify(m => m.AddToRoleAsync(It.IsAny<ApplicationUser>(), "User"), Times.Once);
         }
 
         [Fact]
@@ -346,7 +328,7 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), model.Password))
+            MockUserManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), model.Password))
                 .ReturnsAsync(IdentityResult.Failed(errors.ToArray()));
 
             // Act
@@ -373,9 +355,9 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+            MockUserManager.Setup(m => m.FindByIdAsync(userId))
                 .ReturnsAsync(user);
-            _mockUserManager.Setup(m => m.GetRolesAsync(user))
+            MockUserManager.Setup(m => m.GetRolesAsync(user))
                 .ReturnsAsync(new List<string> { "User" });
 
             // Act
@@ -399,7 +381,7 @@ namespace KeepWarm.Tests.Controllers
             var userId = "nonexistent";
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+            MockUserManager.Setup(m => m.FindByIdAsync(userId))
                 .ReturnsAsync((ApplicationUser?)null);
 
             // Act
@@ -433,15 +415,15 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
+            MockUserManager.Setup(m => m.FindByIdAsync(model.Id))
                 .ReturnsAsync(existingUser);
-            _mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
+            MockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(IdentityResult.Success);
-            _mockUserManager.Setup(m => m.GetRolesAsync(existingUser))
+            MockUserManager.Setup(m => m.GetRolesAsync(existingUser))
                 .ReturnsAsync(new List<string> { "User" });
-            _mockUserManager.Setup(m => m.RemoveFromRolesAsync(existingUser, It.IsAny<IEnumerable<string>>()))
+            MockUserManager.Setup(m => m.RemoveFromRolesAsync(existingUser, It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(IdentityResult.Success);
-            _mockUserManager.Setup(m => m.AddToRoleAsync(existingUser, model.Role))
+            MockUserManager.Setup(m => m.AddToRoleAsync(existingUser, model.Role))
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
@@ -451,7 +433,7 @@ namespace KeepWarm.Tests.Controllers
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("ManageUsers", redirectResult.ActionName);
 
-            _mockUserManager.Verify(m => m.UpdateAsync(It.Is<ApplicationUser>(u => 
+            MockUserManager.Verify(m => m.UpdateAsync(It.Is<ApplicationUser>(u => 
                 u.FirstName == model.FirstName && 
                 u.LastName == model.LastName &&
                 u.Email == model.Email &&
@@ -487,7 +469,7 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
+            MockUserManager.Setup(m => m.FindByIdAsync(model.Id))
                 .ReturnsAsync((ApplicationUser?)null);
 
             // Act
@@ -524,13 +506,13 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
+            MockUserManager.Setup(m => m.FindByIdAsync(model.Id))
                 .ReturnsAsync(existingUser);
-            _mockUserManager.Setup(m => m.GetUserId(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
+            MockUserManager.Setup(m => m.GetUserId(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
                 .Returns("admin1");
-            _mockUserManager.Setup(m => m.GetRolesAsync(existingUser))
+            MockUserManager.Setup(m => m.GetRolesAsync(existingUser))
                 .ReturnsAsync(new List<string> { "User" });
-            _mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
+            MockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(IdentityResult.Failed(errors.ToArray()));
 
             // Act
@@ -556,9 +538,9 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(adminUserId))
+            MockUserManager.Setup(m => m.FindByIdAsync(adminUserId))
                 .ReturnsAsync(targetAdmin);
-            _mockUserManager.Setup(m => m.GetRolesAsync(targetAdmin))
+            MockUserManager.Setup(m => m.GetRolesAsync(targetAdmin))
                 .ReturnsAsync(new List<string> { "Admin" });
 
             // Act
@@ -582,11 +564,11 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(currentAdminId))
+            MockUserManager.Setup(m => m.FindByIdAsync(currentAdminId))
                 .ReturnsAsync(currentAdmin);
-            _mockUserManager.Setup(m => m.GetUserId(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
+            MockUserManager.Setup(m => m.GetUserId(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
                 .Returns("admin1");
-            _mockUserManager.Setup(m => m.GetRolesAsync(currentAdmin))
+            MockUserManager.Setup(m => m.GetRolesAsync(currentAdmin))
                 .ReturnsAsync(new List<string> { "Admin" });
 
             // Act
@@ -624,9 +606,9 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
+            MockUserManager.Setup(m => m.FindByIdAsync(model.Id))
                 .ReturnsAsync(targetAdmin);
-            _mockUserManager.Setup(m => m.GetRolesAsync(targetAdmin))
+            MockUserManager.Setup(m => m.GetRolesAsync(targetAdmin))
                 .ReturnsAsync(new List<string> { "Admin" });
 
             // Act
@@ -660,13 +642,13 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(model.Id))
+            MockUserManager.Setup(m => m.FindByIdAsync(model.Id))
                 .ReturnsAsync(currentAdmin);
-            _mockUserManager.Setup(m => m.GetUserId(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
+            MockUserManager.Setup(m => m.GetUserId(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
                 .Returns("admin1");
-            _mockUserManager.Setup(m => m.GetRolesAsync(currentAdmin))
+            MockUserManager.Setup(m => m.GetRolesAsync(currentAdmin))
                 .ReturnsAsync(new List<string> { "Admin" });
-            _mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
+            MockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
@@ -676,7 +658,7 @@ namespace KeepWarm.Tests.Controllers
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("ManageUsers", redirectResult.ActionName);
 
-            _mockUserManager.Verify(m => m.UpdateAsync(It.Is<ApplicationUser>(u => 
+            MockUserManager.Verify(m => m.UpdateAsync(It.Is<ApplicationUser>(u => 
                 u.FirstName == model.FirstName && 
                 u.LastName == model.LastName &&
                 u.Email == model.Email &&
@@ -697,11 +679,11 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+            MockUserManager.Setup(m => m.FindByIdAsync(userId))
                 .ReturnsAsync(user);
-            _mockUserManager.Setup(m => m.GetRolesAsync(user))
+            MockUserManager.Setup(m => m.GetRolesAsync(user))
                 .ReturnsAsync(new List<string> { "User" });
-            _mockUserManager.Setup(m => m.DeleteAsync(user))
+            MockUserManager.Setup(m => m.DeleteAsync(user))
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
@@ -711,7 +693,7 @@ namespace KeepWarm.Tests.Controllers
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("ManageUsers", redirectResult.ActionName);
 
-            _mockUserManager.Verify(m => m.DeleteAsync(user), Times.Once);
+            MockUserManager.Verify(m => m.DeleteAsync(user), Times.Once);
         }
 
         [Fact]
@@ -721,7 +703,7 @@ namespace KeepWarm.Tests.Controllers
             var userId = "nonexistent";
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+            MockUserManager.Setup(m => m.FindByIdAsync(userId))
                 .ReturnsAsync((ApplicationUser?)null);
 
             // Act
@@ -745,9 +727,9 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(adminUserId))
+            MockUserManager.Setup(m => m.FindByIdAsync(adminUserId))
                 .ReturnsAsync(targetAdmin);
-            _mockUserManager.Setup(m => m.GetRolesAsync(targetAdmin))
+            MockUserManager.Setup(m => m.GetRolesAsync(targetAdmin))
                 .ReturnsAsync(new List<string> { "Admin" });
 
             // Act
@@ -771,9 +753,9 @@ namespace KeepWarm.Tests.Controllers
             };
 
             SetupAuthenticatedUser("admin1", true);
-            _mockUserManager.Setup(m => m.FindByIdAsync(currentAdminId))
+            MockUserManager.Setup(m => m.FindByIdAsync(currentAdminId))
                 .ReturnsAsync(currentAdmin);
-            _mockUserManager.Setup(m => m.GetRolesAsync(currentAdmin))
+            MockUserManager.Setup(m => m.GetRolesAsync(currentAdmin))
                 .ReturnsAsync(new List<string> { "Admin" });
 
             // Act
@@ -832,15 +814,15 @@ namespace KeepWarm.Tests.Controllers
                 new Customer { Id = 2, FirstName = "Customer2", LastName = "Two", Email = "c2@example.com", UserId = userId }
             };
 
-            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+            MockUserManager.Setup(m => m.FindByIdAsync(userId))
                 .ReturnsAsync(user);
-            _mockUserManager.Setup(m => m.GetRolesAsync(user))
+            MockUserManager.Setup(m => m.GetRolesAsync(user))
                 .ReturnsAsync(new List<string> { "User" });
-            _mockUserManager.Setup(m => m.DeleteAsync(user))
+            MockUserManager.Setup(m => m.DeleteAsync(user))
                 .ReturnsAsync(IdentityResult.Success);
 
             // Mock IdentityService för att hantera kunder
-            _mockIdentityService.Setup(s => s.GetAllCustomersAsync(userId))
+            MockIdentityService.Setup(s => s.GetAllCustomersAsync(userId))
                 .ReturnsAsync(customers);
 
             // Act
@@ -851,7 +833,7 @@ namespace KeepWarm.Tests.Controllers
             Assert.Equal("ManageUsers", redirectResult.ActionName);
 
             // Verifiera att IdentityService anropas för att uppdatera kundernas UserId till null
-            _mockIdentityService.Verify(s => s.SetCustomersUserIdToNullAsync(userId), Times.Once);
+            MockIdentityService.Verify(s => s.SetCustomersUserIdToNullAsync(userId), Times.Once);
         }
 
         [Fact]
@@ -868,15 +850,15 @@ namespace KeepWarm.Tests.Controllers
                 Email = "test@example.com"
             };
 
-            _mockUserManager.Setup(m => m.FindByIdAsync(userId))
+            MockUserManager.Setup(m => m.FindByIdAsync(userId))
                 .ReturnsAsync(user);
-            _mockUserManager.Setup(m => m.GetRolesAsync(user))
+            MockUserManager.Setup(m => m.GetRolesAsync(user))
                 .ReturnsAsync(new List<string> { "User" });
-            _mockUserManager.Setup(m => m.DeleteAsync(user))
+            MockUserManager.Setup(m => m.DeleteAsync(user))
                 .ReturnsAsync(IdentityResult.Success);
 
             // Mock IdentityService för att returnera tom lista
-            _mockIdentityService.Setup(s => s.GetAllCustomersAsync(userId))
+            MockIdentityService.Setup(s => s.GetAllCustomersAsync(userId))
                 .ReturnsAsync(new List<Customer>());
 
             // Act
@@ -887,7 +869,7 @@ namespace KeepWarm.Tests.Controllers
             Assert.Equal("ManageUsers", redirectResult.ActionName);
 
             // Verifiera att IdentityService INTE anropas för att uppdatera kundernas UserId
-            _mockIdentityService.Verify(s => s.SetCustomersUserIdToNullAsync(userId), Times.Never);
+            MockIdentityService.Verify(s => s.SetCustomersUserIdToNullAsync(userId), Times.Never);
         }
 
         private void SetupAuthenticatedUser(string userId, bool isAdmin)

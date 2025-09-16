@@ -1,4 +1,5 @@
 using KeepWarm.Models;
+using KeepWarm.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +20,24 @@ namespace KeepWarm.Tests.TestHelpers
         protected readonly Mock<ILogger<T>> MockLogger;
         protected readonly Mock<IConfiguration> MockConfiguration;
         
+        // Vanliga service-mocks
+        protected readonly Mock<ICustomerService> MockCustomerService;
+        protected readonly Mock<IInteractionService> MockInteractionService;
+        protected readonly Mock<IIdentityService> MockIdentityService;
+        protected readonly Mock<IDatabaseSeedService> MockDatabaseSeedService;
+        
         protected ControllerTestBase()
         {
             MockUserManager = CreateMockUserManager();
             MockSignInManager = CreateMockSignInManager();
             MockLogger = new Mock<ILogger<T>>();
             MockConfiguration = new Mock<IConfiguration>();
+            
+            // Initiera service-mocks
+            MockCustomerService = new Mock<ICustomerService>();
+            MockInteractionService = new Mock<IInteractionService>();
+            MockIdentityService = new Mock<IIdentityService>();
+            MockDatabaseSeedService = new Mock<IDatabaseSeedService>();
         }
 
         /// <summary>
@@ -142,5 +155,119 @@ namespace KeepWarm.Tests.TestHelpers
             var viewResult = Assert.IsType<ViewResult>(result);
             return Assert.IsAssignableFrom<IEnumerable<TModel>>(viewResult.Model);
         }
+
+        #region Service Mock Helper Methods
+
+        /// <summary>
+        /// Konfigurerar CustomerService för att returnera specifika kunder för en användare
+        /// </summary>
+        protected void SetupCustomerService_ReturnsCustomers(string userId, params Customer[] customers)
+        {
+            MockCustomerService.Setup(s => s.GetAllCustomersAsync(userId))
+                .ReturnsAsync(customers.ToList());
+        }
+
+        /// <summary>
+        /// Konfigurerar CustomerService för att returnera alla kunder (admin-vy)
+        /// </summary>
+        protected void SetupCustomerService_ReturnsAllCustomers(params Customer[] customers)
+        {
+            MockCustomerService.Setup(s => s.GetAllCustomersForAdminAsync())
+                .ReturnsAsync(customers.ToList());
+        }
+
+        /// <summary>
+        /// Konfigurerar CustomerService för att returnera en specifik kund
+        /// </summary>
+        protected void SetupCustomerService_ReturnsCustomer(int customerId, string userId, Customer? customer)
+        {
+            MockCustomerService.Setup(s => s.GetCustomerByIdAsync(customerId, userId))
+                .ReturnsAsync(customer);
+        }
+
+        /// <summary>
+        /// Konfigurerar CustomerService för att framgångsrikt skapa en kund
+        /// </summary>
+        protected void SetupCustomerService_CreateSuccess(Customer customerToReturn)
+        {
+            MockCustomerService.Setup(s => s.CreateCustomerAsync(It.IsAny<Customer>()))
+                .ReturnsAsync(customerToReturn);
+        }
+
+        /// <summary>
+        /// Konfigurerar InteractionService för att returnera interaktioner för en kund
+        /// </summary>
+        protected void SetupInteractionService_ReturnsInteractions(int customerId, params Interaction[] interactions)
+        {
+            MockInteractionService.Setup(s => s.GetInteractionsByCustomerIdAsync(customerId))
+                .ReturnsAsync(interactions.ToList());
+        }
+
+        /// <summary>
+        /// Konfigurerar InteractionService för framgångsrik skapande av interaktion
+        /// </summary>
+        protected void SetupInteractionService_CreateSuccess()
+        {
+            MockInteractionService.Setup(s => s.CreateInteractionAsync(It.IsAny<Interaction>()))
+                .ReturnsAsync(true);
+        }
+
+        /// <summary>
+        /// Konfigurerar IdentityService för framgångsrik användarskapande
+        /// </summary>
+        protected void SetupIdentityService_UserCreationSuccess()
+        {
+            MockIdentityService.Setup(s => s.CreateUserAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+        }
+
+        /// <summary>
+        /// Konfigurerar IdentityService för misslyckad användarskapande
+        /// </summary>
+        protected void SetupIdentityService_UserCreationFailure()
+        {
+            MockIdentityService.Setup(s => s.CreateUserAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+                .ReturnsAsync(false);
+        }
+
+        /// <summary>
+        /// Konfigurerar IdentityService för att returnera alla användare
+        /// </summary>
+        protected void SetupIdentityService_ReturnsAllUsers(params ApplicationUser[] users)
+        {
+            MockIdentityService.Setup(s => s.GetAllUsersAsync())
+                .ReturnsAsync(users.ToList());
+        }
+
+        /// <summary>
+        /// Konfigurerar IdentityService för att hitta användare via email
+        /// </summary>
+        protected void SetupIdentityService_FindUserByEmail(string email, ApplicationUser? user)
+        {
+            MockIdentityService.Setup(s => s.FindUserByEmailAsync(email))
+                .ReturnsAsync(user);
+        }
+
+        /// <summary>
+        /// Konfigurerar DatabaseSeedService för framgångsrik databasåterskapning
+        /// </summary>
+        protected void SetupDatabaseSeedService_RecreateSuccess()
+        {
+            MockDatabaseSeedService.Setup(s => s.RecreateDatabaseAsync())
+                .ReturnsAsync(true);
+            MockDatabaseSeedService.Setup(s => s.SeedTestDataAsync())
+                .ReturnsAsync(true);
+        }
+
+        /// <summary>
+        /// Konfigurerar DatabaseSeedService för misslyckad databasåterskapning
+        /// </summary>
+        protected void SetupDatabaseSeedService_RecreateFailure()
+        {
+            MockDatabaseSeedService.Setup(s => s.RecreateDatabaseAsync())
+                .ReturnsAsync(false);
+        }
+
+        #endregion
     }
 }
