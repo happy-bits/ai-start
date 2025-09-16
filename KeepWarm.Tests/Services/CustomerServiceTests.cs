@@ -1,25 +1,18 @@
-using KeepWarm.Data;
 using KeepWarm.Models;
 using KeepWarm.Services;
+using KeepWarm.Tests.TestHelpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace KeepWarm.Tests.Services
 {
-    public class CustomerServiceTests : IDisposable
+    public class CustomerServiceTests : DbContextTestBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly CustomerService _customerService;
 
         public CustomerServiceTests()
         {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
-
-            _context = new ApplicationDbContext(options);
-            _customerService = new CustomerService(_context);
+            _customerService = new CustomerService(Context);
         }
 
         [Fact]
@@ -33,8 +26,7 @@ namespace KeepWarm.Tests.Services
             var customer2 = new Customer { FirstName = "Jane", LastName = "Smith", Email = "jane@example.com", UserId = userId1 };
             var customer3 = new Customer { FirstName = "Bob", LastName = "Johnson", Email = "bob@example.com", UserId = userId2 };
 
-            _context.Customers.AddRange(customer1, customer2, customer3);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer1, customer2, customer3);
 
             // Act
             var result = await _customerService.GetAllCustomersAsync(userId1);
@@ -52,8 +44,7 @@ namespace KeepWarm.Tests.Services
             // Arrange
             var userId = "user1";
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = "otheruser" };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.GetAllCustomersAsync(userId);
@@ -69,8 +60,7 @@ namespace KeepWarm.Tests.Services
             var customer1 = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = "user1" };
             var customer2 = new Customer { FirstName = "Jane", LastName = "Smith", Email = "jane@example.com", UserId = "user2" };
 
-            _context.Customers.AddRange(customer1, customer2);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer1, customer2);
 
             // Act
             var result = await _customerService.GetAllCustomersForAdminAsync();
@@ -87,8 +77,7 @@ namespace KeepWarm.Tests.Services
             // Arrange
             var userId = "user1";
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = userId };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.GetCustomerByIdAsync(customer.Id, userId);
@@ -104,8 +93,7 @@ namespace KeepWarm.Tests.Services
             // Arrange
             var userId = "user1";
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = "user2" };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.GetCustomerByIdAsync(customer.Id, userId);
@@ -144,8 +132,7 @@ namespace KeepWarm.Tests.Services
             // Arrange
             var userId = "user1";
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = userId };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             customer.FirstName = "Updated John";
             customer.Email = "updated@example.com";
@@ -165,8 +152,7 @@ namespace KeepWarm.Tests.Services
             // Arrange
             var userId = "user1";
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = "user2" };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             customer.FirstName = "Updated John";
 
@@ -183,15 +169,14 @@ namespace KeepWarm.Tests.Services
             // Arrange
             var userId = "user1";
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = userId };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.DeleteCustomerAsync(customer.Id, userId);
 
             // Assert
             Assert.True(result);
-            var deletedCustomer = await _context.Customers.FindAsync(customer.Id);
+            var deletedCustomer = await Context.Customers.FindAsync(customer.Id);
             Assert.Null(deletedCustomer);
         }
 
@@ -201,15 +186,14 @@ namespace KeepWarm.Tests.Services
             // Arrange
             var userId = "user1";
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = "user2" };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.DeleteCustomerAsync(customer.Id, userId);
 
             // Assert
             Assert.False(result);
-            var existingCustomer = await _context.Customers.FindAsync(customer.Id);
+            var existingCustomer = await Context.Customers.FindAsync(customer.Id);
             Assert.NotNull(existingCustomer);
         }
 
@@ -218,15 +202,14 @@ namespace KeepWarm.Tests.Services
         {
             // Arrange
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = "user1" };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.DeleteCustomerForAdminAsync(customer.Id);
 
             // Assert
             Assert.True(result);
-            var deletedCustomer = await _context.Customers.FindAsync(customer.Id);
+            var deletedCustomer = await Context.Customers.FindAsync(customer.Id);
             Assert.Null(deletedCustomer);
         }
 
@@ -235,8 +218,7 @@ namespace KeepWarm.Tests.Services
         {
             // Arrange
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = "user1" };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.CustomerExistsAsync(customer.Id);
@@ -261,8 +243,7 @@ namespace KeepWarm.Tests.Services
             // Arrange
             var userId = "user1";
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = userId };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.CustomerBelongsToUserAsync(customer.Id, userId);
@@ -277,8 +258,7 @@ namespace KeepWarm.Tests.Services
             // Arrange
             var userId = "user1";
             var customer = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = "user2" };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.CustomerBelongsToUserAsync(customer.Id, userId);
@@ -296,8 +276,7 @@ namespace KeepWarm.Tests.Services
             var customerWithOwner = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = userId };
             var customerWithoutOwner = new Customer { FirstName = "Jane", LastName = "Smith", Email = "jane@example.com", UserId = null };
             
-            _context.Customers.AddRange(customerWithOwner, customerWithoutOwner);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customerWithOwner, customerWithoutOwner);
 
             // Act
             var result = await _customerService.GetAllCustomersAsync(userId);
@@ -314,8 +293,7 @@ namespace KeepWarm.Tests.Services
             var customerWithOwner = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com", UserId = "user1" };
             var customerWithoutOwner = new Customer { FirstName = "Jane", LastName = "Smith", Email = "jane@example.com", UserId = null };
             
-            _context.Customers.AddRange(customerWithOwner, customerWithoutOwner);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customerWithOwner, customerWithoutOwner);
 
             // Act
             var result = await _customerService.GetAllCustomersForAdminAsync();
@@ -331,8 +309,7 @@ namespace KeepWarm.Tests.Services
         {
             // Arrange
             var customer = new Customer { FirstName = "Jane", LastName = "Smith", Email = "jane@example.com", UserId = null };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.GetCustomerByIdForAdminAsync(customer.Id);
@@ -348,8 +325,7 @@ namespace KeepWarm.Tests.Services
         {
             // Arrange
             var customer = new Customer { FirstName = "Jane", LastName = "Smith", Email = "jane@example.com", UserId = null };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             customer.FirstName = "Updated Jane";
             customer.Email = "updated@example.com";
@@ -369,15 +345,14 @@ namespace KeepWarm.Tests.Services
         {
             // Arrange
             var customer = new Customer { FirstName = "Jane", LastName = "Smith", Email = "jane@example.com", UserId = null };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             var result = await _customerService.DeleteCustomerForAdminAsync(customer.Id);
 
             // Assert
             Assert.True(result);
-            var deletedCustomer = await _context.Customers.FindAsync(customer.Id);
+            var deletedCustomer = await Context.Customers.FindAsync(customer.Id);
             Assert.Null(deletedCustomer);
         }
 
@@ -396,14 +371,13 @@ namespace KeepWarm.Tests.Services
                 new Customer { FirstName = "Customer4", LastName = "Test", Email = "c4@test.com", UserId = null } // Already null
             };
             
-            _context.Customers.AddRange(customers);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customers);
 
             // Act
             await _customerService.SetCustomersUserIdToNullAsync(userId);
 
             // Assert
-            var updatedCustomers = await _context.Customers.ToListAsync();
+            var updatedCustomers = await Context.Customers.ToListAsync();
             
             // Kunder som tillhörde userId ska nu ha UserId = null
             var userCustomers = updatedCustomers.Where(c => c.Email.StartsWith("c1@") || c.Email.StartsWith("c2@")).ToList();
@@ -434,8 +408,7 @@ namespace KeepWarm.Tests.Services
                 UpdatedAt = originalTime
             };
             
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
             
             var beforeUpdate = DateTime.UtcNow;
 
@@ -443,7 +416,7 @@ namespace KeepWarm.Tests.Services
             await _customerService.SetCustomersUserIdToNullAsync(userId);
 
             // Assert
-            var updatedCustomer = await _context.Customers.FirstAsync(c => c.Email == "test@example.com");
+            var updatedCustomer = await Context.Customers.FirstAsync(c => c.Email == "test@example.com");
             Assert.Null(updatedCustomer.UserId);
             Assert.True(updatedCustomer.UpdatedAt >= beforeUpdate);
             Assert.True(updatedCustomer.UpdatedAt > originalTime);
@@ -464,14 +437,13 @@ namespace KeepWarm.Tests.Services
                 UserId = otherUserId 
             };
             
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             await _customerService.SetCustomersUserIdToNullAsync(userId);
 
             // Assert
-            var unchangedCustomer = await _context.Customers.FirstAsync(c => c.Email == "other@example.com");
+            var unchangedCustomer = await Context.Customers.FirstAsync(c => c.Email == "other@example.com");
             Assert.Equal(otherUserId, unchangedCustomer.UserId);
         }
 
@@ -487,14 +459,13 @@ namespace KeepWarm.Tests.Services
                 UserId = "user123" 
             };
             
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             await _customerService.SetCustomersUserIdToNullAsync("");
 
             // Assert - Ingen kund ska påverkas av tom userId
-            var unchangedCustomer = await _context.Customers.FirstAsync(c => c.Email == "test@example.com");
+            var unchangedCustomer = await Context.Customers.FirstAsync(c => c.Email == "test@example.com");
             Assert.Equal("user123", unchangedCustomer.UserId);
         }
 
@@ -510,20 +481,15 @@ namespace KeepWarm.Tests.Services
                 UserId = "user123" 
             };
             
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             // Act
             await _customerService.SetCustomersUserIdToNullAsync(null!);
 
             // Assert - Ingen kund ska påverkas av null userId
-            var unchangedCustomer = await _context.Customers.FirstAsync(c => c.Email == "test@example.com");
+            var unchangedCustomer = await Context.Customers.FirstAsync(c => c.Email == "test@example.com");
             Assert.Equal("user123", unchangedCustomer.UserId);
         }
 
-        public void Dispose()
-        {
-            _context.Dispose();
-        }
     }
 }

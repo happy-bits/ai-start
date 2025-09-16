@@ -1,24 +1,17 @@
-using KeepWarm.Data;
 using KeepWarm.Models;
 using KeepWarm.Services;
+using KeepWarm.Tests.TestHelpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace KeepWarm.Tests.Services
 {
-    public class InteractionServiceTests : IDisposable
+    public class InteractionServiceTests : DbContextTestBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly InteractionService _service;
 
         public InteractionServiceTests()
         {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
-
-            _context = new ApplicationDbContext(options);
-            _service = new InteractionService(_context);
+            _service = new InteractionService(Context);
         }
 
         [Fact]
@@ -33,8 +26,7 @@ namespace KeepWarm.Tests.Services
                 Email = "test@example.com",
                 UserId = "user123"
             };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             var interaction = new Interaction
             {
@@ -50,7 +42,7 @@ namespace KeepWarm.Tests.Services
 
             // Assert
             Assert.True(result);
-            var createdInteraction = await _context.Interactions.FirstOrDefaultAsync();
+            var createdInteraction = await Context.Interactions.FirstOrDefaultAsync();
             Assert.NotNull(createdInteraction);
             Assert.Equal("Telefonsamtal", createdInteraction.InteractionType);
             Assert.Equal("Diskuterade projektets framsteg", createdInteraction.Description);
@@ -68,8 +60,7 @@ namespace KeepWarm.Tests.Services
                 Email = "test@example.com",
                 UserId = "user123"
             };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             var interaction = new Interaction
             {
@@ -85,7 +76,7 @@ namespace KeepWarm.Tests.Services
 
             // Assert
             Assert.True(result);
-            var createdInteraction = await _context.Interactions.FirstOrDefaultAsync();
+            var createdInteraction = await Context.Interactions.FirstOrDefaultAsync();
             Assert.NotNull(createdInteraction);
             Assert.Equal(0, createdInteraction.InteractionDate.Second);
             Assert.Equal(0, createdInteraction.InteractionDate.Millisecond);
@@ -105,8 +96,6 @@ namespace KeepWarm.Tests.Services
                 Email = "test@example.com",
                 UserId = "user123"
             };
-            _context.Customers.Add(customer);
-
             var interaction1 = new Interaction
             {
                 CustomerId = 1,
@@ -125,8 +114,7 @@ namespace KeepWarm.Tests.Services
                 InteractionDate = new DateTime(2024, 1, 16, 10, 0, 0)
             };
 
-            _context.Interactions.AddRange(interaction1, interaction2);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer, interaction1, interaction2);
 
             // Act
             var result = await _service.GetInteractionsByCustomerIdAsync(1);
@@ -143,13 +131,10 @@ namespace KeepWarm.Tests.Services
             // Arrange
             var customer1 = new Customer { Id = 1, FirstName = "Test1", LastName = "Customer1", Email = "test1@example.com", UserId = "user123" };
             var customer2 = new Customer { Id = 2, FirstName = "Test2", LastName = "Customer2", Email = "test2@example.com", UserId = "user456" };
-            _context.Customers.AddRange(customer1, customer2);
-
             var interaction1 = new Interaction { CustomerId = 1, UserId = "user123", InteractionType = "Telefonsamtal", Description = "User1 interaction" };
             var interaction2 = new Interaction { CustomerId = 2, UserId = "user456", InteractionType = "Mail", Description = "User2 interaction" };
 
-            _context.Interactions.AddRange(interaction1, interaction2);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer1, customer2, interaction1, interaction2);
 
             // Act
             var result = await _service.GetInteractionsByUserIdAsync("user123");
@@ -164,7 +149,7 @@ namespace KeepWarm.Tests.Services
         {
             // Arrange
             var customer = new Customer { Id = 1, FirstName = "Test", LastName = "Customer", Email = "test@example.com", UserId = "user123" };
-            _context.Customers.Add(customer);
+            Context.Customers.Add(customer);
 
             var interaction = new Interaction
             {
@@ -174,8 +159,7 @@ namespace KeepWarm.Tests.Services
                 Description = "Original beskrivning",
                 InteractionDate = new DateTime(2024, 1, 15, 14, 30, 0)
             };
-            _context.Interactions.Add(interaction);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(interaction);
 
             // Act
             interaction.Description = "Uppdaterad beskrivning";
@@ -183,7 +167,7 @@ namespace KeepWarm.Tests.Services
 
             // Assert
             Assert.True(result);
-            var updatedInteraction = await _context.Interactions.FindAsync(interaction.Id);
+            var updatedInteraction = await Context.Interactions.FindAsync(interaction.Id);
             Assert.Equal("Uppdaterad beskrivning", updatedInteraction!.Description);
         }
 
@@ -192,7 +176,7 @@ namespace KeepWarm.Tests.Services
         {
             // Arrange
             var customer = new Customer { Id = 1, FirstName = "Test", LastName = "Customer", Email = "test@example.com", UserId = "user123" };
-            _context.Customers.Add(customer);
+            Context.Customers.Add(customer);
 
             var interaction = new Interaction
             {
@@ -202,8 +186,7 @@ namespace KeepWarm.Tests.Services
                 Description = "Original beskrivning",
                 InteractionDate = new DateTime(2024, 1, 15, 14, 30, 0)
             };
-            _context.Interactions.Add(interaction);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(interaction);
 
             // Act
             interaction.InteractionDate = new DateTime(2024, 1, 15, 16, 45, 30, 500); // Med sekunder och millisekunder
@@ -211,7 +194,7 @@ namespace KeepWarm.Tests.Services
 
             // Assert
             Assert.True(result);
-            var updatedInteraction = await _context.Interactions.FindAsync(interaction.Id);
+            var updatedInteraction = await Context.Interactions.FindAsync(interaction.Id);
             Assert.Equal(0, updatedInteraction!.InteractionDate.Second);
             Assert.Equal(0, updatedInteraction.InteractionDate.Millisecond);
             Assert.Equal(16, updatedInteraction.InteractionDate.Hour);
@@ -223,7 +206,7 @@ namespace KeepWarm.Tests.Services
         {
             // Arrange
             var customer = new Customer { Id = 1, FirstName = "Test", LastName = "Customer", Email = "test@example.com", UserId = "user123" };
-            _context.Customers.Add(customer);
+            Context.Customers.Add(customer);
 
             var interaction = new Interaction
             {
@@ -232,15 +215,14 @@ namespace KeepWarm.Tests.Services
                 InteractionType = "Telefonsamtal",
                 Description = "Test beskrivning"
             };
-            _context.Interactions.Add(interaction);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(interaction);
 
             // Act
             var result = await _service.DeleteInteractionAsync(interaction.Id);
 
             // Assert
             Assert.True(result);
-            var deletedInteraction = await _context.Interactions.FindAsync(interaction.Id);
+            var deletedInteraction = await Context.Interactions.FindAsync(interaction.Id);
             Assert.Null(deletedInteraction);
         }
 
@@ -256,11 +238,10 @@ namespace KeepWarm.Tests.Services
                 FirstName = "Test",
                 LastName = "User"
             };
-            _context.Users.Add(user);
+            Context.Users.Add(user);
 
             var customer = new Customer { Id = 1, FirstName = "Test", LastName = "Customer", Email = "test@example.com", UserId = "user123" };
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(customer);
 
             var interaction = new Interaction
             {
@@ -269,8 +250,7 @@ namespace KeepWarm.Tests.Services
                 InteractionType = "Telefonsamtal",
                 Description = "Test beskrivning"
             };
-            _context.Interactions.Add(interaction);
-            await _context.SaveChangesAsync();
+            await SeedDatabaseAsync(interaction);
 
             // Act
             var result = await _service.GetInteractionByIdAsync(interaction.Id);
@@ -281,9 +261,5 @@ namespace KeepWarm.Tests.Services
             Assert.Equal("Telefonsamtal", result.InteractionType);
         }
 
-        public void Dispose()
-        {
-            _context.Dispose();
-        }
     }
 }
