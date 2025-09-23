@@ -1,0 +1,95 @@
+---
+description: Kommandon
+globs:
+alwaysApply: true
+---
+
+# Kommandon 
+
+## Analys & Planering
+
+
+`-where`
+Vilka filer och mappar är relevanta för sammanhanget? 
+Ändra ingen kod och föreslå ingen lösning än.
+
+`-steps`
+Skapa numrerad handlingsplan där det framgår vad som ska göras och vilka steg som är klara:
+```
+✅ 1. Slutfört steg
+🖋️ 2. Pågående steg
+```
+`-steps3`
+Dela upp uppgiften i 3-5 steg, där varje steg kan verifieras av en slutanvändare. Förklara hur steget kan verifieras.
+
+`-steps-back`
+Det senaste steget är inte ännu klart. Uppdatera steget till 🖋️ istället för ✅.
+
+`-test`
+Beskriv kortfattat hur jag kan verifiera koduppdateringen.
+
+`-summary`
+Sammanfatta vad vi kommit fram till.
+Ändra vad vi kommit fram till.
+
+## Implementation
+
+`-code-unit [x]`
+Implementera specificerat steg.
+Om [x] utelämnas, implementeras nästa steg i ordningen.
+Skapa enhetstest för att verifiera implementationen.
+
+`-debug-see`
+Jag bifogar ett fel. 
+Ser du felet? 
+Beskriv hur du tolkar felet.
+Ändra ingen kod.
+
+## Prompt
+
+`-prompt-better`
+
+I min tidigare fråga bad jag dig utföra en uppgift, men du missade en detalj, vilket du sedan korrigerade.
+
+Hur skulle jag ha formulerat instruktionen för att säkerställa att du förstod uppgiften korrekt från början? 
+
+## Mallar
+
+`-template`
+Skapa en markdownfil summary.md som beskriver uppgiften och hur du löste den. Syftet är att instruktionen ska fungera som stöd för en AI-assistent i framtiden, vid lösning av liknande problem. Följ nedanstående mall:
+```
+# Rubrik
+
+## Typ av ändring
+- [ ] Feature
+- [ ] Buggfix
+- [ ] Refaktorering
+- [ ] Dokumentation
+- [ ] Annat
+
+## Beskrivning
+En kort sammanfattning av vad ändringen innebär (1 mening)
+
+## Detaljer
+- Lista över specifika ändringar
+- En punkt per ändring
+- Fokusera på vad som gjorts och varför
+
+## Relaterade filer
+- Lista över ändrade filer
+- Ange fullständiga sökvägar
+
+```
+
+`-script`
+Generera ett skript, en funktion med parameterar, som kan användas för att generera liknande kod i framtiden. 
+
+`-script3`
+Generera ett skript, en funktion med parameterar, som kan användas för att generera liknande kod i framtiden.  
+Ge först tre olika förslag.
+
+
+## Dokumentation
+
+`-diagram-er`
+Skapa ett ER-diagram i mermaid-format, svara i ett kodblock.
