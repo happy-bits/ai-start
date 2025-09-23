@@ -765,6 +765,23 @@ namespace KeepWarm.Tests.Controllers
             var forbiddenResult = Assert.IsType<ForbidResult>(result);
         }
 
+        [Fact]
+        public async Task DetailsUser_ShouldReturnViewWithUser_WhenUserIsAdmin()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user1", Email = "user1@example.com", FirstName = "User", LastName = "One" };
+            SetupAuthenticatedUser("admin1", true);
+            MockUserManager.Setup(m => m.FindByIdAsync("user1")).ReturnsAsync(user);
+
+            // Act
+            var result = await _controller.DetailsUser("user1");
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsType<ApplicationUser>(viewResult.Model);
+            Assert.Equal("user1", model.Id);
+        }
+
 
         private void SetupControllerContext()
         {
