@@ -1,4 +1,3 @@
-Analysera problem och ge detaljerad förklaring.
+Analysera problem.
 Fokusera på problemförståelse.
-Skriv i ett kodfönster vilka mappar och filer du föreslår ska skapas eller ändras.
 Ändra ingen kod.

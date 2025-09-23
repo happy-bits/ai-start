@@ -1,3 +1,4 @@
-Analysera problem och ger tre olika lösningsförslag.
-Fokus på problemförståelse.
+Analysera problem.
+Fokusera på problemförståelse.
+Ge tre olika lösningsförslag.
 Ändra ingen kod.
