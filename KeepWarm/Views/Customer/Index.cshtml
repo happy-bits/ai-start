@@ -21,6 +21,7 @@
                             <th>E-post</th>
                             <th>Telefon</th>
                             <th>Stad</th>
+                            <th>Återkomstdag</th>
                             <th>Skapad</th>
                             @if (User.IsInRole("Admin"))
                             {
@@ -57,6 +58,16 @@
                                     else
                                     {
                                         <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (customer.NextFollowUpDate.HasValue)
+                                    {
+                                        <span class="badge bg-success">@customer.NextFollowUpDate.Value.ToString("yyyy-MM-dd")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Ingen</span>
                                     }
                                 </td>
                                 <td>

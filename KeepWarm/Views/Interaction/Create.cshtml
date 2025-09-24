@@ -46,6 +46,19 @@
                         <span asp-validation-for="InteractionDate" class="text-danger"></span>
                     </div>
                     
+                    <div class="form-group mb-3">
+                        <label asp-for="FollowUpDate" class="form-label">Återkomstdatum</label>
+                        <div class="input-group">
+                            <input asp-for="FollowUpDate" type="date" class="form-control" />
+                            <div class="input-group-text">
+                                <input id="noFollowUpCheckbox" class="form-check-input mt-0" type="checkbox" />
+                                <label for="noFollowUpCheckbox" class="ms-2 mb-0">Ingen återkomst</label>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">Standard är 3 dagar framåt. Markera "Ingen återkomst" för att lämna tomt.</small>
+                        <span asp-validation-for="FollowUpDate" class="text-danger"></span>
+                    </div>
+                    
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-plus-circle"></i> Skapa interaktion
@@ -74,6 +87,9 @@
                 <p class="text-muted">
                     <strong>Datum:</strong> Ange när interaktionen ägde rum.
                 </p>
+                <p class="text-muted">
+                    <strong>Återkomstdatum:</strong> Välj dag då du ska återkomma (valfritt). Standard är idag + 3 dagar.
+                </p>
             </div>
         </div>
     </div>
@@ -81,4 +97,29 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (function() {
+            const checkbox = document.getElementById('noFollowUpCheckbox');
+            const dateInput = document.getElementById('FollowUpDate');
+
+            function updateState() {
+                if (!checkbox || !dateInput) return;
+                if (checkbox.checked) {
+                    dateInput.value = '';
+                    dateInput.setAttribute('disabled', 'disabled');
+                } else {
+                    dateInput.removeAttribute('disabled');
+                }
+            }
+
+            if (checkbox && dateInput) {
+                // Sätt initialt läge beroende på om modelvärdet är tomt
+                if (!dateInput.value) {
+                    checkbox.checked = true;
+                }
+                updateState();
+                checkbox.addEventListener('change', updateState);
+            }
+        })();
+    </script>
 }

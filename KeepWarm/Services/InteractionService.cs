@@ -24,6 +24,14 @@ namespace KeepWarm.Services
                 interaction.UpdatedAt = DateTimeHelper.FormatToMinutePrecision(DateTime.UtcNow);
 
                 _context.Interactions.Add(interaction);
+                
+                // Uppdatera Customer.NextFollowUpDate med valt datum
+                var customer = await _context.Customers.FindAsync(interaction.CustomerId);
+                if (customer != null)
+                {
+                    customer.NextFollowUpDate = interaction.FollowUpDate;
+                }
+                
                 await _context.SaveChangesAsync();
                 return true;
             }

@@ -22,6 +22,9 @@ namespace KeepWarm.Models
 
         public DateTime InteractionDate { get; set; } = DateTime.UtcNow;
 
+        // Återkomstdatum som säljaren valde vid denna interaktion
+        public DateOnly? FollowUpDate { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

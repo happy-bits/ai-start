@@ -26,7 +26,8 @@ namespace KeepWarm.Controllers
             var model = new InteractionCreateViewModel
             {
                 CustomerId = customerId,
-                InteractionDate = DateTimeHelper.FormatToMinutePrecision(DateTime.Now)
+                InteractionDate = DateTimeHelper.FormatToMinutePrecision(DateTime.Now),
+                FollowUpDate = DateOnly.FromDateTime(DateTime.Today.AddDays(3))
             };
 
             return View(model);
@@ -50,7 +51,8 @@ namespace KeepWarm.Controllers
                     UserId = userId,
                     InteractionType = model.InteractionType,
                     Description = model.Description,
-                    InteractionDate = DateTimeHelper.FormatToMinutePrecision(model.InteractionDate)
+                    InteractionDate = DateTimeHelper.FormatToMinutePrecision(model.InteractionDate),
+                    FollowUpDate = model.FollowUpDate
                 };
 
                 var result = await _interactionService.CreateInteractionAsync(interaction);

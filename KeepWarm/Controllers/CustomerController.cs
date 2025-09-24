@@ -42,6 +42,9 @@ namespace KeepWarm.Controllers
                 customers = await _customerService.GetAllCustomersAsync(userId);
             }
 
+            // Sortera kunder på NextFollowUpDate (null sist)
+            customers = customers.OrderBy(c => c.NextFollowUpDate ?? DateOnly.MaxValue);
+
             return View(customers);
         }
 

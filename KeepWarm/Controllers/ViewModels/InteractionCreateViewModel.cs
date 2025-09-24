@@ -19,6 +19,9 @@ namespace KeepWarm.Controllers.ViewModels
         [Required(ErrorMessage = "Datum är obligatoriskt")]
         public DateTime InteractionDate { get; set; } = DateTimeHelper.FormatToMinutePrecision(DateTime.Now);
 
+        // Återkomstdatum för säljaren (kan vara null)
+        public DateOnly? FollowUpDate { get; set; } = DateOnly.FromDateTime(DateTime.Today.AddDays(3));
+
         // Lista med tillgängliga interaktionstyper
         public List<string> AvailableInteractionTypes => new List<string>
         {

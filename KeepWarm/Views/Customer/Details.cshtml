@@ -45,6 +45,18 @@
                                     <span class="text-muted">Inte angivet</span>
                                 }
                             </dd>
+                            
+                            <dt class="col-sm-4">Återkomstdag:</dt>
+                            <dd class="col-sm-8">
+                                @if (Model.NextFollowUpDate.HasValue)
+                                {
+                                    <span class="badge bg-success">@Model.NextFollowUpDate.Value.ToString("yyyy-MM-dd")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Ingen</span>
+                                }
+                            </dd>
                         </dl>
                     </div>
                     <div class="col-md-6">

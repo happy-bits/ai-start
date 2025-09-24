@@ -41,6 +41,9 @@ namespace KeepWarm.Models
         // Foreign key till ApplicationUser
         public string? UserId { get; set; }
 
+        // Återkomstdatum för säljaren
+        public DateOnly? NextFollowUpDate { get; set; }
+
         // Navigation property
         public ApplicationUser? User { get; set; }
     }

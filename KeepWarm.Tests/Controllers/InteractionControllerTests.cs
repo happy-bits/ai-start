@@ -39,6 +39,22 @@ namespace KeepWarm.Tests.Controllers
         }
 
         [Fact]
+        public void Create_GET_ShouldSetDefaultFollowUpDateToThreeDaysFromToday()
+        {
+            // Arrange
+            var customerId = 1;
+            var expectedDate = DateOnly.FromDateTime(DateTime.Today.AddDays(3));
+
+            // Act
+            var result = _controller.Create(customerId);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsType<InteractionCreateViewModel>(viewResult.Model);
+            Assert.Equal(expectedDate, model.FollowUpDate);
+        }
+
+        [Fact]
         public async Task Create_POST_WithValidModel_ShouldCreateInteractionAndRedirect()
         {
             // Arrange
@@ -67,6 +83,83 @@ namespace KeepWarm.Tests.Controllers
             Assert.NotNull(redirectResult.RouteValues);
             Assert.Equal(1, redirectResult.RouteValues["id"]);
 
+            MockInteractionService.Verify(x => x.CreateInteractionAsync(It.Is<Interaction>(i =>
+                i.CustomerId == 1 &&
+                i.UserId == userId &&
+                i.InteractionType == "Telefonsamtal" &&
+                i.Description == "Diskuterade projektets framsteg"
+            )), Times.Once);
+        }
+
+        [Fact]
+        public async Task Create_POST_WithFollowUpDate_ShouldUpdateCustomerNextFollowUpDate()
+        {
+            // Arrange
+            var userId = "user123";
+            var followUpDate = DateOnly.FromDateTime(DateTime.Today.AddDays(5));
+            
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+                .Returns(userId);
+
+            var model = new InteractionCreateViewModel
+            {
+                CustomerId = 1,
+                InteractionType = "Telefonsamtal",
+                Description = "Diskuterade projektets framsteg",
+                InteractionDate = new DateTime(2024, 1, 15, 14, 30, 0),
+                FollowUpDate = followUpDate
+            };
+
+            MockInteractionService.Setup(x => x.CreateInteractionAsync(It.IsAny<Interaction>()))
+                .ReturnsAsync(true);
+
+            // Act
+            var result = await _controller.Create(model);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Details", redirectResult.ActionName);
+            Assert.Equal("Customer", redirectResult.ControllerName);
+
+            // Kontrollera att InteractionService anropas med korrekt FollowUpDate
+            MockInteractionService.Verify(x => x.CreateInteractionAsync(It.Is<Interaction>(i =>
+                i.CustomerId == 1 &&
+                i.UserId == userId &&
+                i.InteractionType == "Telefonsamtal" &&
+                i.Description == "Diskuterade projektets framsteg"
+            )), Times.Once);
+        }
+
+        [Fact]
+        public async Task Create_POST_WithNullFollowUpDate_ShouldSetCustomerNextFollowUpDateToNull()
+        {
+            // Arrange
+            var userId = "user123";
+            
+            MockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
+                .Returns(userId);
+
+            var model = new InteractionCreateViewModel
+            {
+                CustomerId = 1,
+                InteractionType = "Telefonsamtal",
+                Description = "Diskuterade projektets framsteg",
+                InteractionDate = new DateTime(2024, 1, 15, 14, 30, 0),
+                FollowUpDate = null
+            };
+
+            MockInteractionService.Setup(x => x.CreateInteractionAsync(It.IsAny<Interaction>()))
+                .ReturnsAsync(true);
+
+            // Act
+            var result = await _controller.Create(model);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Details", redirectResult.ActionName);
+            Assert.Equal("Customer", redirectResult.ControllerName);
+
+            // Kontrollera att InteractionService anropas
             MockInteractionService.Verify(x => x.CreateInteractionAsync(It.Is<Interaction>(i =>
                 i.CustomerId == 1 &&
                 i.UserId == userId &&

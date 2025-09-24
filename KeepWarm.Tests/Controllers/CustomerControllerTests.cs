@@ -453,5 +453,41 @@ namespace KeepWarm.Tests.Controllers
                 c.FirstName == "Admin Updated")), Times.Once);
         }
 
+        [Fact]
+        public async Task Index_ShouldSortCustomersByNextFollowUpDate()
+        {
+            // Arrange
+            var userId = "user1";
+            var today = new DateOnly(2024, 01, 10);
+            var tomorrow = new DateOnly(2024, 01, 11);
+            var nextWeek = new DateOnly(2024, 01, 17);
+
+            var customers = new List<Customer>
+            {
+                new Customer { Id = 1, FirstName = "Customer", LastName = "A", Email = "a@example.com", UserId = userId, NextFollowUpDate = nextWeek },
+                new Customer { Id = 2, FirstName = "Customer", LastName = "B", Email = "b@example.com", UserId = userId, NextFollowUpDate = tomorrow },
+                new Customer { Id = 3, FirstName = "Customer", LastName = "C", Email = "c@example.com", UserId = userId, NextFollowUpDate = null },
+                new Customer { Id = 4, FirstName = "Customer", LastName = "D", Email = "d@example.com", UserId = userId, NextFollowUpDate = today }
+            };
+
+            SetupAuthenticatedUser(_controller, userId);
+            _mockCustomerService.Setup(s => s.GetAllCustomersAsync(userId))
+                .ReturnsAsync(customers);
+
+            // Act
+            var result = await _controller.Index();
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<IEnumerable<Customer>>(viewResult.Model);
+            var sortedCustomers = model.ToList();
+            
+            // Kontrollera att kunderna är sorterade på NextFollowUpDate (null sist)
+            Assert.Equal(4, sortedCustomers[0].Id); // today
+            Assert.Equal(2, sortedCustomers[1].Id); // tomorrow
+            Assert.Equal(1, sortedCustomers[2].Id); // nextWeek
+            Assert.Equal(3, sortedCustomers[3].Id); // null
+        }
+
     }
 }

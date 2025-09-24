@@ -261,5 +261,115 @@ namespace KeepWarm.Tests.Services
             Assert.Equal("Telefonsamtal", result.InteractionType);
         }
 
+        [Fact]
+        public async Task CreateInteractionAsync_WithFollowUpDate_ShouldUpdateCustomerNextFollowUpDate()
+        {
+            // Arrange
+            var customer = new Customer
+            {
+                Id = 1,
+                FirstName = "Test",
+                LastName = "Customer",
+                Email = "test@example.com",
+                UserId = "user123",
+                NextFollowUpDate = null // Inga tidigare uppföljningar
+            };
+            await SeedDatabaseAsync(customer);
+
+            var followUpDate = DateOnly.FromDateTime(DateTime.Today.AddDays(5));
+            var interaction = new Interaction
+            {
+                CustomerId = 1,
+                UserId = "user123",
+                InteractionType = "Telefonsamtal",
+                Description = "Diskuterade projektets framsteg",
+                InteractionDate = new DateTime(2024, 1, 15, 14, 30, 0),
+                FollowUpDate = followUpDate
+            };
+
+            // Act
+            var result = await _service.CreateInteractionAsync(interaction);
+
+            // Assert
+            Assert.True(result);
+            var updatedCustomer = await Context.Customers.FindAsync(1);
+            Assert.NotNull(updatedCustomer);
+            Assert.Equal(followUpDate, updatedCustomer.NextFollowUpDate);
+        }
+
+        [Fact]
+        public async Task CreateInteractionAsync_WithNullFollowUpDate_ShouldSetCustomerNextFollowUpDateToNull()
+        {
+            // Arrange
+            var customer = new Customer
+            {
+                Id = 1,
+                FirstName = "Test",
+                LastName = "Customer",
+                Email = "test@example.com",
+                UserId = "user123",
+                NextFollowUpDate = DateOnly.FromDateTime(DateTime.Today.AddDays(3)) // Tidigare uppföljning
+            };
+            await SeedDatabaseAsync(customer);
+
+            var interaction = new Interaction
+            {
+                CustomerId = 1,
+                UserId = "user123",
+                InteractionType = "Telefonsamtal",
+                Description = "Diskuterade projektets framsteg",
+                InteractionDate = new DateTime(2024, 1, 15, 14, 30, 0),
+                FollowUpDate = null
+            };
+
+            // Act
+            var result = await _service.CreateInteractionAsync(interaction);
+
+            // Assert
+            Assert.True(result);
+            var updatedCustomer = await Context.Customers.FindAsync(1);
+            Assert.NotNull(updatedCustomer);
+            Assert.Null(updatedCustomer.NextFollowUpDate);
+        }
+
+        [Fact]
+        public async Task CreateInteractionAsync_WithNewFollowUpDate_ShouldReplaceExistingFollowUpDate()
+        {
+            // Arrange
+            var existingFollowUpDate = DateOnly.FromDateTime(DateTime.Today.AddDays(3));
+            var newFollowUpDate = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
+            
+            var customer = new Customer
+            {
+                Id = 1,
+                FirstName = "Test",
+                LastName = "Customer",
+                Email = "test@example.com",
+                UserId = "user123",
+                NextFollowUpDate = existingFollowUpDate
+            };
+            await SeedDatabaseAsync(customer);
+
+            var interaction = new Interaction
+            {
+                CustomerId = 1,
+                UserId = "user123",
+                InteractionType = "Telefonsamtal",
+                Description = "Diskuterade projektets framsteg",
+                InteractionDate = new DateTime(2024, 1, 15, 14, 30, 0),
+                FollowUpDate = newFollowUpDate
+            };
+
+            // Act
+            var result = await _service.CreateInteractionAsync(interaction);
+
+            // Assert
+            Assert.True(result);
+            var updatedCustomer = await Context.Customers.FindAsync(1);
+            Assert.NotNull(updatedCustomer);
+            Assert.Equal(newFollowUpDate, updatedCustomer.NextFollowUpDate);
+            Assert.NotEqual(existingFollowUpDate, updatedCustomer.NextFollowUpDate);
+        }
+
     }
 }
