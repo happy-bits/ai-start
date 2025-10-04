@@ -79,16 +79,20 @@ namespace KeepWarm.Controllers
                 return Unauthorized();
             }
 
-            var interaction = await _interactionService.GetInteractionByIdAsync(id);
+            // Använd säker metod (admin kan använda osäker metod vid behov)
+            Interaction? interaction;
+            if (User.IsInRole("Admin"))
+            {
+                interaction = await _interactionService.GetInteractionByIdAsync(id);
+            }
+            else
+            {
+                interaction = await _interactionService.GetInteractionByIdAsync(id, userId);
+            }
+
             if (interaction == null)
             {
                 return NotFound();
-            }
-
-            // Kontrollera att användaren äger interaktionen eller är admin
-            if (interaction.UserId != userId && !User.IsInRole("Admin"))
-            {
-                return Forbid();
             }
 
             var model = new InteractionEditViewModel
@@ -115,23 +119,38 @@ namespace KeepWarm.Controllers
                     return Unauthorized();
                 }
 
-                var existingInteraction = await _interactionService.GetInteractionByIdAsync(model.Id);
+                // Hämta befintlig interaktion för att säkerställa access
+                Interaction? existingInteraction;
+                if (User.IsInRole("Admin"))
+                {
+                    existingInteraction = await _interactionService.GetInteractionByIdAsync(model.Id);
+                }
+                else
+                {
+                    existingInteraction = await _interactionService.GetInteractionByIdAsync(model.Id, userId);
+                }
+
                 if (existingInteraction == null)
                 {
                     return NotFound();
-                }
-
-                // Kontrollera att användaren äger interaktionen eller är admin
-                if (existingInteraction.UserId != userId && !User.IsInRole("Admin"))
-                {
-                    return Forbid();
                 }
 
                 existingInteraction.InteractionType = model.InteractionType;
                 existingInteraction.Description = model.Description;
                 existingInteraction.InteractionDate = DateTimeHelper.FormatToMinutePrecision(model.InteractionDate);
 
-                var result = await _interactionService.UpdateInteractionAsync(existingInteraction);
+                // Använd säker uppdateringsmetod
+                bool result;
+                if (User.IsInRole("Admin"))
+                {
+                    // Admin kan uppdatera vem som helsts interaktioner - använd userId från interaktionen
+                    result = await _interactionService.UpdateInteractionAsync(existingInteraction, existingInteraction.UserId);
+                }
+                else
+                {
+                    result = await _interactionService.UpdateInteractionAsync(existingInteraction, userId);
+                }
+
                 if (result)
                 {
                     TempData["SuccessMessage"] = "Interaktionen har uppdaterats framgångsrikt.";
@@ -155,16 +174,19 @@ namespace KeepWarm.Controllers
                 return Unauthorized();
             }
 
-            var interaction = await _interactionService.GetInteractionByIdAsync(id);
+            Interaction? interaction;
+            if (User.IsInRole("Admin"))
+            {
+                interaction = await _interactionService.GetInteractionByIdAsync(id);
+            }
+            else
+            {
+                interaction = await _interactionService.GetInteractionByIdAsync(id, userId);
+            }
+
             if (interaction == null)
             {
                 return NotFound();
-            }
-
-            // Kontrollera att användaren äger interaktionen eller är admin
-            if (interaction.UserId != userId && !User.IsInRole("Admin"))
-            {
-                return Forbid();
             }
 
             return View(interaction);
@@ -179,16 +201,19 @@ namespace KeepWarm.Controllers
                 return Unauthorized();
             }
 
-            var interaction = await _interactionService.GetInteractionByIdAsync(id);
+            Interaction? interaction;
+            if (User.IsInRole("Admin"))
+            {
+                interaction = await _interactionService.GetInteractionByIdAsync(id);
+            }
+            else
+            {
+                interaction = await _interactionService.GetInteractionByIdAsync(id, userId);
+            }
+
             if (interaction == null)
             {
                 return NotFound();
-            }
-
-            // Kontrollera att användaren äger interaktionen eller är admin
-            if (interaction.UserId != userId && !User.IsInRole("Admin"))
-            {
-                return Forbid();
             }
 
             return View(interaction);
@@ -204,28 +229,45 @@ namespace KeepWarm.Controllers
                 return Unauthorized();
             }
 
-            var interaction = await _interactionService.GetInteractionByIdAsync(id);
+            // Hämta interaktionen för att få CustomerId innan borttagning
+            Interaction? interaction;
+            if (User.IsInRole("Admin"))
+            {
+                interaction = await _interactionService.GetInteractionByIdAsync(id);
+            }
+            else
+            {
+                interaction = await _interactionService.GetInteractionByIdAsync(id, userId);
+            }
+
             if (interaction == null)
             {
                 return NotFound();
             }
 
-            // Kontrollera att användaren äger interaktionen eller är admin
-            if (interaction.UserId != userId && !User.IsInRole("Admin"))
+            var customerId = interaction.CustomerId;
+
+            // Använd säker borttagningsmetod
+            bool result;
+            if (User.IsInRole("Admin"))
             {
-                return Forbid();
+                // Admin kan ta bort vem som helsts interaktioner - använd userId från interaktionen
+                result = await _interactionService.DeleteInteractionAsync(id, interaction.UserId);
+            }
+            else
+            {
+                result = await _interactionService.DeleteInteractionAsync(id, userId);
             }
 
-            var result = await _interactionService.DeleteInteractionAsync(id);
             if (result)
             {
                 TempData["SuccessMessage"] = "Interaktionen har tagits bort framgångsrikt.";
-                return RedirectToAction("Details", "Customer", new { id = interaction.CustomerId });
+                return RedirectToAction("Details", "Customer", new { id = customerId });
             }
             else
             {
                 TempData["ErrorMessage"] = "Ett fel uppstod vid borttagningen av interaktionen.";
-                return RedirectToAction("Details", "Customer", new { id = interaction.CustomerId });
+                return RedirectToAction("Details", "Customer", new { id = customerId });
             }
         }
     }

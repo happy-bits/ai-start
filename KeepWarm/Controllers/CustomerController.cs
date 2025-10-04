@@ -75,7 +75,18 @@ namespace KeepWarm.Controllers
             }
 
             // Hämta interaktioner för kunden
-            var interactions = await _interactionService.GetInteractionsByCustomerIdAsync(id);
+            IEnumerable<Interaction> interactions;
+            if (isAdmin)
+            {
+                // Admin använder osäker metod för att hämta alla kundens interaktioner
+                interactions = (await _interactionService.GetAllInteractionsForAdminAsync())
+                    .Where(i => i.CustomerId == id);
+            }
+            else
+            {
+                interactions = await _interactionService.GetInteractionsByCustomerIdAsync(id, userId);
+            }
+            
             var orderedInteractions = interactions.OrderByDescending(i => i.InteractionDate);
 
             // Lägg till interaktionsdata i ViewData
