@@ -28,6 +28,3 @@ Undvik att ta bort tester
 - Kontrollera befintlig funktionalitet innan du utvecklar ny
 - Använd och utöka existerande komponenter
 
-**TDD (Test-Driven Development)** 
-- Projektet ska byggas enligt TDD
-– Börja alltid med att skriva ett test som misslyckas innan du implementerar funktionaliteten.
