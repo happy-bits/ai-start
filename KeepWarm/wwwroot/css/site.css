@@ -19,7 +19,6 @@ html {
 
 body {
   margin-bottom: 60px;
-  background-color: red;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
