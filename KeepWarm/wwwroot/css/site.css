@@ -14,11 +14,10 @@ html {
 
 html {
   position: relative;
-  min-height: 100%;
-}
-
-body {
+  min-hbody {
   margin-bottom: 60px;
+  background-color: red;
+}rgin-bottom: 60px;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
