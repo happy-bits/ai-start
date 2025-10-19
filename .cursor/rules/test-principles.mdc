@@ -1,0 +1,23 @@
+---
+description: Principer när du skapar tester
+alwaysApply: true
+---
+
+Mål:
+- Säkra beteende och affärsvärde med minsta effektiva testsvit.
+
+Gör så här:
+- Skriv beteendedrivna enhetstester (ex: "När saldo < 0 tas ingen avgift ut.").
+- Fokusera integrationstester på kritiska skärningspunkter (kod + DB, kod + filsystem) där mocks inte räcker.
+- Täck ett fåtal affärskritiska E2E-flöden (t.ex. checkout: happy path + 1–2 viktiga felvägar).
+- Lägg till regressionstester: reproducera buggen (rött), fixa, behåll testet.
+
+Undvik:
+- Tester utan tydligt syfte eller för att jaga 100% coverage.
+- Onödig mocking av data som döljer verkliga beroenden.
+- Att testa privata metoder (testa publikt beteende i stället).
+
+Riktlinjer:
+- Namnge tester utifrån scenario/utfall.
+- En orsak per test; tydliga given–when–then.
+- Håll testdata realistisk och minimal.

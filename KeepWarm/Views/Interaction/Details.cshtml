@@ -1,0 +1,149 @@
+@model KeepWarm.Models.Interaction
+
+@{
+    ViewData["Title"] = "Interaktionsdetaljer";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Interaktionsdetaljer</h4>
+                <div class="btn-group">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Redigera
+                    </a>
+                    <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Tillbaka
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Interaktionsinformation</h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">Interaktionstyp:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-primary">@Model.InteractionType</span>
+                            </dd>
+                            
+                            <dt class="col-sm-4">Beskrivning:</dt>
+                            <dd class="col-sm-8">@Model.Description</dd>
+                            
+                            <dt class="col-sm-4">Datum:</dt>
+                            <dd class="col-sm-8">
+                                <strong>@Model.InteractionDate.ToString("yyyy-MM-dd HH:mm")</strong>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Kundinformation</h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">Kund:</dt>
+                            <dd class="col-sm-8">
+                                <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId">
+                                    @Model.Customer?.FirstName @Model.Customer?.LastName
+                                </a>
+                            </dd>
+                            
+                            <dt class="col-sm-4">E-post:</dt>
+                            <dd class="col-sm-8">
+                                <a href="mailto:@Model.Customer?.Email">@Model.Customer?.Email</a>
+                            </dd>
+                            
+                            <dt class="col-sm-4">Telefon:</dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.Customer?.Phone))
+                                {
+                                    <a href="tel:@Model.Customer.Phone">@Model.Customer.Phone</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Inte angivet</span>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Systeminformation</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-5">Interaktions-ID:</dt>
+                    <dd class="col-sm-7"><code>@Model.Id</code></dd>
+                    
+                    <dt class="col-sm-5">Skapad:</dt>
+                    <dd class="col-sm-7">
+                        <small>@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                    </dd>
+                    
+                    <dt class="col-sm-5">Senast uppdaterad:</dt>
+                    <dd class="col-sm-7">
+                        <small>@Model.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                    </dd>
+                    
+                    <dt class="col-sm-5">Skapad av:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-info">@Model.User?.FirstName @Model.User?.LastName</span>
+                        <br>
+                        <small class="text-muted">@Model.User?.Email</small>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">Åtgärder</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Redigera interaktion
+                    </a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="bi bi-trash"></i> Ta bort interaktion
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Bekräfta borttagning</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Är du säker på att du vill ta bort denna interaktion?</p>
+                <div class="alert alert-warning">
+                    <strong>Interaktionstyp:</strong> @Model.InteractionType<br>
+                    <strong>Datum:</strong> @Model.InteractionDate.ToString("yyyy-MM-dd HH:mm")<br>
+                    <strong>Beskrivning:</strong> @Model.Description
+                </div>
+                <p class="text-danger"><strong>Denna åtgärd kan inte ångras.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+                <form asp-action="Delete" method="post" class="d-inline">
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Ta bort
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
