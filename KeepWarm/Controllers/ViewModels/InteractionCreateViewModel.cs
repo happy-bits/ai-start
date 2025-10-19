@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using KeepWarm.Helpers;
+using KeepWarm.Models;
 
 namespace KeepWarm.Controllers.ViewModels
 {
@@ -17,20 +18,12 @@ namespace KeepWarm.Controllers.ViewModels
         public string Description { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Datum är obligatoriskt")]
-        public DateTime InteractionDate { get; set; } = DateTimeHelper.FormatToMinutePrecision(DateTime.Now);
+        public DateTime InteractionDate { get; set; } = DateTimeHelper.FormatToMinutePrecision(DateTime.UtcNow);
 
         // Återkomstdatum för säljaren (kan vara null)
         public DateOnly? FollowUpDate { get; set; } = DateOnly.FromDateTime(DateTime.Today.AddDays(3));
 
         // Lista med tillgängliga interaktionstyper
-        public List<string> AvailableInteractionTypes => new List<string>
-        {
-            "Telefonsamtal",
-            "Fysiskt möte",
-            "Videomöte",
-            "LinkedIn",
-            "SMS",
-            "Mail"
-        };
+        public List<string> AvailableInteractionTypes => InteractionTypes.All;
     }
 }

@@ -7,12 +7,10 @@ namespace KeepWarm.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
     private readonly IConfiguration _configuration;
 
-    public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
+    public HomeController(IConfiguration configuration)
     {
-        _logger = logger;
         _configuration = configuration;
     }
 

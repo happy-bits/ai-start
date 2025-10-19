@@ -1,4 +1,5 @@
 using KeepWarm.Controllers.ViewModels;
+using KeepWarm.Extensions;
 using KeepWarm.Models;
 using KeepWarm.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -35,20 +36,13 @@ namespace KeepWarm.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser
-                {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName
-                };
-
+                var user = model.ToApplicationUser();
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
                     // Tilldela User-roll som standard
-                    await _userManager.AddToRoleAsync(user, "User");
+                    await _userManager.AddToRoleAsync(user, Roles.User);
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Home");
@@ -122,20 +116,13 @@ namespace KeepWarm.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser
-                {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName
-                };
-
+                var user = model.ToApplicationUser();
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
                     // Admin kan bara skapa User-roller (enligt kravspecifikationen)
-                    await _userManager.AddToRoleAsync(user, "User");
+                    await _userManager.AddToRoleAsync(user, Roles.User);
                     return RedirectToAction("ManageUsers");
                 }
 
@@ -164,28 +151,15 @@ namespace KeepWarm.Controllers
             }
 
             // Säkerhetskontroll: Admin kan inte redigera andra admin (men kan redigera sig själv)
-            var currentUserId = _userManager.GetUserId(User);
-            var userRoles = await _userManager.GetRolesAsync(user);
-            var isTargetAdmin = userRoles.Contains("Admin");
-
-            if (isTargetAdmin && user.Id != currentUserId)
+            if (!await CanModifyUserAsync(id))
             {
                 return Forbid();
             }
 
             var roles = await _userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault() ?? "User";
+            var role = roles.FirstOrDefault() ?? Roles.User;
 
-            var model = new EditUserViewModel
-            {
-                Id = user.Id,
-                FirstName = user.FirstName ?? string.Empty,
-                LastName = user.LastName ?? string.Empty,
-                Email = user.Email ?? string.Empty,
-                PhoneNumber = user.PhoneNumber,
-                Role = role
-            };
-
+            var model = user.ToEditViewModel(role);
             return View(model);
         }
 
@@ -203,23 +177,13 @@ namespace KeepWarm.Controllers
                 }
 
                 // Säkerhetskontroll: Admin kan inte redigera andra admin (men kan redigera sig själv)
-                var currentUserId = _userManager.GetUserId(User);
-                var userRoles = await _userManager.GetRolesAsync(user);
-                var isTargetAdmin = userRoles.Contains("Admin");
-
-                if (isTargetAdmin && user.Id != currentUserId)
+                if (!await CanModifyUserAsync(model.Id))
                 {
                     return Forbid();
                 }
 
                 // Uppdatera användardata
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
-                user.Email = model.Email;
-                user.UserName = model.Email; // UserName ska matcha Email
-                user.PhoneNumber = model.PhoneNumber;
-                user.UpdatedAt = DateTime.UtcNow;
-
+                user.UpdateFromViewModel(model);
                 var result = await _userManager.UpdateAsync(user);
 
                 if (result.Succeeded)
@@ -269,11 +233,7 @@ namespace KeepWarm.Controllers
             }
 
             // Säkerhetskontroll: Admin kan inte ta bort andra admin eller sig själv
-            var currentUserId = _userManager.GetUserId(User);
-            var userRoles = await _userManager.GetRolesAsync(user);
-            var isTargetAdmin = userRoles.Contains("Admin");
-
-            if (isTargetAdmin)
+            if (!await CanDeleteUserAsync(id))
             {
                 return Forbid();
             }
@@ -319,6 +279,43 @@ namespace KeepWarm.Controllers
             }
 
             return View(user);
+        }
+
+        /// <summary>
+        /// Kontrollerar om den aktuella admin kan modifiera den angivna användaren.
+        /// Admin kan redigera sig själv men inte andra admins.
+        /// </summary>
+        private async Task<bool> CanModifyUserAsync(string targetUserId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            var targetUser = await _userManager.FindByIdAsync(targetUserId);
+            
+            if (targetUser == null)
+                return false;
+
+            var userRoles = await _userManager.GetRolesAsync(targetUser);
+            var isTargetAdmin = userRoles.Contains(Roles.Admin);
+
+            // Admin kan modifiera sig själv eller användare som inte är admin
+            return !isTargetAdmin || targetUserId == currentUserId;
+        }
+
+        /// <summary>
+        /// Kontrollerar om den aktuella admin kan ta bort den angivna användaren.
+        /// Admin kan inte ta bort andra admins eller sig själv.
+        /// </summary>
+        private async Task<bool> CanDeleteUserAsync(string targetUserId)
+        {
+            var targetUser = await _userManager.FindByIdAsync(targetUserId);
+            
+            if (targetUser == null)
+                return false;
+
+            var userRoles = await _userManager.GetRolesAsync(targetUser);
+            var isTargetAdmin = userRoles.Contains(Roles.Admin);
+
+            // Admin kan inte ta bort admins
+            return !isTargetAdmin;
         }
 
         private IActionResult RedirectToLocal(string? returnUrl)

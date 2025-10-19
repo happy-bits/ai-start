@@ -60,16 +60,7 @@ namespace KeepWarm.Services
             if (existingCustomer == null)
                 return null;
 
-            existingCustomer.FirstName = customer.FirstName;
-            existingCustomer.LastName = customer.LastName;
-            existingCustomer.Email = customer.Email;
-            existingCustomer.Phone = customer.Phone;
-            existingCustomer.Address = customer.Address;
-            existingCustomer.City = customer.City;
-            existingCustomer.PostalCode = customer.PostalCode;
-            existingCustomer.Country = customer.Country;
-            existingCustomer.UpdatedAt = DateTime.UtcNow;
-
+            UpdateCustomerProperties(existingCustomer, customer);
             await _context.SaveChangesAsync();
             return existingCustomer;
         }
@@ -80,18 +71,25 @@ namespace KeepWarm.Services
             if (existingCustomer == null)
                 return null;
 
-            existingCustomer.FirstName = customer.FirstName;
-            existingCustomer.LastName = customer.LastName;
-            existingCustomer.Email = customer.Email;
-            existingCustomer.Phone = customer.Phone;
-            existingCustomer.Address = customer.Address;
-            existingCustomer.City = customer.City;
-            existingCustomer.PostalCode = customer.PostalCode;
-            existingCustomer.Country = customer.Country;
-            existingCustomer.UpdatedAt = DateTime.UtcNow;
-
+            UpdateCustomerProperties(existingCustomer, customer);
             await _context.SaveChangesAsync();
             return existingCustomer;
+        }
+
+        /// <summary>
+        /// Uppdaterar egenskaper från source till target
+        /// </summary>
+        private void UpdateCustomerProperties(Customer target, Customer source)
+        {
+            target.FirstName = source.FirstName;
+            target.LastName = source.LastName;
+            target.Email = source.Email;
+            target.Phone = source.Phone;
+            target.Address = source.Address;
+            target.City = source.City;
+            target.PostalCode = source.PostalCode;
+            target.Country = source.Country;
+            target.UpdatedAt = DateTime.UtcNow;
         }
 
         public async Task<bool> DeleteCustomerAsync(int id, string userId)

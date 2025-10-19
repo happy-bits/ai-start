@@ -12,9 +12,9 @@ namespace KeepWarm.Services
         Task<bool> UpdateInteractionAsync(Interaction interaction, string userId);
         Task<bool> DeleteInteractionAsync(int id, string userId);
         
-        // Osäkra metoder för intern användning och admin
+        // Metoder för admin (tydlig namngivning)
         Task<IEnumerable<Interaction>> GetInteractionsByUserIdAsync(string userId);
-        Task<Interaction?> GetInteractionByIdAsync(int id);
+        Task<Interaction?> GetInteractionByIdForAdminAsync(int id);
         Task<IEnumerable<Interaction>> GetAllInteractionsForAdminAsync();
     }
 }

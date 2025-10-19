@@ -2,22 +2,21 @@ using KeepWarm.Controllers.ViewModels;
 using KeepWarm.Helpers;
 using KeepWarm.Models;
 using KeepWarm.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KeepWarm.Controllers
 {
-    [Authorize]
-    public class InteractionController : Controller
+    public class InteractionController : BaseAuthenticatedController
     {
         private readonly IInteractionService _interactionService;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public InteractionController(IInteractionService interactionService, UserManager<ApplicationUser> userManager)
+        public InteractionController(
+            IInteractionService interactionService, 
+            UserManager<ApplicationUser> userManager) 
+            : base(userManager)
         {
             _interactionService = interactionService;
-            _userManager = userManager;
         }
 
         [HttpGet]
@@ -26,7 +25,7 @@ namespace KeepWarm.Controllers
             var model = new InteractionCreateViewModel
             {
                 CustomerId = customerId,
-                InteractionDate = DateTimeHelper.FormatToMinutePrecision(DateTime.Now),
+                InteractionDate = DateTimeHelper.FormatToMinutePrecision(DateTime.UtcNow),
                 FollowUpDate = DateOnly.FromDateTime(DateTime.Today.AddDays(3))
             };
 
@@ -39,7 +38,7 @@ namespace KeepWarm.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userId = _userManager.GetUserId(User);
+                var userId = GetAuthenticatedUserId();
                 if (userId == null)
                 {
                     return Unauthorized();
@@ -73,22 +72,16 @@ namespace KeepWarm.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = GetAuthenticatedUserId();
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            // Använd säker metod (admin kan använda osäker metod vid behov)
-            Interaction? interaction;
-            if (User.IsInRole("Admin"))
-            {
-                interaction = await _interactionService.GetInteractionByIdAsync(id);
-            }
-            else
-            {
-                interaction = await _interactionService.GetInteractionByIdAsync(id, userId);
-            }
+            var interaction = await ExecuteWithRoleCheck(
+                adminAction: async () => await _interactionService.GetInteractionByIdForAdminAsync(id),
+                userAction: async () => await _interactionService.GetInteractionByIdAsync(id, userId)
+            );
 
             if (interaction == null)
             {
@@ -113,22 +106,17 @@ namespace KeepWarm.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userId = _userManager.GetUserId(User);
+                var userId = GetAuthenticatedUserId();
                 if (userId == null)
                 {
                     return Unauthorized();
                 }
 
                 // Hämta befintlig interaktion för att säkerställa access
-                Interaction? existingInteraction;
-                if (User.IsInRole("Admin"))
-                {
-                    existingInteraction = await _interactionService.GetInteractionByIdAsync(model.Id);
-                }
-                else
-                {
-                    existingInteraction = await _interactionService.GetInteractionByIdAsync(model.Id, userId);
-                }
+                var existingInteraction = await ExecuteWithRoleCheck(
+                    adminAction: async () => await _interactionService.GetInteractionByIdForAdminAsync(model.Id),
+                    userAction: async () => await _interactionService.GetInteractionByIdAsync(model.Id, userId)
+                );
 
                 if (existingInteraction == null)
                 {
@@ -140,16 +128,10 @@ namespace KeepWarm.Controllers
                 existingInteraction.InteractionDate = DateTimeHelper.FormatToMinutePrecision(model.InteractionDate);
 
                 // Använd säker uppdateringsmetod
-                bool result;
-                if (User.IsInRole("Admin"))
-                {
-                    // Admin kan uppdatera vem som helsts interaktioner - använd userId från interaktionen
-                    result = await _interactionService.UpdateInteractionAsync(existingInteraction, existingInteraction.UserId);
-                }
-                else
-                {
-                    result = await _interactionService.UpdateInteractionAsync(existingInteraction, userId);
-                }
+                var result = await _interactionService.UpdateInteractionAsync(
+                    existingInteraction, 
+                    IsCurrentUserAdmin() ? existingInteraction.UserId : userId
+                );
 
                 if (result)
                 {
@@ -168,21 +150,16 @@ namespace KeepWarm.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = GetAuthenticatedUserId();
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            Interaction? interaction;
-            if (User.IsInRole("Admin"))
-            {
-                interaction = await _interactionService.GetInteractionByIdAsync(id);
-            }
-            else
-            {
-                interaction = await _interactionService.GetInteractionByIdAsync(id, userId);
-            }
+            var interaction = await ExecuteWithRoleCheck(
+                adminAction: async () => await _interactionService.GetInteractionByIdForAdminAsync(id),
+                userAction: async () => await _interactionService.GetInteractionByIdAsync(id, userId)
+            );
 
             if (interaction == null)
             {
@@ -195,21 +172,16 @@ namespace KeepWarm.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = GetAuthenticatedUserId();
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            Interaction? interaction;
-            if (User.IsInRole("Admin"))
-            {
-                interaction = await _interactionService.GetInteractionByIdAsync(id);
-            }
-            else
-            {
-                interaction = await _interactionService.GetInteractionByIdAsync(id, userId);
-            }
+            var interaction = await ExecuteWithRoleCheck(
+                adminAction: async () => await _interactionService.GetInteractionByIdForAdminAsync(id),
+                userAction: async () => await _interactionService.GetInteractionByIdAsync(id, userId)
+            );
 
             if (interaction == null)
             {
@@ -223,22 +195,17 @@ namespace KeepWarm.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = GetAuthenticatedUserId();
             if (userId == null)
             {
                 return Unauthorized();
             }
 
             // Hämta interaktionen för att få CustomerId innan borttagning
-            Interaction? interaction;
-            if (User.IsInRole("Admin"))
-            {
-                interaction = await _interactionService.GetInteractionByIdAsync(id);
-            }
-            else
-            {
-                interaction = await _interactionService.GetInteractionByIdAsync(id, userId);
-            }
+            var interaction = await ExecuteWithRoleCheck(
+                adminAction: async () => await _interactionService.GetInteractionByIdForAdminAsync(id),
+                userAction: async () => await _interactionService.GetInteractionByIdAsync(id, userId)
+            );
 
             if (interaction == null)
             {
@@ -248,16 +215,10 @@ namespace KeepWarm.Controllers
             var customerId = interaction.CustomerId;
 
             // Använd säker borttagningsmetod
-            bool result;
-            if (User.IsInRole("Admin"))
-            {
-                // Admin kan ta bort vem som helsts interaktioner - använd userId från interaktionen
-                result = await _interactionService.DeleteInteractionAsync(id, interaction.UserId);
-            }
-            else
-            {
-                result = await _interactionService.DeleteInteractionAsync(id, userId);
-            }
+            var result = await _interactionService.DeleteInteractionAsync(
+                id, 
+                IsCurrentUserAdmin() ? interaction.UserId : userId
+            );
 
             if (result)
             {

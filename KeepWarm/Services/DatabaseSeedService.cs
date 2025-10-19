@@ -65,14 +65,14 @@ namespace KeepWarm.Services
 
         private async Task CreateRolesAsync()
         {
-            if (!await _roleManager.RoleExistsAsync("Admin"))
+            if (!await _roleManager.RoleExistsAsync(Roles.Admin))
             {
-                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                await _roleManager.CreateAsync(new IdentityRole(Roles.Admin));
             }
 
-            if (!await _roleManager.RoleExistsAsync("User"))
+            if (!await _roleManager.RoleExistsAsync(Roles.User))
             {
-                await _roleManager.CreateAsync(new IdentityRole("User"));
+                await _roleManager.CreateAsync(new IdentityRole(Roles.User));
             }
         }
 
@@ -100,7 +100,7 @@ namespace KeepWarm.Services
                     var result = await _userManager.CreateAsync(user, admin.Password);
                     if (result.Succeeded)
                     {
-                        await _userManager.AddToRoleAsync(user, "Admin");
+                        await _userManager.AddToRoleAsync(user, Roles.Admin);
                     }
                 }
             }
@@ -131,7 +131,7 @@ namespace KeepWarm.Services
                     var result = await _userManager.CreateAsync(user, regular.Password);
                     if (result.Succeeded)
                     {
-                        await _userManager.AddToRoleAsync(user, "User");
+                        await _userManager.AddToRoleAsync(user, Roles.User);
                     }
                 }
             }

@@ -74,8 +74,8 @@ namespace KeepWarm.Services
                 .FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
         }
 
-        // Osäker metod för admin/intern användning
-        public async Task<Interaction?> GetInteractionByIdAsync(int id)
+        // Admin-metod utan userId-kontroll
+        public async Task<Interaction?> GetInteractionByIdForAdminAsync(int id)
         {
             return await _context.Interactions
                 .Include(i => i.Customer)

@@ -1,46 +1,40 @@
 using KeepWarm.Controllers.ViewModels;
+using KeepWarm.Extensions;
 using KeepWarm.Models;
 using KeepWarm.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KeepWarm.Controllers
 {
-    [Authorize]
-    public class CustomerController : Controller
+    public class CustomerController : BaseAuthenticatedController
     {
         private readonly ICustomerService _customerService;
         private readonly IInteractionService _interactionService;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CustomerController(ICustomerService customerService, IInteractionService interactionService, UserManager<ApplicationUser> userManager)
+        public CustomerController(
+            ICustomerService customerService, 
+            IInteractionService interactionService, 
+            UserManager<ApplicationUser> userManager) 
+            : base(userManager)
         {
             _customerService = customerService;
             _interactionService = interactionService;
-            _userManager = userManager;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = GetAuthenticatedUserId();
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            var isAdmin = User.IsInRole("Admin");
-
-            IEnumerable<Customer> customers;
-            if (isAdmin)
-            {
-                customers = await _customerService.GetAllCustomersForAdminAsync();
-            }
-            else
-            {
-                customers = await _customerService.GetAllCustomersAsync(userId);
-            }
+            var customers = await ExecuteWithRoleCheck(
+                adminAction: async () => await _customerService.GetAllCustomersForAdminAsync(),
+                userAction: async () => await _customerService.GetAllCustomersAsync(userId)
+            );
 
             // Sortera kunder på NextFollowUpDate (null sist)
             customers = customers.OrderBy(c => c.NextFollowUpDate ?? DateOnly.MaxValue);
@@ -51,23 +45,16 @@ namespace KeepWarm.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = GetAuthenticatedUserId();
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            var isAdmin = User.IsInRole("Admin");
-
-            Customer? customer;
-            if (isAdmin)
-            {
-                customer = await _customerService.GetCustomerByIdForAdminAsync(id);
-            }
-            else
-            {
-                customer = await _customerService.GetCustomerByIdAsync(id, userId);
-            }
+            var customer = await ExecuteWithRoleCheck(
+                adminAction: async () => await _customerService.GetCustomerByIdForAdminAsync(id),
+                userAction: async () => await _customerService.GetCustomerByIdAsync(id, userId)
+            );
 
             if (customer == null)
             {
@@ -76,7 +63,7 @@ namespace KeepWarm.Controllers
 
             // Hämta interaktioner för kunden
             IEnumerable<Interaction> interactions;
-            if (isAdmin)
+            if (IsCurrentUserAdmin())
             {
                 // Admin använder osäker metod för att hämta alla kundens interaktioner
                 interactions = (await _interactionService.GetAllInteractionsForAdminAsync())
@@ -108,25 +95,13 @@ namespace KeepWarm.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userId = _userManager.GetUserId(User);
+                var userId = GetAuthenticatedUserId();
                 if (userId == null)
                 {
                     return Unauthorized();
                 }
 
-                var customer = new Customer
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    Phone = model.Phone,
-                    Address = model.Address,
-                    City = model.City,
-                    PostalCode = model.PostalCode,
-                    Country = model.Country,
-                    UserId = userId
-                };
-
+                var customer = model.ToCustomer(userId);
                 await _customerService.CreateCustomerAsync(customer);
                 return RedirectToAction(nameof(Index));
             }
@@ -137,42 +112,23 @@ namespace KeepWarm.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = GetAuthenticatedUserId();
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            var isAdmin = User.IsInRole("Admin");
-
-            Customer? customer;
-            if (isAdmin)
-            {
-                customer = await _customerService.GetCustomerByIdForAdminAsync(id);
-            }
-            else
-            {
-                customer = await _customerService.GetCustomerByIdAsync(id, userId);
-            }
+            var customer = await ExecuteWithRoleCheck(
+                adminAction: async () => await _customerService.GetCustomerByIdForAdminAsync(id),
+                userAction: async () => await _customerService.GetCustomerByIdAsync(id, userId)
+            );
 
             if (customer == null)
             {
                 return NotFound();
             }
 
-            var model = new CustomerEditViewModel
-            {
-                Id = customer.Id,
-                FirstName = customer.FirstName,
-                LastName = customer.LastName,
-                Email = customer.Email,
-                Phone = customer.Phone,
-                Address = customer.Address,
-                City = customer.City,
-                PostalCode = customer.PostalCode,
-                Country = customer.Country
-            };
-
+            var model = customer.ToEditViewModel();
             return View(model);
         }
 
@@ -182,36 +138,18 @@ namespace KeepWarm.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userId = _userManager.GetUserId(User);
+                var userId = GetAuthenticatedUserId();
                 if (userId == null)
                 {
                     return Unauthorized();
                 }
 
-                var isAdmin = User.IsInRole("Admin");
+                var customer = model.ToCustomer();
 
-                var customer = new Customer
-                {
-                    Id = model.Id,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    Phone = model.Phone,
-                    Address = model.Address,
-                    City = model.City,
-                    PostalCode = model.PostalCode,
-                    Country = model.Country
-                };
-
-                Customer? updatedCustomer;
-                if (isAdmin)
-                {
-                    updatedCustomer = await _customerService.UpdateCustomerForAdminAsync(customer);
-                }
-                else
-                {
-                    updatedCustomer = await _customerService.UpdateCustomerAsync(customer, userId);
-                }
+                var updatedCustomer = await ExecuteWithRoleCheck(
+                    adminAction: async () => await _customerService.UpdateCustomerForAdminAsync(customer),
+                    userAction: async () => await _customerService.UpdateCustomerAsync(customer, userId)
+                );
 
                 if (updatedCustomer == null)
                 {
@@ -227,23 +165,16 @@ namespace KeepWarm.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = GetAuthenticatedUserId();
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            var isAdmin = User.IsInRole("Admin");
-
-            Customer? customer;
-            if (isAdmin)
-            {
-                customer = await _customerService.GetCustomerByIdForAdminAsync(id);
-            }
-            else
-            {
-                customer = await _customerService.GetCustomerByIdAsync(id, userId);
-            }
+            var customer = await ExecuteWithRoleCheck(
+                adminAction: async () => await _customerService.GetCustomerByIdForAdminAsync(id),
+                userAction: async () => await _customerService.GetCustomerByIdAsync(id, userId)
+            );
 
             if (customer == null)
             {
@@ -257,23 +188,16 @@ namespace KeepWarm.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = GetAuthenticatedUserId();
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            var isAdmin = User.IsInRole("Admin");
-
-            bool result;
-            if (isAdmin)
-            {
-                result = await _customerService.DeleteCustomerForAdminAsync(id);
-            }
-            else
-            {
-                result = await _customerService.DeleteCustomerAsync(id, userId);
-            }
+            var result = await ExecuteWithRoleCheck(
+                adminAction: async () => await _customerService.DeleteCustomerForAdminAsync(id),
+                userAction: async () => await _customerService.DeleteCustomerAsync(id, userId)
+            );
 
             if (!result)
             {

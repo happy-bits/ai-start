@@ -104,15 +104,15 @@ namespace KeepWarm.Services
             try
             {
                 // Skapa Admin-roll om den inte finns
-                if (!await _roleManager.RoleExistsAsync("Admin"))
+                if (!await _roleManager.RoleExistsAsync(Roles.Admin))
                 {
-                    await CreateRoleAsync("Admin");
+                    await CreateRoleAsync(Roles.Admin);
                 }
 
                 // Skapa User-roll om den inte finns
-                if (!await _roleManager.RoleExistsAsync("User"))
+                if (!await _roleManager.RoleExistsAsync(Roles.User))
                 {
-                    await CreateRoleAsync("User");
+                    await CreateRoleAsync(Roles.User);
                 }
 
                 return true;
