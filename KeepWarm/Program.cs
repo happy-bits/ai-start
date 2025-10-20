@@ -7,11 +7,21 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    // Inaktivera CSRF-validering för integrationstester
+    if (builder.Environment.IsEnvironment("Testing"))
+    {
+        options.Filters.Add(new Microsoft.AspNetCore.Mvc.IgnoreAntiforgeryTokenAttribute());
+    }
+});
 
-// Konfigurera Entity Framework med SQLite
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Konfigurera Entity Framework med SQLite (endast om inte Testing-miljö)
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
 // Konfigurera Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
