@@ -102,14 +102,15 @@ public class ServiceTestBase : IDisposable
         string userId,
         string firstName = "Test",
         string lastName = "Customer",
-        string? email = null)
+        string? email = null,
+        string? phone = null)
     {
         var customer = new Customer
         {
             FirstName = firstName,
             LastName = lastName,
             Email = email ?? $"{firstName.ToLower()}.{lastName.ToLower()}@example.com",
-            Phone = "+46701234567",
+            Phone = phone ?? "+46701234567",
             Address = "Testgatan 1",
             City = "Stockholm",
             PostalCode = "12345",
