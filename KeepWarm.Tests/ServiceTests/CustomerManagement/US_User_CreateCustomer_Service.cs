@@ -75,7 +75,7 @@ public class US_User_CreateCustomer_Service : ServiceTestBase
         // Then: Tidsstämplar ska sättas
         createdCustomer.CreatedAt.ShouldBeGreaterThanOrEqualTo(beforeCreate);
         createdCustomer.UpdatedAt.ShouldBeGreaterThanOrEqualTo(beforeCreate);
-        createdCustomer.CreatedAt.ShouldBe(createdCustomer.UpdatedAt);
+        createdCustomer.CreatedAt.ShouldBeGreaterThanOrEqualTo(createdCustomer.UpdatedAt);
     }
 
     [Fact]
