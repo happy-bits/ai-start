@@ -20,10 +20,7 @@
                             <th>Namn</th>
                             <th>E-post</th>
                             <th>Telefon</th>
-                            <th>Adress</th>
                             <th>Stad</th>
-                            <th>Postnummer</th>
-                            <th>Land</th>
                             <th>Skapad</th>
                             @if (User.IsInRole("Admin"))
                             {
@@ -53,39 +50,9 @@
                                     }
                                 </td>
                                 <td>
-                                    @if (!string.IsNullOrEmpty(customer.Address))
-                                    {
-                                        @customer.Address
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-                                </td>
-                                <td>
                                     @if (!string.IsNullOrEmpty(customer.City))
                                     {
                                         @customer.City
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-                                </td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(customer.PostalCode))
-                                    {
-                                        @customer.PostalCode
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-                                </td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(customer.Country))
-                                    {
-                                        @customer.Country
                                     }
                                     else
                                     {
