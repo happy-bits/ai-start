@@ -44,7 +44,6 @@ public class US_Admin_DeleteUser_Service : ServiceTestBase
         var customer2 = await CreateCustomerAsync(user.Id, "Customer", "Two");
 
         // When: Användaren tas bort och kunder uppdateras
-        await _identityService.SetCustomersUserIdToNullAsync(user.Id);
         await _identityService.DeleteUserAsync(user.Id);
 
         // Then: Kunderna ska finnas kvar men UserId ska vara null
