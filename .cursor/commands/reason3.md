@@ -1,4 +1,4 @@
-Analysera problem.
-Fokusera på problemförståelse.
-Ge tre olika lösningsförslag.
-Ändra ingen kod.
+Analyze the problem.
+Focus on problem understanding.
+Provide three different solution proposals.
+Do not change any code.

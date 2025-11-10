@@ -1,30 +1,28 @@
 ---
-description: Grundläggande principer och arkitektur
+description: Basic principles and architecture
 globs:
 alwaysApply: true
 ---
 
-# Grundläggande Principer
+# Basic Principles
 
-Svara alltid på svenska
+Do not use modals on the website
 
-Använd inte modaler på hemsidan
+Avoid removing tests
 
-Undvik att ta bort tester
+# Architecture & Code Quality
 
-# Arkitektur & Kodkvalitet
-
-## Grundprinciper
+## Basic Principles
 
 **DRY (Don't Repeat Yourself)**
-- Undvik kodduplicering
-- Skapa återanvändbara komponenter
+- Avoid code duplication
+- Create reusable components
 
 **You ain't gonna need it (YAGNI)**
-- Utveckla endast vad som behövs
-- Undvik överkomplexitet
+- Develop only what is needed
+- Avoid over-complexity
 
-**Återanvändning**
-- Kontrollera befintlig funktionalitet innan du utvecklar ny
-- Använd och utöka existerande komponenter
+**Reusability**
+- Check existing functionality before developing new
+- Use and extend existing components
 

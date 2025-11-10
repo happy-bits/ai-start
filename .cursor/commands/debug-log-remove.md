@@ -1,1 +1,1 @@
-Ta bort alla tillfälliga debug-loggar (sök efter '🤡')
+Remove all temporary debug logs (search for '🤡')

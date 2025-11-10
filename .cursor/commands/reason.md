@@ -1,3 +1,3 @@
-Analysera problem.
-Fokusera på problemförståelse.
-Ändra ingen kod.
+Analyze the problem.
+Focus on problem understanding.
+Do not change any code.

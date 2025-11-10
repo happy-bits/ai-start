@@ -1,29 +1,29 @@
 
-Analysera hela projektet. Skapa en översikt över projektet och lägg svaret i en ny fil `overview.md` med följande innehåll:
+Analyze the entire project. Create an overview of the project and put the answer in a new file `overview.md` with the following content:
 
 ```markdown
-# Projektets namn
+# Project name
 
-## Syfte
+## Purpose
 
-Beskriv med max 3 meningar
+Describe in max 3 sentences
 
-## Struktur
+## Structure
 
-Beskriv med max 3 meningar
+Describe in max 3 sentences
 
-Skapa ett mermaid-diagram (graph TD) som visar systemarkitekturen med klienten överst
+Create a mermaid diagram (graph TD) showing the system architecture with the client at the top
 
-## Komponenter
+## Components
 
-Beskriv de viktigaste komponenterna
+Describe the most important components
 
-## Tekniska val
+## Technical choices
 
-Lista med tekniker
+List of technologies
 
-## Utvecklingsmiljö
+## Development environment
 
-## Verktyg och Paket
-Lista med verktyg och paket
+## Tools and Packages
+List of tools and packages
 ```

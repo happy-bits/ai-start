@@ -1,2 +1,2 @@
-Analysera vad som ännu inte är implementerat
-Skriv tre userstories som är lämpliga att börja med
+Analyze what is not yet implemented
+Write three user stories that are suitable to start with

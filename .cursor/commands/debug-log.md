@@ -1,3 +1,3 @@
-För att underlätta felsökning, lägg till loggning på flera ställen:
-- Lägg till loggning på servern och inled varje meddlande med '🤡'
-- Lägg till loggning på klienten och inled varje meddlande med '🤡'
+To facilitate debugging, add logging in several places:
+- Add logging on the server and prefix each message with '🤡'
+- Add logging on the client and prefix each message with '🤡'
