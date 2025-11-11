@@ -34,10 +34,14 @@ As an **admin**, I want to **manage all customers** to be able to help users.
 
 ## Interaction Management
 
-As a **user**, I want to **see all interactions for a customer** on the customer details page to have an overview of the contact history.
+As a **user**, I want to **see my interactions** for a customer on the customer details page to track contact history.
 
-As a **user**, I want to **log a new interaction** (call, meeting, or email) directly on the customer details page to document my communication with the customer.
+As a **user**, I want to **log a new interaction** (call, meeting, or email) with date, time, and notes directly on the customer details page.
 
-As a **user**, I want to **edit and delete interactions** for a customer I have access to to keep the interaction history accurate and up to date.
+As a **user**, I want to **edit my interactions** to update interaction details.
+
+As a **user**, I want to **delete my interactions** to remove incorrect entries.
+
+As an **admin**, I want to **see all interactions** for any customer to have full visibility.
 
 

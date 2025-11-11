@@ -43,6 +43,7 @@ public class ServiceTestBase : IDisposable
 
         // Registrera services
         services.AddScoped<KeepWarm.Services.ICustomerService, KeepWarm.Services.CustomerService>();
+        services.AddScoped<KeepWarm.Services.IInteractionService, KeepWarm.Services.InteractionService>();
         services.AddScoped<KeepWarm.Services.IIdentityService, KeepWarm.Services.IdentityService>();
         services.AddLogging();
 
@@ -124,6 +125,30 @@ public class ServiceTestBase : IDisposable
         await Context.SaveChangesAsync();
 
         return customer;
+    }
+
+    protected async Task<Interaction> CreateInteractionAsync(
+        int customerId,
+        string userId,
+        InteractionType interactionType = InteractionType.Call,
+        DateTime? interactionDate = null,
+        string? notes = null)
+    {
+        var interaction = new Interaction
+        {
+            CustomerId = customerId,
+            UserId = userId,
+            InteractionType = interactionType,
+            InteractionDate = interactionDate ?? DateTime.UtcNow,
+            Notes = notes,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        Context.Interactions.Add(interaction);
+        await Context.SaveChangesAsync();
+
+        return interaction;
     }
 
     public void Dispose()

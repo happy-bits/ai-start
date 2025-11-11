@@ -12,6 +12,7 @@ namespace KeepWarm.Data
         }
 
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<Interaction> Interactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -38,6 +39,31 @@ namespace KeepWarm.Data
                     .WithMany()
                     .HasForeignKey(c => c.UserId)
                     .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Konfigurera Interaction-entiteten
+            builder.Entity<Interaction>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.CustomerId).IsRequired();
+                entity.Property(e => e.InteractionType).IsRequired();
+                entity.Property(e => e.InteractionDate).IsRequired();
+                entity.Property(e => e.Notes).HasMaxLength(2000);
+                entity.Property(e => e.CreatedAt).IsRequired();
+                entity.Property(e => e.UpdatedAt).IsRequired();
+                entity.Property(e => e.UserId).IsRequired();
+
+                // Konfigurera relation till Customer
+                entity.HasOne<Customer>(i => i.Customer)
+                    .WithMany()
+                    .HasForeignKey(i => i.CustomerId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Konfigurera relation till ApplicationUser
+                entity.HasOne<ApplicationUser>(i => i.User)
+                    .WithMany()
+                    .HasForeignKey(i => i.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

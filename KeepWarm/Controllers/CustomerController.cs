@@ -11,11 +11,16 @@ namespace KeepWarm.Controllers
     public class CustomerController : Controller
     {
         private readonly ICustomerService _customerService;
+        private readonly IInteractionService _interactionService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public CustomerController(ICustomerService customerService, UserManager<ApplicationUser> userManager)
+        public CustomerController(
+            ICustomerService customerService,
+            IInteractionService interactionService,
+            UserManager<ApplicationUser> userManager)
         {
             _customerService = customerService;
+            _interactionService = interactionService;
             _userManager = userManager;
         }
 
@@ -68,6 +73,23 @@ namespace KeepWarm.Controllers
             {
                 return NotFound();
             }
+
+            IEnumerable<Interaction> interactions;
+            if (isAdmin)
+            {
+                interactions = await _interactionService.GetInteractionsByCustomerIdForAdminAsync(id);
+            }
+            else
+            {
+                interactions = await _interactionService.GetInteractionsByCustomerIdAsync(id, userId);
+            }
+
+            ViewBag.Interactions = interactions;
+            ViewBag.CreateInteractionModel = new InteractionCreateViewModel
+            {
+                CustomerId = customer.Id,
+                InteractionDate = DateTime.Now
+            };
 
             return View(customer);
         }
