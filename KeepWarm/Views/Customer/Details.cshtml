@@ -38,7 +38,7 @@
                             <dd class="col-sm-8">
                                 @if (!string.IsNullOrEmpty(Model.Phone))
                                 {
-                                    <a href="tel:@Model.Phone">@Model.Phone</a>
+                                    <a href="tel:@Model.Phone">@PhoneNumberFormatter.Format(Model.Phone)</a>
                                 }
                                 else
                                 {

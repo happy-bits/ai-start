@@ -34,7 +34,7 @@
                             <dd class="col-sm-8">
                                 @if (!string.IsNullOrEmpty(Model.Phone))
                                 {
-                                    @Model.Phone
+                                    @PhoneNumberFormatter.Format(Model.Phone)
                                 }
                                 else
                                 {

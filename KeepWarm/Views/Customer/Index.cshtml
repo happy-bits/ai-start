@@ -43,7 +43,7 @@
                                 <td>
                                     @if (!string.IsNullOrEmpty(customer.Phone))
                                     {
-                                        <a href="tel:@customer.Phone">@customer.Phone</a>
+                                        <a href="tel:@customer.Phone">@PhoneNumberFormatter.Format(customer.Phone)</a>
                                     }
                                     else
                                     {
