@@ -1,35 +1,43 @@
 # User Stories - KeepWarm CRM
 
-## Användarhantering
+## User Management
 
-Som **användare** vill jag **logga in** för att komma åt mina kunder.
+As a **user**, I want to **log in** to access my customers.
 
-Som **användare** vill jag **logga ut** för att säkert avsluta min session.
+As a **user**, I want to **log out** to securely end my session.
 
-Som **admin** vill jag **skapa nya användare** för att ge dem åtkomst till systemet.
+As an **admin**, I want to **create new users** to give them access to the system.
 
-Som **admin** vill jag **redigera användarinformation** för att hålla data aktuell.
+As an **admin**, I want to **edit user information** to keep data current.
 
-Som **admin** vill jag **visa användardetaljer** för att se användarens information.
+As an **admin**, I want to **view user details** to see the user's information.
 
-Som **admin** vill jag **ta bort användare** för att hantera åtkomst.
+As an **admin**, I want to **delete users** to manage access.
 
-Som **admin** vill jag **hantera alla användare** för att ha full kontroll över systemet.
+As an **admin**, I want to **manage all users** to have full control over the system.
 
-## Kundhantering
+## Customer Management
 
-Som **användare** vill jag **lista mina kunder** sorterade på återkomstdatum för att se vilka som behöver uppföljning.
+As a **user**, I want to **list my customers** sorted by follow-up date to see which ones need follow-up.
 
-Som **användare** vill jag **skapa en ny kund** för att börja hantera relationen.
+As a **user**, I want to **create a new customer** to start managing the relationship.
 
-Som **användare** vill jag **visa kunddetaljer** för att se all information om kunden.
+As a **user**, I want to **view customer details** to see all information about the customer.
 
-Som **användare** vill jag **redigera kundinformation** för att hålla data aktuell.
+As a **user**, I want to **edit customer information** to keep data current.
 
-Som **användare** vill jag **ta bort en kund** för att rensa bort gamla kontakter.
+As a **user**, I want to **delete a customer** to clean up old contacts.
 
-Som **admin** vill jag **se alla kunder** i systemet för att ha full översikt.
+As an **admin**, I want to **see all customers** in the system to have a full overview.
 
-Som **admin** vill jag **hantera alla kunder** för att kunna hjälpa användare.
+As an **admin**, I want to **manage all customers** to be able to help users.
+
+## Interaction Management
+
+As a **user**, I want to **see all interactions for a customer** on the customer details page to have an overview of the contact history.
+
+As a **user**, I want to **log a new interaction** (call, meeting, or email) directly on the customer details page to document my communication with the customer.
+
+As a **user**, I want to **edit and delete interactions** for a customer I have access to to keep the interaction history accurate and up to date.
 
 
