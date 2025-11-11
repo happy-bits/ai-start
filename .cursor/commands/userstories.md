@@ -1,2 +1,3 @@
-Analyze what is not yet implemented
-Write three user stories that are suitable to start with
+Add userstories to the file userstories.md to solve the problem.
+Keep the userstories brief.
+Do not change any code
