@@ -20,6 +20,7 @@
                             <th>Namn</th>
                             <th>E-post</th>
                             <th>Telefon</th>
+                            <th>Adress</th>
                             <th>Stad</th>
                             <th>Skapad</th>
                             @if (User.IsInRole("Admin"))
@@ -43,6 +44,16 @@
                                     @if (!string.IsNullOrEmpty(customer.Phone))
                                     {
                                         <a href="tel:@customer.Phone">@customer.Phone</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(customer.Address))
+                                    {
+                                        @customer.Address
                                     }
                                     else
                                     {
