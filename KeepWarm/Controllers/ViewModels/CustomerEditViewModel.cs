@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using KeepWarm.Helpers;
 
 namespace KeepWarm.Controllers.ViewModels
 {
@@ -42,5 +43,10 @@ namespace KeepWarm.Controllers.ViewModels
         [StringLength(100, ErrorMessage = "Land får inte vara längre än 100 tecken")]
         [Display(Name = "Land")]
         public string? Country { get; set; }
+
+        [LinkedInUrl(ErrorMessage = "LinkedIn-adressen måste vara en giltig LinkedIn-URL")]
+        [StringLength(255, ErrorMessage = "LinkedIn-adress får inte vara längre än 255 tecken")]
+        [Display(Name = "LinkedIn-adress")]
+        public string? LinkedInUrl { get; set; }
     }
 }

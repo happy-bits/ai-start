@@ -68,6 +68,7 @@ namespace KeepWarm.Services
             existingCustomer.City = customer.City;
             existingCustomer.PostalCode = customer.PostalCode;
             existingCustomer.Country = customer.Country;
+            existingCustomer.LinkedInUrl = customer.LinkedInUrl;
             existingCustomer.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -88,6 +89,7 @@ namespace KeepWarm.Services
             existingCustomer.City = customer.City;
             existingCustomer.PostalCode = customer.PostalCode;
             existingCustomer.Country = customer.Country;
+            existingCustomer.LinkedInUrl = customer.LinkedInUrl;
             existingCustomer.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

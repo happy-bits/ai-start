@@ -45,6 +45,20 @@
                                     <span class="text-muted">Inte angivet</span>
                                 }
                             </dd>
+                            
+                            <dt class="col-sm-4">LinkedIn:</dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.LinkedInUrl))
+                                {
+                                    <a href="@Model.LinkedInUrl" target="_blank" rel="noopener noreferrer">
+                                        <i class="bi bi-linkedin"></i> @Model.LinkedInUrl
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Inte angivet</span>
+                                }
+                            </dd>
                         </dl>
                     </div>
                     <div class="col-md-6">

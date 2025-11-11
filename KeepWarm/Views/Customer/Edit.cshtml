@@ -65,6 +65,12 @@
                         </div>
                     </div>
                     
+                    <div class="mb-3">
+                        <label asp-for="LinkedInUrl" class="form-label"></label>
+                        <input asp-for="LinkedInUrl" class="form-control" placeholder="https://linkedin.com/in/profilnamn" type="url" />
+                        <span asp-validation-for="LinkedInUrl" class="text-danger"></span>
+                    </div>
+                    
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i>
                         <strong>Information:</strong> Endast fält markerade med asterisk (*) är obligatoriska. 

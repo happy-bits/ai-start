@@ -29,6 +29,7 @@ namespace KeepWarm.Data
                 entity.Property(e => e.City).HasMaxLength(100);
                 entity.Property(e => e.PostalCode).HasMaxLength(10);
                 entity.Property(e => e.Country).HasMaxLength(100);
+                entity.Property(e => e.LinkedInUrl).HasMaxLength(255);
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.UpdatedAt).IsRequired();
 

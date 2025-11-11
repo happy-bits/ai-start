@@ -100,6 +100,7 @@ namespace KeepWarm.Controllers
                     City = model.City,
                     PostalCode = model.PostalCode,
                     Country = model.Country,
+                    LinkedInUrl = model.LinkedInUrl,
                     UserId = userId
                 };
 
@@ -146,7 +147,8 @@ namespace KeepWarm.Controllers
                 Address = customer.Address,
                 City = customer.City,
                 PostalCode = customer.PostalCode,
-                Country = customer.Country
+                Country = customer.Country,
+                LinkedInUrl = customer.LinkedInUrl
             };
 
             return View(model);
@@ -176,7 +178,8 @@ namespace KeepWarm.Controllers
                     Address = model.Address,
                     City = model.City,
                     PostalCode = model.PostalCode,
-                    Country = model.Country
+                    Country = model.Country,
+                    LinkedInUrl = model.LinkedInUrl
                 };
 
                 Customer? updatedCustomer;

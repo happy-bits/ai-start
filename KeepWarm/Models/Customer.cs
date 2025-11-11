@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using KeepWarm.Helpers;
 
 namespace KeepWarm.Models
 {
@@ -34,6 +35,10 @@ namespace KeepWarm.Models
 
         [StringLength(100)]
         public string? Country { get; set; }
+
+        [LinkedInUrl]
+        [StringLength(255)]
+        public string? LinkedInUrl { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
