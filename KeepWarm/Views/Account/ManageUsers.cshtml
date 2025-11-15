@@ -4,44 +4,66 @@
     ViewData["Title"] = "Hantera användare";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Hantera användare</h2>
-    <a asp-action="CreateUser" class="btn btn-primary">Skapa ny användare</a>
+<div class="page-header">
+    <h2 class="page-title">Hantera användare</h2>
+    <a asp-action="CreateUser" class="btn btn-primary btn-create">Skapa ny användare</a>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        @if (Model.Any())
-        {
-            <div class="table-responsive">
-                <table class="table table-striped">
+<div class="customer-table-container">
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table modern-table">
                     <thead>
                         <tr>
-                            <th>Namn</th>
-                            <th>E-post</th>
-                            <th>Telefon</th>
-                            <th>Registrerad</th>
-                            <th>Senast uppdaterad</th>
-                            <th>Åtgärder</th>
+                            <th class="col-name">Namn</th>
+                            <th class="col-email">E-post</th>
+                            <th class="col-phone">Telefon</th>
+                            <th class="col-created d-none d-lg-table-cell">Registrerad</th>
+                            <th class="col-updated d-none d-lg-table-cell">Senast uppdaterad</th>
+                            <th class="col-actions">Åtgärder</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var user in Model)
                         {
                             <tr>
-                                <td>@user.FirstName @user.LastName</td>
-                                <td>@user.Email</td>
-                                <td>@(user.PhoneNumber ?? "-")</td>
-                                <td>@user.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td>@user.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-sm btn-outline-primary" 
-                                                onclick="viewUser('@user.Id')">Visa</button>
-                                        <button type="button" class="btn btn-sm btn-outline-warning" 
-                                                onclick="editUser('@user.Id')">Redigera</button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                onclick="deleteUser('@user.Id')">Ta bort</button>
+                                <td class="col-name">
+                                    <strong>@user.FirstName @user.LastName</strong>
+                                </td>
+                                <td class="col-email">
+                                    <a href="mailto:@user.Email" class="customer-email">@user.Email</a>
+                                </td>
+                                <td class="col-phone">
+                                    @if (!string.IsNullOrEmpty(user.PhoneNumber))
+                                    {
+                                        <a href="tel:@user.PhoneNumber" class="customer-phone">@user.PhoneNumber</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td class="col-created d-none d-lg-table-cell">
+                                    <span class="customer-date">@user.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
+                                </td>
+                                <td class="col-updated d-none d-lg-table-cell">
+                                    <span class="customer-date">@user.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</span>
+                                </td>
+                                <td class="col-actions">
+                                    <div class="customer-actions">
+                                        <button type="button" class="action-btn action-view" 
+                                                onclick="viewUser('@user.Id')" title="Visa">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button type="button" class="action-btn action-edit" 
+                                                onclick="editUser('@user.Id')" title="Redigera">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button type="button" class="action-btn action-delete" 
+                                                onclick="deleteUser('@user.Id')" title="Ta bort">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -49,15 +71,20 @@
                     </tbody>
                 </table>
             </div>
-        }
-        else
-        {
-            <div class="text-center py-4">
-                <p class="text-muted">Inga användare hittades.</p>
-                <a asp-action="CreateUser" class="btn btn-primary">Skapa första användaren</a>
+    }
+    else
+    {
+        <div class="customer-empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-people"></i>
             </div>
-        }
-    </div>
+            <h4 class="empty-title">Inga användare hittades</h4>
+            <p class="empty-text">Du har inte skapat några användare än. Klicka på knappen nedan för att skapa din första användare.</p>
+            <a asp-action="CreateUser" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Skapa första användaren
+            </a>
+        </div>
+    }
 </div>
 
 @section Scripts {
