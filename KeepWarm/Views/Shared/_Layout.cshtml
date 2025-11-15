@@ -12,27 +12,35 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-modern">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">KeepWarm</a>
+                <a class="navbar-brand navbar-brand-modern" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-house-heart"></i> KeepWarm
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Hem</a>
+                            <a class="nav-link nav-link-modern" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house"></i> Hem
+                            </a>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Customer" asp-action="Index">Kunder</a>
+                                <a class="nav-link nav-link-modern" asp-area="" asp-controller="Customer" asp-action="Index">
+                                    <i class="bi bi-people"></i> Kunder
+                                </a>
                             </li>
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="ManageUsers">Hantera användare</a>
+                                    <a class="nav-link nav-link-modern" asp-area="" asp-controller="Account" asp-action="ManageUsers">
+                                        <i class="bi bi-person-gear"></i> Hantera användare
+                                    </a>
                                 </li>
                             }
                         }
@@ -40,28 +48,28 @@
                     <ul class="navbar-nav">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    @User.Identity.Name
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item" href="#">Profil</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                            <button type="submit" class="dropdown-item">Logga ut</button>
-                                        </form>
-                                    </li>
-                                </ul>
+                            <li class="nav-item">
+                                <span class="navbar-text user-name">@User.Identity.Name</span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="nav-link nav-link-modern nav-link-logout">
+                                        <i class="bi bi-box-arrow-right"></i> Logga ut
+                                    </button>
+                                </form>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Logga in</a>
+                                <a class="nav-link nav-link-modern" asp-area="" asp-controller="Account" asp-action="Login">
+                                    <i class="bi bi-box-arrow-in-right"></i> Logga in
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Registrera</a>
+                                <a class="nav-link nav-link-modern" asp-area="" asp-controller="Account" asp-action="Register">
+                                    <i class="bi bi-person-plus"></i> Registrera
+                                </a>
                             </li>
                         }
                     </ul>
@@ -75,11 +83,6 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - KeepWarm - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

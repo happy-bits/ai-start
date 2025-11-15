@@ -18,7 +18,7 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  margin-bottom: 0;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -44,7 +44,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-top: 1.5rem;
+  margin-bottom: 3rem;
+  padding-left: 1rem;
+  padding-bottom: 1rem;
 }
 
 .customer-title {
@@ -52,6 +55,10 @@ body {
   font-weight: 600;
   color: #1a1a1a;
   margin: 0;
+  padding: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e9ecef;
+  display: inline-block;
 }
 
 .btn-create {
@@ -87,6 +94,14 @@ body {
   vertical-align: middle;
 }
 
+.customer-table thead th.col-actions {
+  text-align: right;
+}
+
+.customer-table tbody td.col-actions {
+  text-align: right;
+}
+
 .customer-table tbody tr {
   border-bottom: 1px solid #f1f3f5;
   transition: background-color 0.15s ease;
@@ -111,6 +126,17 @@ body {
   font-weight: 600;
   color: #1a1a1a;
   margin: 0;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.customer-name:hover {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.customer-name strong {
+  font-weight: 600;
 }
 
 .customer-email {
@@ -235,6 +261,101 @@ body {
   margin-right: auto;
 }
 
+/* Modern Navbar Design */
+.navbar-modern {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e9ecef;
+  padding: 1rem 0;
+  box-shadow: none;
+}
+
+.navbar-brand-modern {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #6c757d;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.15s ease;
+}
+
+.navbar-brand-modern:hover {
+  color: #495057;
+}
+
+.navbar-brand-modern i {
+  font-size: 1.25rem;
+  color: #9ca3af;
+}
+
+.nav-link-modern {
+  color: #495057;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  border-radius: 6px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-link-modern:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.1);
+}
+
+.nav-link-modern:hover {
+  color: #212529;
+  background-color: #f8f9fa;
+}
+
+.nav-link-modern i {
+  font-size: 1rem;
+}
+
+.nav-link-logout {
+  color: #6c757d;
+  font-family: inherit;
+}
+
+.nav-link-logout:hover {
+  color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.nav-item form {
+  margin: 0;
+}
+
+.user-name {
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-toggler {
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 0.375rem 0.75rem;
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.1);
+}
+
 /* Responsive adjustments */
 @media (max-width: 767.98px) {
   .customer-header {
@@ -264,5 +385,19 @@ body {
     width: 28px;
     height: 28px;
     font-size: 0.875rem;
+  }
+
+  .navbar-brand-modern {
+    font-size: 1.25rem;
+  }
+
+  .nav-link-modern {
+    padding: 0.75rem 1rem;
+    margin: 0.25rem 0;
+  }
+
+  .user-name {
+    padding: 0.75rem 1rem;
+    margin: 0.25rem 0;
   }
 }
