@@ -9,15 +9,15 @@
     <a asp-action="Create" class="btn btn-primary">Skapa ny kund</a>
 </div>
 
-<div class="card shadow-sm border-0">
-    <div class="card-body p-0">
+<div class="card">
+    <div class="card-body">
         @if (Model.Any())
         {
             <div class="table-responsive">
-                <table class="table table-hover mb-0 customer-table">
-                    <thead>
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
                         <tr>
-                            <th class="ps-4">Namn</th>
+                            <th>Namn</th>
                             <th>E-post</th>
                             <th>Telefon</th>
                             <th>Adress</th>
@@ -27,34 +27,23 @@
                             {
                                 <th>Skapad av</th>
                             }
-                            <th class="text-end pe-4">Åtgärder</th>
+                            <th>Åtgärder</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var customer in Model)
                         {
                             <tr>
-                                <td class="ps-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="customer-avatar me-2">
-                                            <span>@((!string.IsNullOrEmpty(customer.FirstName) ? customer.FirstName.Substring(0, 1) : "") + (!string.IsNullOrEmpty(customer.LastName) ? customer.LastName.Substring(0, 1) : ""))</span>
-                                        </div>
-                                        <div>
-                                            <strong class="customer-name">@customer.FirstName @customer.LastName</strong>
-                                        </div>
-                                    </div>
+                                <td>
+                                    <strong>@customer.FirstName @customer.LastName</strong>
                                 </td>
                                 <td>
-                                    <a href="mailto:@customer.Email" class="text-decoration-none">
-                                        <i class="bi bi-envelope me-1"></i>@customer.Email
-                                    </a>
+                                    <a href="mailto:@customer.Email">@customer.Email</a>
                                 </td>
                                 <td>
                                     @if (!string.IsNullOrEmpty(customer.Phone))
                                     {
-                                        <a href="tel:@customer.Phone" class="text-decoration-none">
-                                            <i class="bi bi-telephone me-1"></i>@PhoneNumberFormatter.Format(customer.Phone)
-                                        </a>
+                                        <a href="tel:@customer.Phone">@PhoneNumberFormatter.Format(customer.Phone)</a>
                                     }
                                     else
                                     {
@@ -64,7 +53,7 @@
                                 <td>
                                     @if (!string.IsNullOrEmpty(customer.Address))
                                     {
-                                        <span><i class="bi bi-geo-alt me-1 text-muted"></i>@customer.Address</span>
+                                        @customer.Address
                                     }
                                     else
                                     {
@@ -82,14 +71,14 @@
                                     }
                                 </td>
                                 <td>
-                                    <span class="text-muted">@customer.CreatedAt.ToString("yyyy-MM-dd")</span>
+                                    <small class="text-muted">@customer.CreatedAt.ToString("yyyy-MM-dd")</small>
                                 </td>
                                 @if (User.IsInRole("Admin"))
                                 {
                                     <td>
                                         @if (customer.User != null)
                                         {
-                                            <span class="badge bg-light text-dark border">@customer.User.FirstName @customer.User.LastName</span>
+                                            <span class="badge bg-info">@customer.User.FirstName @customer.User.LastName</span>
                                         }
                                         else
                                         {
@@ -97,19 +86,19 @@
                                         }
                                     </td>
                                 }
-                                <td class="text-end pe-4">
-                                    <div class="btn-group btn-group-sm" role="group">
+                                <td>
+                                    <div class="btn-group" role="group">
                                         <a asp-action="Details" asp-route-id="@customer.Id" 
-                                           class="btn btn-outline-primary btn-action" title="Visa detaljer">
-                                            <i class="bi bi-eye"></i>
+                                           class="btn btn-sm btn-outline-primary" title="Visa detaljer">
+                                            <i class="bi bi-eye"></i> Visa
                                         </a>
                                         <a asp-action="Edit" asp-route-id="@customer.Id" 
-                                           class="btn btn-outline-warning btn-action" title="Redigera">
-                                            <i class="bi bi-pencil"></i>
+                                           class="btn btn-sm btn-outline-warning" title="Redigera">
+                                            <i class="bi bi-pencil"></i> Redigera
                                         </a>
                                         <a asp-action="Delete" asp-route-id="@customer.Id" 
-                                           class="btn btn-outline-danger btn-action" title="Ta bort">
-                                            <i class="bi bi-trash"></i>
+                                           class="btn btn-sm btn-outline-danger" title="Ta bort">
+                                            <i class="bi bi-trash"></i> Ta bort
                                         </a>
                                     </div>
                                 </td>
