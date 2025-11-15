@@ -9,6 +9,12 @@
     <a asp-action="Create" class="btn btn-primary">Skapa ny kund</a>
 </div>
 
+<p class="text-muted mb-4">
+    Denna sida ger dig en översikt över alla dina kunder i systemet. 
+    Varje kundpost innehåller kontaktinformation, adressuppgifter och historik över när kunden skapades. 
+    Du kan enkelt söka, filtrera och hantera dina kunddata direkt från denna vy.
+</p>
+
 <div class="card shadow-sm border-0">
     <div class="card-body p-0">
         @if (Model.Any())
