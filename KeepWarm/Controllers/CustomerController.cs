@@ -133,6 +133,57 @@ namespace KeepWarm.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> QuickCreate(CustomerCreateViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var userId = _userManager.GetUserId(User);
+                if (userId == null)
+                {
+                    return Unauthorized();
+                }
+
+                var customer = new Customer
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    Phone = model.Phone,
+                    Address = model.Address,
+                    City = model.City,
+                    PostalCode = model.PostalCode,
+                    Country = model.Country,
+                    LinkedInUrl = model.LinkedInUrl,
+                    UserId = userId
+                };
+
+                await _customerService.CreateCustomerAsync(customer);
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Om validering misslyckas, returnera till Index med felmeddelanden
+            var isAdmin = User.IsInRole("Admin");
+            IEnumerable<Customer> customers;
+            if (isAdmin)
+            {
+                customers = await _customerService.GetAllCustomersForAdminAsync();
+            }
+            else
+            {
+                var userId = _userManager.GetUserId(User);
+                if (userId == null)
+                {
+                    return Unauthorized();
+                }
+                customers = await _customerService.GetAllCustomersAsync(userId);
+            }
+
+            ViewData["QuickAddModel"] = model;
+            return View("Index", customers);
+        }
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {

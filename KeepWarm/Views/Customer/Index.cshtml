@@ -1,12 +1,49 @@
 @model IEnumerable<KeepWarm.Models.Customer>
+@using KeepWarm.Controllers.ViewModels
 
 @{
     ViewData["Title"] = "Kunder";
+    var quickAddModel = ViewData["QuickAddModel"] as CustomerCreateViewModel ?? new CustomerCreateViewModel();
 }
 
 <div class="customer-header mb-4">
     <h2 class="customer-title">Kunder</h2>
     <a asp-action="Create" class="btn btn-primary btn-create">Skapa ny kund</a>
+</div>
+
+<div class="mb-4">
+    <div class="modern-card">
+        <div class="card-body">
+            <form asp-action="QuickCreate" method="post" id="quickAddCustomerForm">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="@quickAddModel.FirstName" class="form-label">Förnamn <span class="text-danger">*</span></label>
+                        <input name="FirstName" asp-for="@quickAddModel.FirstName" class="form-control" placeholder="Ange förnamn" required />
+                        <span asp-validation-for="@quickAddModel.FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="@quickAddModel.LastName" class="form-label">Efternamn <span class="text-danger">*</span></label>
+                        <input name="LastName" asp-for="@quickAddModel.LastName" class="form-control" placeholder="Ange efternamn" required />
+                        <span asp-validation-for="@quickAddModel.LastName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="@quickAddModel.Email" class="form-label">E-post <span class="text-danger">*</span></label>
+                        <input name="Email" asp-for="@quickAddModel.Email" type="email" class="form-control" placeholder="Ange e-postadress" required />
+                        <span asp-validation-for="@quickAddModel.Email" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Lägg till
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <div class="customer-table-container">
@@ -95,6 +132,8 @@
 </div>
 
 @section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
     <script>
         // Lägg till bekräftelse för borttagning
         document.addEventListener('DOMContentLoaded', function() {
@@ -104,6 +143,16 @@
                     // Ta bort preventDefault så att länken fungerar direkt
                 });
             });
+
+            // Hantera quick-add form submission - visa loading state
+            const quickAddForm = document.getElementById('quickAddCustomerForm');
+            if (quickAddForm) {
+                quickAddForm.addEventListener('submit', function(e) {
+                    const submitButton = quickAddForm.querySelector('button[type="submit"]');
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Lägger till...';
+                });
+            }
         });
     </script>
 }
