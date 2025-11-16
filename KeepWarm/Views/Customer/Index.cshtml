@@ -1,134 +1,266 @@
 @model IEnumerable<KeepWarm.Models.Customer>
 @using KeepWarm.Controllers.ViewModels
+@using System.Globalization
+@using System.Collections.Generic
 
 @{
     ViewData["Title"] = "Kunder";
     var quickAddModel = ViewData["QuickAddModel"] as CustomerCreateViewModel ?? new CustomerCreateViewModel();
+    var customers = Model?.ToList() ?? new List<KeepWarm.Models.Customer>();
+    var culture = CultureInfo.GetCultureInfo("sv-SE");
+    var monthLabel = DateTime.UtcNow.ToString("MMMM", culture);
+    var newThisMonth = customers.Count(c => c.CreatedAt.Month == DateTime.UtcNow.Month && c.CreatedAt.Year == DateTime.UtcNow.Year);
+    var latestCustomer = customers.OrderByDescending(c => c.UpdatedAt).FirstOrDefault();
 }
 
-<div class="customer-header mb-4">
-    <h2 class="customer-title">Kunder</h2>
-    <a asp-action="Create" class="btn btn-primary btn-create">Skapa ny kund</a>
-</div>
+<div class="customer-page">
+    <section class="customer-hero glass-panel">
+        <div class="hero-content">
+            <p class="hero-eyebrow">Customer Hub · @monthLabel</p>
+            <h1>Bygg värme i dina kundrelationer</h1>
+            <p class="hero-description">
+                En snabb översikt över alla kontakter med klickbara kontaktvägar, rollstyrda vyer
+                och en ultrarapid snabbregistrering.
+            </p>
+            <div class="hero-actions">
+                <a asp-action="Create" class="btn btn-light hero-btn">
+                    <i class="bi bi-gem"></i>
+                    Skapa ny kund
+                </a>
+                <a href="#quickAddCustomerForm" class="btn btn-outline-light hero-btn">
+                    <i class="bi bi-bolt"></i>
+                    Hoppa till snabbadd
+                </a>
+            </div>
+        </div>
+        <div class="hero-metrics">
+            <div class="metric-card glass-panel">
+                <span>Totalt sparade</span>
+                <strong>@customers.Count()</strong>
+                <small>Kunder i KeepWarm</small>
+            </div>
+            <div class="metric-card glass-panel">
+                <span>@monthLabel</span>
+                <strong>+@newThisMonth</strong>
+                <small>Nyregistreringar</small>
+            </div>
+            <div class="metric-card glass-panel">
+                <span>Senaste uppdatering</span>
+                <strong>@(latestCustomer != null ? latestCustomer.UpdatedAt.ToString("dd MMM", culture) : "-")</strong>
+                <small>@(latestCustomer != null ? $"{latestCustomer.FirstName} {latestCustomer.LastName}" : "Ingen historik än")</small>
+            </div>
+        </div>
+    </section>
 
-<div class="mb-4">
-    <div class="modern-card">
-        <div class="card-body">
+    <section class="customer-grid">
+        <div class="modern-card quick-add-card" id="quickAddModule">
+            <div class="quick-add-header">
+                <div>
+                    <p class="hero-eyebrow">Snabbregistrering</p>
+                    <h3>Lägg till kund på under en minut</h3>
+                    <p class="quick-add-description">
+                        Fälten är validerade och redo – fyll i tre fält och låt resten av processen ske senare.
+                    </p>
+                </div>
+                <span class="quick-add-badge">
+                    <i class="bi bi-stars"></i>
+                    Autofyll redo
+                </span>
+            </div>
+
             <form asp-action="QuickCreate" method="post" id="quickAddCustomerForm">
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-                
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label asp-for="@quickAddModel.FirstName" class="form-label">Förnamn <span class="text-danger">*</span></label>
-                        <input name="FirstName" asp-for="@quickAddModel.FirstName" class="form-control" placeholder="Ange förnamn" required />
+
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <label asp-for="@quickAddModel.FirstName" class="form-label d-flex align-items-center gap-2">
+                            <i class="bi bi-person-badge"></i>
+                            Förnamn <span class="text-danger">*</span>
+                        </label>
+                        <input name="FirstName" asp-for="@quickAddModel.FirstName" class="form-control form-control-lg" placeholder="Alicia" required />
                         <span asp-validation-for="@quickAddModel.FirstName" class="text-danger"></span>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label asp-for="@quickAddModel.LastName" class="form-label">Efternamn <span class="text-danger">*</span></label>
-                        <input name="LastName" asp-for="@quickAddModel.LastName" class="form-control" placeholder="Ange efternamn" required />
+                    <div class="col-md-4">
+                        <label asp-for="@quickAddModel.LastName" class="form-label d-flex align-items-center gap-2">
+                            <i class="bi bi-person-check"></i>
+                            Efternamn <span class="text-danger">*</span>
+                        </label>
+                        <input name="LastName" asp-for="@quickAddModel.LastName" class="form-control form-control-lg" placeholder="Nordström" required />
                         <span asp-validation-for="@quickAddModel.LastName" class="text-danger"></span>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label asp-for="@quickAddModel.Email" class="form-label">E-post <span class="text-danger">*</span></label>
-                        <input name="Email" asp-for="@quickAddModel.Email" type="email" class="form-control" placeholder="Ange e-postadress" required />
+                    <div class="col-md-4">
+                        <label asp-for="@quickAddModel.Email" class="form-label d-flex align-items-center gap-2">
+                            <i class="bi bi-envelope-open"></i>
+                            E-post <span class="text-danger">*</span>
+                        </label>
+                        <input name="Email" asp-for="@quickAddModel.Email" type="email" class="form-control form-control-lg" placeholder="hej@företag.se" required />
                         <span asp-validation-for="@quickAddModel.Email" class="text-danger"></span>
                     </div>
                 </div>
-                
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-circle"></i> Lägg till
+
+                <div class="quick-add-footer">
+                    <div class="quick-benefits">
+                        <span><i class="bi bi-magic"></i> Trimma detaljer senare</span>
+                        <span><i class="bi bi-phone"></i> Klickbara kontaktlänkar</span>
+                        <span><i class="bi bi-shield-check"></i> Rollstyrt skydd</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle"></i> Lägg till kund
                     </button>
                 </div>
             </form>
         </div>
-    </div>
-</div>
 
-<div class="customer-table-container">
-        @if (Model.Any())
-        {
-            <div class="table-responsive">
-            <table class="table customer-table">
-                <thead>
-                        <tr>
-                        <th class="col-name">Namn</th>
-                        <th class="col-email">E-post</th>
-                        <th class="col-phone d-none d-md-table-cell">Telefon</th>
-                            @if (User.IsInRole("Admin"))
-                            {
-                            <th class="col-creator d-none d-xl-table-cell">Skapad av</th>
-                            }
-                        <th class="col-actions">Åtgärder</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var customer in Model)
-                        {
-                            <tr>
-                            <td class="col-name">
-                                <a asp-action="Details" asp-route-id="@customer.Id" class="customer-name">
-                                    <strong>@customer.FirstName @customer.LastName</strong>
-                                </a>
-                                </td>
-                            <td class="col-email">
-                                <a href="mailto:@customer.Email" class="customer-email">@customer.Email</a>
-                                </td>
-                            <td class="col-phone d-none d-md-table-cell">
-                                    @if (!string.IsNullOrEmpty(customer.Phone))
-                                    {
-                                    <a href="tel:@customer.Phone" class="customer-phone">@PhoneNumberFormatter.Format(customer.Phone)</a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-                                </td>
-                            @if (User.IsInRole("Admin"))
-                                    {
-                                <td class="col-creator d-none d-xl-table-cell">
-                                    @if (customer.User != null)
-                                    {
-                                        <span class="badge customer-badge">@customer.User.FirstName @customer.User.LastName</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-                                </td>
-                            }
-                            <td class="col-actions">
-                                <div class="customer-actions">
-                                        <a asp-action="Edit" asp-route-id="@customer.Id" 
-                                       class="action-btn action-edit" title="Redigera">
-                                        <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <a asp-action="Delete" asp-route-id="@customer.Id" 
-                                       class="action-btn action-delete" title="Ta bort">
-                                        <i class="bi bi-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-        <div class="customer-empty-state">
-            <div class="empty-icon">
-                <i class="bi bi-people"></i>
+        <div class="quick-insights">
+            <article class="insight-card glass-panel">
+                <span class="insight-label">Team vibe</span>
+                <h4>Samla hela kundbilden</h4>
+                <p>
+                    Kundlistan visar automatiskt vem som skapade posten och låter dig hoppa vidare
+                    till detaljer med ett klick.
+                </p>
+                <ul class="insight-list">
+                    <li><i class="bi bi-view-list"></i> Tabellvy med hover-effekt</li>
+                    <li><i class="bi bi-link-45deg"></i> Maila eller ring direkt</li>
+                    <li><i class="bi bi-person-gear"></i> Admin får extra metadata</li>
+                </ul>
+            </article>
+
+            <article class="insight-card glass-panel">
+                <span class="insight-label">Flow tips</span>
+                <h4>Skapa en modern customer journey</h4>
+                <p>
+                    Kombinera snabbadd och detaljerade vyer för att få en levande pipeline.
+                </p>
+                <div class="insight-stats">
+                    <div>
+                        <strong>@customers.Count(c => !string.IsNullOrEmpty(c.Phone))</strong>
+                        <small>Har telefonnummer</small>
+                    </div>
+                    <div>
+                        <strong>@customers.Count(c => !string.IsNullOrEmpty(c.LinkedInUrl))</strong>
+                        <small>Har LinkedIn-länk</small>
+                    </div>
                 </div>
-            <h4 class="empty-title">Inga kunder hittades</h4>
-            <p class="empty-text">Du har inte skapat några kunder än. Klicka på knappen nedan för att skapa din första kund.</p>
-            <a asp-action="Create" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Skapa första kunden
-                </a>
+            </article>
+        </div>
+    </section>
+
+    <section class="customer-table-shell glass-panel">
+        <div class="table-toolbar">
+            <div class="toolbar-label">
+                <i class="bi bi-broadcast"></i>
+                Live-lista över kunder
             </div>
-        }
+            <div class="toolbar-chips">
+                <span class="toolbar-chip">
+                    <i class="bi bi-layers"></i>
+                    Tabellvy
+                </span>
+                <span class="toolbar-chip">
+                    <i class="bi bi-thermometer-half"></i>
+                    Fokus: relationer
+                </span>
+                <span class="toolbar-chip">
+                    <i class="bi bi-clock-history"></i>
+                    Uppdaterad @DateTime.UtcNow.ToString("HH:mm")
+                </span>
+            </div>
+        </div>
+
+        <div class="customer-table-container">
+            @if (customers.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table customer-table">
+                        <thead>
+                            <tr>
+                                <th class="col-name">Namn</th>
+                                <th class="col-email">E-post</th>
+                                <th class="col-phone d-none d-md-table-cell">Telefon</th>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <th class="col-creator d-none d-xl-table-cell">Skapad av</th>
+                                }
+                                <th class="col-actions">Åtgärder</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var customer in customers)
+                            {
+                                <tr>
+                                    <td class="col-name">
+                                        <div class="customer-name-stack">
+                                            <a asp-action="Details" asp-route-id="@customer.Id" class="customer-name">
+                                                <strong>@customer.FirstName @customer.LastName</strong>
+                                            </a>
+                                            <span class="customer-subtitle">
+                                                @customer.City ?? "Ingen ort"
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="col-email">
+                                        <a href="mailto:@customer.Email" class="customer-email">@customer.Email</a>
+                                    </td>
+                                    <td class="col-phone d-none d-md-table-cell">
+                                        @if (!string.IsNullOrEmpty(customer.Phone))
+                                        {
+                                            <a href="tel:@customer.Phone" class="customer-phone">@PhoneNumberFormatter.Format(customer.Phone)</a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <td class="col-creator d-none d-xl-table-cell">
+                                            @if (customer.User != null)
+                                            {
+                                                <span class="badge customer-badge">@customer.User.FirstName @customer.User.LastName</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                    }
+                                    <td class="col-actions">
+                                        <div class="customer-actions">
+                                            <a asp-action="Edit" asp-route-id="@customer.Id"
+                                               class="action-btn action-edit" title="Redigera">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@customer.Id"
+                                               class="action-btn action-delete" title="Ta bort">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="customer-empty-state glass-panel">
+                    <div class="empty-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h4 class="empty-title">Inga kunder hittades</h4>
+                    <p class="empty-text">
+                        Du har inte skapat några kunder än. Klicka på knappen nedan för att skapa din första kund.
+                    </p>
+                    <a asp-action="Create" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle"></i> Skapa första kunden
+                    </a>
+                </div>
+            }
+        </div>
+    </section>
 </div>
 
 @section Scripts {
