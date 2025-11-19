@@ -2,7 +2,7 @@
 
 ## Purpose
 
-KeepWarm is a customer relationship management (CRM) system designed to help users manage their customer contacts. The system provides role-based access control with Admin and User roles, allowing users to create, view, edit, and delete their own customers while admins can manage all customers and users in the system. The application focuses on maintaining customer relationships with features like contact information management, LinkedIn profile links, and phone number formatting.
+KeepWarm is a customer relationship management (CRM) system designed to help users manage their customer contacts and track interactions. The system provides role-based access control with Admin and User roles, allowing users to create, view, edit, and delete their own customers while admins can manage all customers and users in the system. The application focuses on maintaining customer relationships with features like contact information management, LinkedIn profile links, phone number formatting, and interaction history tracking.
 
 ## Structure
 
@@ -25,27 +25,31 @@ graph TD
 ### Controllers
 - **AccountController**: Handles user authentication (login, logout, register) and admin user management (create, edit, delete users)
 - **CustomerController**: Manages customer CRUD operations with role-based access control (users see only their customers, admins see all)
+- **InteractionController**: Handles interaction CRUD operations (create, edit, delete) for tracking customer contact history (calls, meetings, emails)
 - **HomeController**: Provides basic home page and privacy views
 - **DeveloperToolsController**: Optional developer utilities (can be disabled via configuration)
 
 ### Services
 - **CustomerService**: Implements business logic for customer operations, including user-scoped and admin-scoped methods
+- **InteractionService**: Manages interaction operations with role-based access control for tracking customer contact history
 - **IdentityService**: Wraps ASP.NET Core Identity functionality for user and role management, including role initialization
 - **DatabaseSeedService**: Handles database seeding operations
 
 ### Models
 - **Customer**: Core entity with contact information (name, email, phone, address, LinkedIn URL) and user association
+- **Interaction**: Tracks customer interactions (calls, meetings, emails) with date, time, and notes
+- **InteractionType**: Enumeration for interaction types (Call, Meeting, Email)
 - **ApplicationUser**: Extends IdentityUser with additional fields (FirstName, LastName, timestamps)
 
 ### Data Layer
-- **ApplicationDbContext**: Entity Framework Core context managing Customer and Identity entities with proper relationships and constraints
+- **ApplicationDbContext**: Entity Framework Core context managing Customer, Interaction, and Identity entities with proper relationships and constraints
 
 ### Helpers
 - **LinkedInUrlAttribute**: Custom validation attribute for LinkedIn URL format validation
 - **PhoneNumberFormatter**: Utility class for formatting phone numbers (supports Swedish and international formats)
 
 ### Test Suite
-- Comprehensive integration tests organized by user stories (CustomerManagement, UserManagement)
+- Comprehensive integration tests organized by user stories (CustomerManagement, UserManagement, InteractionManagement)
 - Uses xUnit, Shouldly, and Microsoft.AspNetCore.Mvc.Testing for integration testing
 - Test helpers include AuthenticationHelper, TestDataBuilder, and ServiceTestBase
 
@@ -90,4 +94,3 @@ graph TD
 - jQuery (JavaScript library)
 - jQuery Validation (form validation)
 - jQuery Validation Unobtrusive (ASP.NET Core integration)
-
