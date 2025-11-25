@@ -12,13 +12,21 @@
                     <h5 class="mb-0">🛠️ Utvecklarverktyg</h5>
                 </div>
                 <div class="card-body">
+                    @if (TempData["DbMessage"] != null)
+                    {
+                        <div class="alert @(TempData["DbMessageType"]?.ToString() == "success" ? "alert-info" : "alert-warning") mb-3">
+                            @TempData["DbMessage"]
+                        </div>
+                    }
                     <div class="row">
                         <div class="col-md-6">
-                            <h6>Databas</h6>
-                            <button id="recreateDbBtn" class="btn btn-danger btn-sm mb-3">
-                                🔄 Återskapa databas med testdata
-                            </button>
-                            <div id="dbResult" class="alert" style="display: none;"></div>
+                            <h6 class="text-muted mb-3">Databas</h6>
+                            <form asp-controller="DeveloperTools" asp-action="RecreateDatabase" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-secondary btn-sm mb-3">
+                                    <i class="bi bi-arrow-clockwise"></i> Återskapa databas med testdata
+                                </button>
+                            </form>
                         </div>
                         <div class="col-md-6">
                             <h6>Snabb inloggning</h6>
@@ -49,38 +57,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Databasåterskapning
-            document.getElementById('recreateDbBtn').addEventListener('click', function() {
-                const btn = this;
-                const resultDiv = document.getElementById('dbResult');
-                
-                btn.disabled = true;
-                btn.innerHTML = '⏳ Återskapar...';
-                
-                fetch('/DeveloperTools/RecreateDatabase', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    resultDiv.className = 'alert ' + (data.success ? 'alert-success' : 'alert-danger');
-                    resultDiv.textContent = data.message;
-                    resultDiv.style.display = 'block';
-                })
-                .catch(error => {
-                    resultDiv.className = 'alert alert-danger';
-                    resultDiv.textContent = 'Ett fel inträffade: ' + error.message;
-                    resultDiv.style.display = 'block';
-                })
-                .finally(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '🔄 Återskapa databas med testdata';
-                });
-            });
-
             // Snabb inloggning
             document.querySelectorAll('.login-btn').forEach(btn => {
                 btn.addEventListener('click', function() {

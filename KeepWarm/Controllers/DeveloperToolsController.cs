@@ -30,6 +30,7 @@ namespace KeepWarm.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RecreateDatabase()
         {
             try
@@ -37,21 +38,29 @@ namespace KeepWarm.Controllers
                 var recreateResult = await _seedService.RecreateDatabaseAsync();
                 if (!recreateResult)
                 {
-                    return Json(new { success = false, message = "Fel vid återskapning av databas" });
+                    TempData["DbMessage"] = "Fel vid återskapning av databas";
+                    TempData["DbMessageType"] = "error";
+                    return RedirectToAction("Index", "Home");
                 }
 
                 var seedResult = await _seedService.SeedTestDataAsync();
                 if (!seedResult)
                 {
-                    return Json(new { success = false, message = "Fel vid tillägg av testdata" });
+                    TempData["DbMessage"] = "Fel vid tillägg av testdata";
+                    TempData["DbMessageType"] = "error";
+                    return RedirectToAction("Index", "Home");
                 }
 
-                return Json(new { success = true, message = "Databas återskapad och testdata tillagd!" });
+                TempData["DbMessage"] = "Databas återskapad och testdata tillagd!";
+                TempData["DbMessageType"] = "success";
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Fel vid återskapning av databas");
-                return Json(new { success = false, message = "Ett oväntat fel inträffade" });
+                TempData["DbMessage"] = "Ett oväntat fel inträffade";
+                TempData["DbMessageType"] = "error";
+                return RedirectToAction("Index", "Home");
             }
         }
 
