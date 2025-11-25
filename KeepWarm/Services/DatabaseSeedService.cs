@@ -25,18 +25,25 @@ namespace KeepWarm.Services
         {
             try
             {
+                // Stäng eventuella öppna anslutningar
+                var connection = _context.Database.GetDbConnection();
+                if (connection.State == System.Data.ConnectionState.Open)
+                {
+                    await connection.CloseAsync();
+                }
+
                 // Ta bort befintlig databas
                 await _context.Database.EnsureDeletedAsync();
 
-                // Skapa ny databas från migrations
-                await _context.Database.EnsureCreatedAsync();
+                // Skapa ny databas och applicera alla migrations
+                await _context.Database.MigrateAsync();
 
                 // Skapa roller
                 await CreateRolesAsync();
 
                 return true;
             }
-            catch
+            catch (Exception)
             {
                 return false;
             }
@@ -57,7 +64,7 @@ namespace KeepWarm.Services
 
                 return true;
             }
-            catch
+            catch (Exception)
             {
                 return false;
             }
