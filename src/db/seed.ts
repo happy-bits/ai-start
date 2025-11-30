@@ -2,6 +2,7 @@ import { hash } from '@node-rs/argon2';
 import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from './schema.js';
+import { ARGON_OPTIONS, ROLES } from '../constants.js';
 
 // Deterministic seed data (no random values, fixed dates)
 const SEED_DATE = '2024-01-15T10:00:00.000Z';
@@ -14,16 +15,8 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   db.delete(schema.users).run();
 
   // Create password hashes (deterministic with fixed options)
-  const adminPassword = await hash('admin123', {
-    memoryCost: 19456,
-    timeCost: 2,
-    parallelism: 1,
-  });
-  const sellerPassword = await hash('seller123', {
-    memoryCost: 19456,
-    timeCost: 2,
-    parallelism: 1,
-  });
+  const adminPassword = await hash('admin123', ARGON_OPTIONS);
+  const sellerPassword = await hash('seller123', ARGON_OPTIONS);
 
   // Seed users
   const adminUser = db
@@ -32,7 +25,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
       email: 'admin@keepwarm.com',
       passwordHash: adminPassword,
       name: 'Admin User',
-      role: 'admin',
+      role: ROLES.ADMIN,
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })
@@ -45,7 +38,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
       email: 'alice@keepwarm.com',
       passwordHash: sellerPassword,
       name: 'Alice Johnson',
-      role: 'seller',
+      role: ROLES.SELLER,
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })
@@ -58,7 +51,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
       email: 'bob@keepwarm.com',
       passwordHash: sellerPassword,
       name: 'Bob Smith',
-      role: 'seller',
+      role: ROLES.SELLER,
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })

@@ -6,6 +6,7 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { type AuthVariables, adminOnly, hashPassword } from '../middleware/auth.js';
 import { parseIdParam, buildUpdateValues } from './helpers.js';
+import { ERROR_MESSAGES, ROLES, SUCCESS_MESSAGES } from '../constants.js';
 
 const createSellerSchema = z.object({
   email: z.string().email(),
@@ -40,7 +41,7 @@ export function createSellerRoutes(db: BetterSQLite3Database<typeof schema>) {
     const sellers = db
       .select(sellerFields)
       .from(schema.users)
-      .where(eq(schema.users.role, 'seller'))
+      .where(eq(schema.users.role, ROLES.SELLER))
       .all();
 
     return c.json({ sellers });
@@ -54,11 +55,11 @@ export function createSellerRoutes(db: BetterSQLite3Database<typeof schema>) {
     const seller = db
       .select(sellerFields)
       .from(schema.users)
-      .where(and(eq(schema.users.id, parsed.id), eq(schema.users.role, 'seller')))
+      .where(and(eq(schema.users.id, parsed.id), eq(schema.users.role, ROLES.SELLER)))
       .get();
 
     if (!seller) {
-      return c.json({ error: 'Seller not found' }, 404);
+      return c.json({ error: ERROR_MESSAGES.SELLER_NOT_FOUND }, 404);
     }
 
     return c.json({ seller });
@@ -72,7 +73,7 @@ export function createSellerRoutes(db: BetterSQLite3Database<typeof schema>) {
     const existing = db.select().from(schema.users).where(eq(schema.users.email, email)).get();
 
     if (existing) {
-      return c.json({ error: 'Email already exists' }, 409);
+      return c.json({ error: ERROR_MESSAGES.EMAIL_ALREADY_EXISTS }, 409);
     }
 
     const passwordHash = await hashPassword(password);
@@ -84,7 +85,7 @@ export function createSellerRoutes(db: BetterSQLite3Database<typeof schema>) {
         email,
         passwordHash,
         name,
-        role: 'seller',
+        role: ROLES.SELLER,
         createdAt: now,
         updatedAt: now,
       })
@@ -105,11 +106,11 @@ export function createSellerRoutes(db: BetterSQLite3Database<typeof schema>) {
     const existing = db
       .select()
       .from(schema.users)
-      .where(and(eq(schema.users.id, parsed.id), eq(schema.users.role, 'seller')))
+      .where(and(eq(schema.users.id, parsed.id), eq(schema.users.role, ROLES.SELLER)))
       .get();
 
     if (!existing) {
-      return c.json({ error: 'Seller not found' }, 404);
+      return c.json({ error: ERROR_MESSAGES.SELLER_NOT_FOUND }, 404);
     }
 
     // Check email uniqueness if updating email
@@ -121,7 +122,7 @@ export function createSellerRoutes(db: BetterSQLite3Database<typeof schema>) {
         .get();
 
       if (emailExists) {
-        return c.json({ error: 'Email already exists' }, 409);
+        return c.json({ error: ERROR_MESSAGES.EMAIL_ALREADY_EXISTS }, 409);
       }
     }
 
@@ -152,16 +153,16 @@ export function createSellerRoutes(db: BetterSQLite3Database<typeof schema>) {
     const existing = db
       .select()
       .from(schema.users)
-      .where(and(eq(schema.users.id, parsed.id), eq(schema.users.role, 'seller')))
+      .where(and(eq(schema.users.id, parsed.id), eq(schema.users.role, ROLES.SELLER)))
       .get();
 
     if (!existing) {
-      return c.json({ error: 'Seller not found' }, 404);
+      return c.json({ error: ERROR_MESSAGES.SELLER_NOT_FOUND }, 404);
     }
 
     db.delete(schema.users).where(eq(schema.users.id, parsed.id)).run();
 
-    return c.json({ message: 'Seller deleted successfully' });
+    return c.json({ message: ERROR_MESSAGES.deletedSuccessfully('Seller') });
   });
 
   return app;

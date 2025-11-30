@@ -6,18 +6,25 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { type AuthVariables } from '../middleware/auth.js';
 import { withEntityAccess, buildUpdateValues, checkSellerAccess } from './helpers.js';
+import {
+  DATE_FORMAT_MESSAGE,
+  DATE_FORMAT_REGEX,
+  ERROR_MESSAGES,
+  INTERACTION_TYPE_VALUES,
+  ROLES,
+} from '../constants.js';
 
 const createInteractionSchema = z.object({
   customerId: z.number().int().positive(),
-  type: z.enum(['call', 'meeting', 'email']),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD format'),
+  type: z.enum(INTERACTION_TYPE_VALUES),
+  date: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE),
   time: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
 });
 
 const updateInteractionSchema = z.object({
-  type: z.enum(['call', 'meeting', 'email']).optional(),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD format').optional(),
+  type: z.enum(INTERACTION_TYPE_VALUES).optional(),
+  date: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE).optional(),
   time: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
 });
@@ -36,13 +43,13 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
     if (customerId) {
       const id = parseInt(customerId, 10);
       if (isNaN(id)) {
-        return c.json({ error: 'Invalid customer ID' }, 400);
+        return c.json({ error: ERROR_MESSAGES.INVALID_CUSTOMER_ID }, 400);
       }
       conditions.push(eq(schema.interactions.customerId, id));
     }
 
     // Sellers only see their own interactions
-    if (user.role === 'seller') {
+    if (user.role === ROLES.SELLER) {
       conditions.push(eq(schema.interactions.sellerId, user.id));
     }
 
@@ -76,7 +83,7 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
       .get();
 
     if (!customer) {
-      return c.json({ error: 'Customer not found' }, 404);
+      return c.json({ error: ERROR_MESSAGES.CUSTOMER_NOT_FOUND }, 404);
     }
 
     const accessDenied = checkSellerAccess(user, customer.sellerId);
@@ -129,7 +136,7 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
     db.delete(schema.interactions).where(eq(schema.interactions.id, result.entity.id)).run();
 
-    return c.json({ message: 'Interaction deleted successfully' });
+    return c.json({ message: ERROR_MESSAGES.deletedSuccessfully('Interaction') });
   });
 
   return app;

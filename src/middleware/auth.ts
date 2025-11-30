@@ -4,9 +4,13 @@ import { hash } from '@node-rs/argon2';
 import { eq, and, gt, lt } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
-
-// Argon2 options for password hashing
-const ARGON_OPTIONS = { memoryCost: 19456, timeCost: 2, parallelism: 1 };
+import {
+  ARGON_OPTIONS,
+  AUTH_HEADER_PREFIX,
+  ERROR_MESSAGES,
+  ROLES,
+  SESSION_CONFIG,
+} from '../constants.js';
 
 // Hash a password using Argon2
 export function hashPassword(password: string) {
@@ -29,7 +33,7 @@ export type AuthVariables = {
 function extractToken(authHeader: string | undefined): string | null {
   if (!authHeader) return null;
   const parts = authHeader.split(' ');
-  if (parts.length !== 2 || parts[0] !== 'Bearer') return null;
+  if (parts.length !== 2 || parts[0] !== AUTH_HEADER_PREFIX) return null;
   return parts[1];
 }
 
@@ -39,7 +43,7 @@ export function authMiddleware(db: BetterSQLite3Database<typeof schema>) {
     const token = extractToken(c.req.header('Authorization'));
 
     if (!token) {
-      throw new HTTPException(401, { message: 'Authentication required' });
+      throw new HTTPException(401, { message: ERROR_MESSAGES.AUTHENTICATION_REQUIRED });
     }
 
     const now = new Date().toISOString();
@@ -58,7 +62,7 @@ export function authMiddleware(db: BetterSQLite3Database<typeof schema>) {
       .get();
 
     if (!session) {
-      throw new HTTPException(401, { message: 'Invalid or expired session' });
+      throw new HTTPException(401, { message: ERROR_MESSAGES.INVALID_OR_EXPIRED_SESSION });
     }
 
     // Set user in context
@@ -79,8 +83,8 @@ export function adminOnly() {
   return async (c: Context<{ Variables: AuthVariables }>, next: Next) => {
     const user = c.get('user');
 
-    if (!user || user.role !== 'admin') {
-      throw new HTTPException(403, { message: 'Admin access required' });
+    if (!user || user.role !== ROLES.ADMIN) {
+      throw new HTTPException(403, { message: ERROR_MESSAGES.ADMIN_ACCESS_REQUIRED });
     }
 
     await next();
@@ -91,9 +95,9 @@ export function adminOnly() {
 export function generateToken(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let token = '';
-  const randomBytes = new Uint8Array(48);
+  const randomBytes = new Uint8Array(SESSION_CONFIG.TOKEN_LENGTH);
   crypto.getRandomValues(randomBytes);
-  for (let i = 0; i < 48; i++) {
+  for (let i = 0; i < SESSION_CONFIG.TOKEN_LENGTH; i++) {
     token += chars[randomBytes[i] % chars.length];
   }
   return token;
@@ -103,7 +107,7 @@ export function generateToken(): string {
 export function createSession(
   db: BetterSQLite3Database<typeof schema>,
   userId: number,
-  expiresInHours: number = 24
+  expiresInHours: number = SESSION_CONFIG.DEFAULT_EXPIRY_HOURS
 ): string {
   const token = generateToken();
   const expiresAt = new Date(Date.now() + expiresInHours * 60 * 60 * 1000).toISOString();

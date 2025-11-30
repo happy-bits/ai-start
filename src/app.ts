@@ -10,6 +10,7 @@ import { createSellerRoutes } from './routes/sellers.js';
 import { createCustomerRoutes } from './routes/customers.js';
 import { createInteractionRoutes } from './routes/interactions.js';
 import { seedDatabase } from './db/seed.js';
+import { ERROR_MESSAGES, ROLES, SUCCESS_MESSAGES } from './constants.js';
 
 export function createApp(db: BetterSQLite3Database<typeof schema>, options?: { enableLogging?: boolean }) {
   const app = new Hono<{ Variables: AuthVariables }>();
@@ -48,17 +49,17 @@ export function createApp(db: BetterSQLite3Database<typeof schema>, options?: { 
   protectedApp.post('/dev/reset', async (c) => {
     const user = c.get('user');
 
-    if (user.role !== 'admin') {
-      return c.json({ error: 'Admin access required' }, 403);
+    if (user.role !== ROLES.ADMIN) {
+      return c.json({ error: ERROR_MESSAGES.ADMIN_ACCESS_REQUIRED }, 403);
     }
 
     // Only allow in development
     if (process.env.NODE_ENV === 'production') {
-      return c.json({ error: 'Not available in production' }, 403);
+      return c.json({ error: ERROR_MESSAGES.NOT_AVAILABLE_IN_PRODUCTION }, 403);
     }
 
     await seedDatabase(db);
-    return c.json({ message: 'Database reset and seeded successfully' });
+    return c.json({ message: SUCCESS_MESSAGES.DATABASE_RESET });
   });
 
   // Mount protected routes under /api
@@ -71,12 +72,12 @@ export function createApp(db: BetterSQLite3Database<typeof schema>, options?: { 
     }
 
     console.error('Unexpected error:', err);
-    return c.json({ error: 'Internal server error' }, 500);
+    return c.json({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR }, 500);
   });
 
   // 404 handler
   app.notFound((c) => {
-    return c.json({ error: 'Not found' }, 404);
+    return c.json({ error: ERROR_MESSAGES.NOT_FOUND }, 404);
   });
 
   return app;

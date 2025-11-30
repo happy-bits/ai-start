@@ -6,6 +6,7 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { type AuthVariables } from '../middleware/auth.js';
 import { withEntityAccess, buildUpdateValues } from './helpers.js';
+import { ERROR_MESSAGES, ROLES } from '../constants.js';
 
 const createCustomerSchema = z.object({
   name: z.string().min(1),
@@ -33,7 +34,7 @@ export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
     let query = db.select().from(schema.customers);
 
     // Sellers only see their own customers
-    if (user.role === 'seller') {
+    if (user.role === ROLES.SELLER) {
       query = query.where(eq(schema.customers.sellerId, user.id)) as typeof query;
     }
 
@@ -99,7 +100,7 @@ export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
 
     db.delete(schema.customers).where(eq(schema.customers.id, result.entity.id)).run();
 
-    return c.json({ message: 'Customer deleted successfully' });
+    return c.json({ message: ERROR_MESSAGES.deletedSuccessfully('Customer') });
   });
 
   return app;

@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { createSession, deleteSession, type AuthVariables } from '../middleware/auth.js';
+import { AUTH_HEADER_PREFIX, ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants.js';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -23,13 +24,13 @@ export function createAuthRoutes(db: BetterSQLite3Database<typeof schema>) {
     const user = db.select().from(schema.users).where(eq(schema.users.email, email)).get();
 
     if (!user) {
-      return c.json({ error: 'Invalid email or password' }, 401);
+      return c.json({ error: ERROR_MESSAGES.INVALID_CREDENTIALS }, 401);
     }
 
     // Verify password
     const validPassword = await verify(user.passwordHash, password);
     if (!validPassword) {
-      return c.json({ error: 'Invalid email or password' }, 401);
+      return c.json({ error: ERROR_MESSAGES.INVALID_CREDENTIALS }, 401);
     }
 
     // Create session
@@ -49,18 +50,19 @@ export function createAuthRoutes(db: BetterSQLite3Database<typeof schema>) {
   // POST /auth/logout - Logout (invalidate session)
   app.post('/logout', (c) => {
     const authHeader = c.req.header('Authorization');
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.slice(7);
+    const prefix = `${AUTH_HEADER_PREFIX} `;
+    if (authHeader?.startsWith(prefix)) {
+      const token = authHeader.slice(prefix.length);
       deleteSession(db, token);
     }
-    return c.json({ message: 'Logged out successfully' });
+    return c.json({ message: SUCCESS_MESSAGES.LOGGED_OUT });
   });
 
   // GET /auth/me - Get current user info (requires auth)
   app.get('/me', (c) => {
     const user = c.get('user');
     if (!user) {
-      return c.json({ error: 'Not authenticated' }, 401);
+      return c.json({ error: ERROR_MESSAGES.NOT_AUTHENTICATED }, 401);
     }
     return c.json({ user });
   });

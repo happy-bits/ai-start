@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import type { AuthUser, AuthVariables } from '../middleware/auth.js';
 import type * as schema from '../db/schema.js';
+import { ERROR_MESSAGES, ROLES } from '../constants.js';
 
 type ParseResult = { success: true; id: number } | { success: false; response: Response };
 
@@ -14,15 +15,15 @@ export function parseIdParam(
 ): ParseResult {
   const id = parseInt(c.req.param(param), 10);
   if (isNaN(id)) {
-    return { success: false, response: c.json({ error: `Invalid ${entityName} ID` }, 400) };
+    return { success: false, response: c.json({ error: ERROR_MESSAGES.invalidId(entityName) }, 400) };
   }
   return { success: true, id };
 }
 
 // Check seller ownership - returns error response or null if allowed
 export function checkSellerAccess(user: AuthUser, sellerId: number) {
-  if (user.role === 'seller' && sellerId !== user.id) {
-    return { error: 'Access denied' };
+  if (user.role === ROLES.SELLER && sellerId !== user.id) {
+    return { error: ERROR_MESSAGES.ACCESS_DENIED };
   }
   return null;
 }
@@ -67,7 +68,7 @@ export function withEntityAccess<T extends { sellerId: number }>(
   const entity = db.select().from(table).where(eq(table.id, parsed.id)).get() as T | undefined;
 
   if (!entity) {
-    return { success: false, response: c.json({ error: `${entityName} not found` }, 404) };
+    return { success: false, response: c.json({ error: ERROR_MESSAGES.notFound(entityName) }, 404) };
   }
 
   const accessDenied = checkSellerAccess(user, entity.sellerId);
