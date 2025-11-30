@@ -8,8 +8,8 @@ export interface User {
   updatedAt?: string;
 }
 
-// Customer types
-export interface Customer {
+// Contact types
+export interface Contact {
   id: number;
   sellerId: number;
   name: string;
@@ -21,7 +21,7 @@ export interface Customer {
   updatedAt: string;
 }
 
-export interface CreateCustomerData {
+export interface CreateContactData {
   name: string;
   email?: string | null;
   phone?: string | null;
@@ -29,7 +29,7 @@ export interface CreateCustomerData {
   notes?: string | null;
 }
 
-export interface UpdateCustomerData {
+export interface UpdateContactData {
   name?: string;
   email?: string | null;
   phone?: string | null;
@@ -42,7 +42,7 @@ export type InteractionType = 'call' | 'meeting' | 'email';
 
 export interface Interaction {
   id: number;
-  customerId: number;
+  contactId: number;
   sellerId: number;
   type: InteractionType;
   date: string;
@@ -53,7 +53,7 @@ export interface Interaction {
 }
 
 export interface CreateInteractionData {
-  customerId: number;
+  contactId: number;
   type: InteractionType;
   date: string;
   time?: string | null;

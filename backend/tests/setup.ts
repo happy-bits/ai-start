@@ -15,8 +15,8 @@ export type TestContext = {
   adminId: number;
   sellerId: number;
   seller2Id: number;
-  customerId: number;
-  customer2Id: number;
+  contactId: number;
+  contact2Id: number;
   interactionId: number;
 };
 
@@ -45,7 +45,7 @@ export function createTestDatabase() {
       created_at TEXT NOT NULL
     );
 
-    CREATE TABLE customers (
+    CREATE TABLE contacts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       name TEXT NOT NULL,
@@ -59,7 +59,7 @@ export function createTestDatabase() {
 
     CREATE TABLE interactions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+      contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
       seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       type TEXT NOT NULL CHECK(type IN ('call', 'meeting', 'email')),
       date TEXT NOT NULL,
@@ -69,8 +69,8 @@ export function createTestDatabase() {
       updated_at TEXT NOT NULL
     );
 
-    CREATE INDEX idx_customers_seller_id ON customers(seller_id);
-    CREATE INDEX idx_interactions_customer_id ON interactions(customer_id);
+    CREATE INDEX idx_contacts_seller_id ON contacts(seller_id);
+    CREATE INDEX idx_interactions_contact_id ON interactions(contact_id);
     CREATE INDEX idx_interactions_seller_id ON interactions(seller_id);
     CREATE INDEX idx_sessions_token ON sessions(token);
   `);
@@ -84,8 +84,8 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
   adminId: number;
   sellerId: number;
   seller2Id: number;
-  customerId: number;
-  customer2Id: number;
+  contactId: number;
+  contact2Id: number;
   interactionId: number;
   adminToken: string;
   sellerToken: string;
@@ -135,13 +135,13 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
     .returning()
     .get();
 
-  // Create customers
-  const customer = db
-    .insert(schema.customers)
+  // Create contacts
+  const contact = db
+    .insert(schema.contacts)
     .values({
       sellerId: seller.id,
-      name: 'Test Customer',
-      email: 'customer@test.com',
+      name: 'Test Contact',
+      email: 'contact@test.com',
       phone: '+1-555-0100',
       company: 'Test Corp',
       notes: 'Test notes',
@@ -151,11 +151,11 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
     .returning()
     .get();
 
-  const customer2 = db
-    .insert(schema.customers)
+  const contact2 = db
+    .insert(schema.contacts)
     .values({
       sellerId: seller2.id,
-      name: 'Other Customer',
+      name: 'Other Contact',
       email: 'other@test.com',
       phone: '+1-555-0200',
       company: 'Other Corp',
@@ -170,7 +170,7 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
   const interaction = db
     .insert(schema.interactions)
     .values({
-      customerId: customer.id,
+      contactId: contact.id,
       sellerId: seller.id,
       type: 'call',
       date: '2024-01-10',
@@ -191,8 +191,8 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
     adminId: admin.id,
     sellerId: seller.id,
     seller2Id: seller2.id,
-    customerId: customer.id,
-    customer2Id: customer2.id,
+    contactId: contact.id,
+    contact2Id: contact2.id,
     interactionId: interaction.id,
     adminToken,
     sellerToken,
@@ -304,8 +304,8 @@ export function createTestUser(
     .get();
 }
 
-// Helper to create test customer with defaults
-export function createTestCustomer(
+// Helper to create test contact with defaults
+export function createTestContact(
   db: ReturnType<typeof drizzle<typeof schema>>,
   sellerId: number,
   overrides?: Partial<{
@@ -318,11 +318,11 @@ export function createTestCustomer(
 ) {
   const now = '2024-01-15T10:00:00.000Z';
   return db
-    .insert(schema.customers)
+    .insert(schema.contacts)
     .values({
       sellerId,
-      name: overrides?.name ?? 'Test Customer',
-      email: overrides?.email ?? 'customer@test.com',
+      name: overrides?.name ?? 'Test Contact',
+      email: overrides?.email ?? 'contact@test.com',
       phone: overrides?.phone ?? '+1-555-0100',
       company: overrides?.company ?? 'Test Corp',
       notes: overrides?.notes ?? 'Test notes',

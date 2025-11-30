@@ -15,7 +15,7 @@ import {
 } from '../constants.js';
 
 const createInteractionSchema = z.object({
-  customerId: z.number().int().positive(),
+  contactId: z.number().int().positive(),
   type: z.enum(INTERACTION_TYPE_VALUES),
   date: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE),
   time: z.string().optional().nullable(),
@@ -35,17 +35,17 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
   // GET /interactions - List interactions (sellers see their own, admins see all)
   app.get('/', (c) => {
     const user = c.get('user');
-    const customerId = c.req.query('customerId');
+    const contactId = c.req.query('contactId');
 
     let conditions: ReturnType<typeof eq>[] = [];
 
-    // Filter by customer if provided
-    if (customerId) {
-      const id = parseInt(customerId, 10);
+    // Filter by contact if provided
+    if (contactId) {
+      const id = parseInt(contactId, 10);
       if (isNaN(id)) {
-        return c.json({ error: ERROR_MESSAGES.INVALID_CUSTOMER_ID }, 400);
+        return c.json({ error: ERROR_MESSAGES.INVALID_CONTACT_ID }, 400);
       }
-      conditions.push(eq(schema.interactions.customerId, id));
+      conditions.push(eq(schema.interactions.contactId, id));
     }
 
     // Sellers only see their own interactions
@@ -75,18 +75,18 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
     const user = c.get('user');
     const data = c.req.valid('json');
 
-    // Verify customer exists and belongs to the seller (or user is admin)
-    const customer = db
+    // Verify contact exists and belongs to the seller (or user is admin)
+    const contact = db
       .select()
-      .from(schema.customers)
-      .where(eq(schema.customers.id, data.customerId))
+      .from(schema.contacts)
+      .where(eq(schema.contacts.id, data.contactId))
       .get();
 
-    if (!customer) {
-      return c.json({ error: ERROR_MESSAGES.CUSTOMER_NOT_FOUND }, 404);
+    if (!contact) {
+      return c.json({ error: ERROR_MESSAGES.CONTACT_NOT_FOUND }, 404);
     }
 
-    const accessDenied = checkSellerAccess(user, customer.sellerId);
+    const accessDenied = checkSellerAccess(user, contact.sellerId);
     if (accessDenied) {
       return c.json({ error: accessDenied.error }, 403);
     }
@@ -96,7 +96,7 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
     const interaction = db
       .insert(schema.interactions)
       .values({
-        customerId: data.customerId,
+        contactId: data.contactId,
         sellerId: user.id,
         type: data.type,
         date: data.date,

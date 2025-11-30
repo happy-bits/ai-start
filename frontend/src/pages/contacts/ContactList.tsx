@@ -1,23 +1,23 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useCustomers, useDeleteCustomer } from '../../api/customers';
+import { useContacts, useDeleteContact } from '../../api/contacts';
 import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput } from '../../components/ui';
 
-export default function CustomerList() {
-  const { data: customers = [], isLoading } = useCustomers();
-  const deleteCustomer = useDeleteCustomer();
+export default function ContactList() {
+  const { data: contacts = [], isLoading } = useContacts();
+  const deleteContact = useDeleteContact();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredCustomers = customers.filter(
-    (customer) =>
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredContacts = contacts.filter(
+    (contact) =>
+      contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleDelete = async (id: number, name: string) => {
     if (confirm(`Are you sure you want to delete "${name}"?`)) {
-      deleteCustomer.mutate(id);
+      deleteContact.mutate(id);
     }
   };
 
@@ -26,44 +26,44 @@ export default function CustomerList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Customers</h1>
-          <p className="text-dark-400 mt-1">Manage your customer relationships</p>
+          <h1 className="text-2xl font-bold text-white">Contacts</h1>
+          <p className="text-dark-400 mt-1">Manage your contact relationships</p>
         </div>
-        <Link to="/customers/new">
+        <Link to="/contacts/new">
           <Button>
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add Customer
+            Add Contact
           </Button>
         </Link>
       </div>
 
       {/* Search */}
       <SearchInput
-        placeholder="Search customers..."
+        placeholder="Search contacts..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {/* Customer list */}
+      {/* Contact list */}
       <Card padding="none">
         {isLoading ? (
           <div className="p-8 flex justify-center">
             <LoadingSpinner size="md" />
           </div>
-        ) : filteredCustomers.length === 0 ? (
+        ) : filteredContacts.length === 0 ? (
           <EmptyState
             icon={
               <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             }
-            title="No customers found"
-            message={searchTerm ? 'Try a different search term' : 'Get started by adding your first customer'}
+            title="No contacts found"
+            message={searchTerm ? 'Try a different search term' : 'Get started by adding your first contact'}
             action={!searchTerm ? (
-              <Link to="/customers/new">
-                <Button size="sm">Add Customer</Button>
+              <Link to="/contacts/new">
+                <Button size="sm">Add Contact</Button>
               </Link>
             ) : undefined}
           />
@@ -73,10 +73,10 @@ export default function CustomerList() {
               <thead>
                 <tr className="border-b border-dark-700">
                   <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
-                    Customer
+                    Contact
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
-                    Contact
+                    Contact Info
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
                     Company
@@ -87,18 +87,18 @@ export default function CustomerList() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-dark-700">
-                {filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-dark-800/50 transition-colors">
+                {filteredContacts.map((contact) => (
+                  <tr key={contact.id} className="hover:bg-dark-800/50 transition-colors">
                     <td className="px-6 py-4">
-                      <Link to={`/customers/${customer.id}`} className="flex items-center gap-4">
-                        <Avatar name={customer.name} size="md" />
+                      <Link to={`/contacts/${contact.id}`} className="flex items-center gap-4">
+                        <Avatar name={contact.name} size="md" />
                         <div>
                           <p className="text-sm font-medium text-white hover:text-warm-400 transition-colors">
-                            {customer.name}
+                            {contact.name}
                           </p>
-                          {customer.notes && (
+                          {contact.notes && (
                             <p className="text-xs text-dark-500 truncate max-w-xs">
-                              {customer.notes}
+                              {contact.notes}
                             </p>
                           )}
                         </div>
@@ -106,30 +106,30 @@ export default function CustomerList() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="space-y-1">
-                        {customer.email && (
-                          <p className="text-sm text-dark-300">{customer.email}</p>
+                        {contact.email && (
+                          <p className="text-sm text-dark-300">{contact.email}</p>
                         )}
-                        {customer.phone && (
-                          <p className="text-sm text-dark-400">{customer.phone}</p>
+                        {contact.phone && (
+                          <p className="text-sm text-dark-400">{contact.phone}</p>
                         )}
-                        {!customer.email && !customer.phone && (
+                        {!contact.email && !contact.phone && (
                           <p className="text-sm text-dark-500">No contact info</p>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-sm text-dark-300">
-                        {customer.company || <span className="text-dark-500">—</span>}
+                        {contact.company || <span className="text-dark-500">—</span>}
                       </p>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        <Link to={`/customers/${customer.id}`}>
+                        <Link to={`/contacts/${contact.id}`}>
                           <Button variant="ghost" size="sm">
                             View
                           </Button>
                         </Link>
-                        <Link to={`/customers/${customer.id}/edit`}>
+                        <Link to={`/contacts/${contact.id}/edit`}>
                           <Button variant="ghost" size="sm">
                             Edit
                           </Button>
@@ -137,8 +137,8 @@ export default function CustomerList() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(customer.id, customer.name)}
-                          disabled={deleteCustomer.isPending}
+                          onClick={() => handleDelete(contact.id, contact.name)}
+                          disabled={deleteContact.isPending}
                           className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                         >
                           Delete

@@ -3,9 +3,9 @@ import { apiClient } from './client';
 import type { Interaction, CreateInteractionData, UpdateInteractionData } from './types';
 
 // API functions
-export async function getInteractions(customerId?: number): Promise<Interaction[]> {
-  const url = customerId
-    ? `/api/interactions?customerId=${customerId}`
+export async function getInteractions(contactId?: number): Promise<Interaction[]> {
+  const url = contactId
+    ? `/api/interactions?contactId=${contactId}`
     : '/api/interactions';
   const response = await apiClient.get<{ interactions: Interaction[] }>(url);
   return response.interactions;
@@ -31,10 +31,10 @@ export async function deleteInteraction(id: number): Promise<void> {
 }
 
 // React Query hooks
-export function useInteractions(customerId?: number) {
+export function useInteractions(contactId?: number) {
   return useQuery({
-    queryKey: ['interactions', { customerId }],
-    queryFn: () => getInteractions(customerId),
+    queryKey: ['interactions', { contactId }],
+    queryFn: () => getInteractions(contactId),
   });
 }
 
@@ -53,7 +53,7 @@ export function useCreateInteraction() {
     mutationFn: createInteraction,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['interactions'] });
-      queryClient.invalidateQueries({ queryKey: ['interactions', { customerId: data.customerId }] });
+      queryClient.invalidateQueries({ queryKey: ['interactions', { contactId: data.contactId }] });
     },
   });
 }

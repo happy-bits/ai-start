@@ -2,9 +2,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
-import CustomerList from './pages/customers/CustomerList';
-import CustomerDetail from './pages/customers/CustomerDetail';
-import CustomerForm from './pages/customers/CustomerForm';
+import ContactList from './pages/contacts/ContactList';
+import ContactDetail from './pages/contacts/ContactDetail';
+import ContactForm from './pages/contacts/ContactForm';
 import SellerList from './pages/sellers/SellerList';
 import SellerForm from './pages/sellers/SellerForm';
 
@@ -48,11 +48,11 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/customers" replace />} />
-        <Route path="customers" element={<CustomerList />} />
-        <Route path="customers/new" element={<CustomerForm />} />
-        <Route path="customers/:id" element={<CustomerDetail />} />
-        <Route path="customers/:id/edit" element={<CustomerForm />} />
+        <Route index element={<Navigate to="/contacts" replace />} />
+        <Route path="contacts" element={<ContactList />} />
+        <Route path="contacts/new" element={<ContactForm />} />
+        <Route path="contacts/:id" element={<ContactDetail />} />
+        <Route path="contacts/:id/edit" element={<ContactForm />} />
         <Route
           path="sellers"
           element={

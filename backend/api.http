@@ -107,32 +107,32 @@ DELETE {{baseUrl}}/api/sellers/4
 Authorization: Bearer {{token}}
 
 ###############################################################################
-# CUSTOMERS
+# CONTACTS
 ###############################################################################
 
-### List All Customers (Admin sees all, Seller sees own)
-GET {{baseUrl}}/api/customers
+### List All Contacts (Admin sees all, Seller sees own)
+GET {{baseUrl}}/api/contacts
 Authorization: Bearer {{token}}
 
-### Get Customer by ID
-GET {{baseUrl}}/api/customers/1
+### Get Contact by ID
+GET {{baseUrl}}/api/contacts/1
 Authorization: Bearer {{token}}
 
-### Create New Customer
-POST {{baseUrl}}/api/customers
+### Create New Contact
+POST {{baseUrl}}/api/contacts
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "New Customer Inc",
-  "email": "contact@newcustomer.com",
+  "name": "New Contact Inc",
+  "email": "contact@newcontact.com",
   "phone": "+1-555-9999",
-  "company": "New Customer Inc",
+  "company": "New Contact Inc",
   "notes": "Potential enterprise client"
 }
 
-### Update Customer
-PUT {{baseUrl}}/api/customers/1
+### Update Contact
+PUT {{baseUrl}}/api/contacts/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -140,8 +140,8 @@ Content-Type: application/json
   "notes": "Updated notes - Very interested in premium plan"
 }
 
-### Delete Customer
-DELETE {{baseUrl}}/api/customers/5
+### Delete Contact
+DELETE {{baseUrl}}/api/contacts/5
 Authorization: Bearer {{token}}
 
 ###############################################################################
@@ -152,8 +152,8 @@ Authorization: Bearer {{token}}
 GET {{baseUrl}}/api/interactions
 Authorization: Bearer {{token}}
 
-### List Interactions for Specific Customer
-GET {{baseUrl}}/api/interactions?customerId=13
+### List Interactions for Specific Contact
+GET {{baseUrl}}/api/interactions?contactId=13
 Authorization: Bearer {{token}}
 
 ### Get Interaction by ID
@@ -166,7 +166,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "customerId": 13,
+  "contactId": 13,
   "type": "call",
   "date": "2025-12-01",
   "time": "17:30",
@@ -179,7 +179,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "customerId": 1,
+  "contactId": 1,
   "type": "meeting",
   "date": "2024-01-25",
   "time": "10:00",
@@ -192,7 +192,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "customerId": 2,
+  "contactId": 2,
   "type": "email",
   "date": "2024-01-18",
   "notes": "Sent contract proposal"

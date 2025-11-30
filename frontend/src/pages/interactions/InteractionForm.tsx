@@ -5,7 +5,7 @@ import type { InteractionType } from '../../api/types';
 import { getErrorMessage } from '../../utils';
 
 interface InteractionFormProps {
-  customerId: number;
+  contactId: number;
   interactionId?: number;
   onSuccess: () => void;
   onCancel: () => void;
@@ -18,7 +18,7 @@ const interactionTypes = [
 ];
 
 export default function InteractionForm({
-  customerId,
+  contactId,
   interactionId,
   onSuccess,
   onCancel,
@@ -72,7 +72,7 @@ export default function InteractionForm({
         });
       } else {
         await createInteraction.mutateAsync({
-          customerId,
+          contactId,
           type: formData.type,
           date: formData.date,
           time: formData.time || null,

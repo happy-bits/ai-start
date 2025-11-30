@@ -60,9 +60,9 @@ export const ERROR_MESSAGES = {
   SELLER_NOT_FOUND: 'Seller not found',
   EMAIL_ALREADY_EXISTS: 'Email already exists',
 
-  // Customer errors
-  CUSTOMER_NOT_FOUND: 'Customer not found',
-  INVALID_CUSTOMER_ID: 'Invalid customer ID',
+  // Contact errors
+  CONTACT_NOT_FOUND: 'Contact not found',
+  INVALID_CONTACT_ID: 'Invalid contact ID',
 
   // Generic entity errors
   invalidId: (entityName: string) => `Invalid ${entityName} ID`,

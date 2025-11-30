@@ -20,8 +20,8 @@ export const sessions = sqliteTable('sessions', {
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
 });
 
-// Customers table
-export const customers = sqliteTable('customers', {
+// Contacts table
+export const contacts = sqliteTable('contacts', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   sellerId: integer('seller_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
@@ -36,7 +36,7 @@ export const customers = sqliteTable('customers', {
 // Interactions table
 export const interactions = sqliteTable('interactions', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  customerId: integer('customer_id').notNull().references(() => customers.id, { onDelete: 'cascade' }),
+  contactId: integer('contact_id').notNull().references(() => contacts.id, { onDelete: 'cascade' }),
   sellerId: integer('seller_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   type: text('type', { enum: ['call', 'meeting', 'email'] }).notNull(),
   date: text('date').notNull(),
@@ -51,8 +51,8 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Session = typeof sessions.$inferSelect;
 export type NewSession = typeof sessions.$inferInsert;
-export type Customer = typeof customers.$inferSelect;
-export type NewCustomer = typeof customers.$inferInsert;
+export type Contact = typeof contacts.$inferSelect;
+export type NewContact = typeof contacts.$inferInsert;
 export type Interaction = typeof interactions.$inferSelect;
 export type NewInteraction = typeof interactions.$inferInsert;
 

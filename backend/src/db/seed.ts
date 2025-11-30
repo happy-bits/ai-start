@@ -10,7 +10,7 @@ const SEED_DATE = '2024-01-15T10:00:00.000Z';
 export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   // Clear existing data
   db.delete(schema.interactions).run();
-  db.delete(schema.customers).run();
+  db.delete(schema.contacts).run();
   db.delete(schema.sessions).run();
   db.delete(schema.users).run();
 
@@ -60,9 +60,9 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
 
   console.log('Created users:', { adminUser, seller1, seller2 });
 
-  // Seed customers for seller1 (Alice)
-  const customer1 = db
-    .insert(schema.customers)
+  // Seed contacts for seller1 (Alice)
+  const contact1 = db
+    .insert(schema.contacts)
     .values({
       sellerId: seller1.id,
       name: 'Acme Corporation',
@@ -76,8 +76,8 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     .returning()
     .get();
 
-  const customer2 = db
-    .insert(schema.customers)
+  const contact2 = db
+    .insert(schema.contacts)
     .values({
       sellerId: seller1.id,
       name: 'Tech Startup Inc',
@@ -91,9 +91,9 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     .returning()
     .get();
 
-  // Seed customers for seller2 (Bob)
-  const customer3 = db
-    .insert(schema.customers)
+  // Seed contacts for seller2 (Bob)
+  const contact3 = db
+    .insert(schema.contacts)
     .values({
       sellerId: seller2.id,
       name: 'Global Industries',
@@ -107,11 +107,11 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     .returning()
     .get();
 
-  console.log('Created customers:', { customer1, customer2, customer3 });
+  console.log('Created contacts:', { contact1, contact2, contact3 });
 
-  // Seed interactions for customer1
+  // Seed interactions for contact1
   db.insert(schema.interactions).values({
-    customerId: customer1.id,
+    contactId: contact1.id,
     sellerId: seller1.id,
     type: 'call',
     date: '2024-01-10',
@@ -122,7 +122,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   }).run();
 
   db.insert(schema.interactions).values({
-    customerId: customer1.id,
+    contactId: contact1.id,
     sellerId: seller1.id,
     type: 'email',
     date: '2024-01-12',
@@ -133,7 +133,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   }).run();
 
   db.insert(schema.interactions).values({
-    customerId: customer1.id,
+    contactId: contact1.id,
     sellerId: seller1.id,
     type: 'meeting',
     date: '2024-01-15',
@@ -143,9 +143,9 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     updatedAt: SEED_DATE,
   }).run();
 
-  // Seed interactions for customer2
+  // Seed interactions for contact2
   db.insert(schema.interactions).values({
-    customerId: customer2.id,
+    contactId: contact2.id,
     sellerId: seller1.id,
     type: 'call',
     date: '2024-01-08',
@@ -155,9 +155,9 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     updatedAt: SEED_DATE,
   }).run();
 
-  // Seed interactions for customer3
+  // Seed interactions for contact3
   db.insert(schema.interactions).values({
-    customerId: customer3.id,
+    contactId: contact3.id,
     sellerId: seller2.id,
     type: 'meeting',
     date: '2024-01-14',
@@ -172,7 +172,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   return {
     admin: adminUser,
     sellers: [seller1, seller2],
-    customers: [customer1, customer2, customer3],
+    contacts: [contact1, contact2, contact3],
   };
 }
 

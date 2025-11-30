@@ -8,7 +8,7 @@ import { type AuthVariables } from '../middleware/auth.js';
 import { withEntityAccess, buildUpdateValues } from './helpers.js';
 import { ERROR_MESSAGES, ROLES } from '../constants.js';
 
-const createCustomerSchema = z.object({
+const createContactSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
@@ -16,7 +16,7 @@ const createCustomerSchema = z.object({
   notes: z.string().optional().nullable(),
 });
 
-const updateCustomerSchema = z.object({
+const updateContactSchema = z.object({
   name: z.string().min(1).optional(),
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
@@ -24,41 +24,41 @@ const updateCustomerSchema = z.object({
   notes: z.string().optional().nullable(),
 });
 
-export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
+export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
   const app = new Hono<{ Variables: AuthVariables }>();
 
-  // GET /customers - List customers (sellers see their own, admins see all)
+  // GET /contacts - List contacts (sellers see their own, admins see all)
   app.get('/', (c) => {
     const user = c.get('user');
 
-    let query = db.select().from(schema.customers);
+    let query = db.select().from(schema.contacts);
 
-    // Sellers only see their own customers
+    // Sellers only see their own contacts
     if (user.role === ROLES.SELLER) {
-      query = query.where(eq(schema.customers.sellerId, user.id)) as typeof query;
+      query = query.where(eq(schema.contacts.sellerId, user.id)) as typeof query;
     }
 
-    const customers = query.all();
-    return c.json({ customers });
+    const contacts = query.all();
+    return c.json({ contacts });
   });
 
-  // GET /customers/:id - Get customer details
+  // GET /contacts/:id - Get contact details
   app.get('/:id', (c) => {
-    const result = withEntityAccess<schema.Customer>(c, db, schema.customers, 'Customer');
+    const result = withEntityAccess<schema.Contact>(c, db, schema.contacts, 'Contact');
     if (!result.success) return result.response;
 
-    return c.json({ customer: result.entity });
+    return c.json({ contact: result.entity });
   });
 
-  // POST /customers - Create new customer
-  app.post('/', zValidator('json', createCustomerSchema), (c) => {
+  // POST /contacts - Create new contact
+  app.post('/', zValidator('json', createContactSchema), (c) => {
     const user = c.get('user');
     const data = c.req.valid('json');
 
     const now = new Date().toISOString();
 
-    const customer = db
-      .insert(schema.customers)
+    const contact = db
+      .insert(schema.contacts)
       .values({
         sellerId: user.id,
         name: data.name,
@@ -72,39 +72,37 @@ export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
       .returning()
       .get();
 
-    return c.json({ customer }, 201);
+    return c.json({ contact }, 201);
   });
 
-  // PUT /customers/:id - Update customer
-  app.put('/:id', zValidator('json', updateCustomerSchema), (c) => {
-    const result = withEntityAccess<schema.Customer>(c, db, schema.customers, 'Customer');
+  // PUT /contacts/:id - Update contact
+  app.put('/:id', zValidator('json', updateContactSchema), (c) => {
+    const result = withEntityAccess<schema.Contact>(c, db, schema.contacts, 'Contact');
     if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
     const updateValues = buildUpdateValues(updates, ['name', 'email', 'phone', 'company', 'notes']);
 
-    const customer = db
-      .update(schema.customers)
+    const contact = db
+      .update(schema.contacts)
       .set(updateValues)
-      .where(eq(schema.customers.id, result.entity.id))
+      .where(eq(schema.contacts.id, result.entity.id))
       .returning()
       .get();
 
-    return c.json({ customer });
+    return c.json({ contact });
   });
 
-  // DELETE /customers/:id - Delete customer
+  // DELETE /contacts/:id - Delete contact
   app.delete('/:id', (c) => {
-    const result = withEntityAccess<schema.Customer>(c, db, schema.customers, 'Customer');
+    const result = withEntityAccess<schema.Contact>(c, db, schema.contacts, 'Contact');
     if (!result.success) return result.response;
 
-    db.delete(schema.customers).where(eq(schema.customers.id, result.entity.id)).run();
+    db.delete(schema.contacts).where(eq(schema.contacts.id, result.entity.id)).run();
 
-    return c.json({ message: ERROR_MESSAGES.deletedSuccessfully('Customer') });
+    return c.json({ message: ERROR_MESSAGES.deletedSuccessfully('Contact') });
   });
 
   return app;
 }
-
-
 

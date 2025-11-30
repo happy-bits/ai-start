@@ -1,18 +1,18 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useCustomer, useCreateCustomer, useUpdateCustomer } from '../../api/customers';
+import { useContact, useCreateContact, useUpdateContact } from '../../api/contacts';
 import { Button, Card, Input, Textarea, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
 import { useFormSubmission } from '../../hooks/useFormSubmission';
-import type { Customer, CreateCustomerData, UpdateCustomerData } from '../../api/types';
+import type { Contact, CreateContactData, UpdateContactData } from '../../api/types';
 
-export default function CustomerForm() {
+export default function ContactForm() {
   const { id } = useParams<{ id: string }>();
   const isEditing = !!id;
-  const customerId = id ? parseInt(id, 10) : 0;
+  const contactId = id ? parseInt(id, 10) : 0;
 
-  const { data: existingCustomer, isLoading } = useCustomer(customerId);
-  const createCustomer = useCreateCustomer();
-  const updateCustomer = useUpdateCustomer();
+  const { data: existingContact, isLoading } = useContact(contactId);
+  const createContact = useCreateContact();
+  const updateContact = useUpdateContact();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -23,30 +23,30 @@ export default function CustomerForm() {
   });
 
   useEffect(() => {
-    if (existingCustomer) {
+    if (existingContact) {
       setFormData({
-        name: existingCustomer.name,
-        email: existingCustomer.email || '',
-        phone: existingCustomer.phone || '',
-        company: existingCustomer.company || '',
-        notes: existingCustomer.notes || '',
+        name: existingContact.name,
+        email: existingContact.email || '',
+        phone: existingContact.phone || '',
+        company: existingContact.company || '',
+        notes: existingContact.notes || '',
       });
     }
-  }, [existingCustomer]);
+  }, [existingContact]);
 
   const { error, isSubmitting, handleSubmit } = useFormSubmission<
-    CreateCustomerData | UpdateCustomerData,
-    Customer
+    CreateContactData | UpdateContactData,
+    Contact
   >({
     onSubmit: async (data) => {
       if (isEditing) {
-        return await updateCustomer.mutateAsync({ id: customerId, data: data as UpdateCustomerData });
+        return await updateContact.mutateAsync({ id: contactId, data: data as UpdateContactData });
       } else {
-        return await createCustomer.mutateAsync(data as CreateCustomerData);
+        return await createContact.mutateAsync(data as CreateContactData);
       }
     },
-    onSuccess: (customer) => {
-      return `/customers/${customer.id}`;
+    onSuccess: (contact) => {
+      return `/contacts/${contact.id}`;
     },
     validate: (data) => {
       if (!data.name?.trim()) {
@@ -79,13 +79,13 @@ export default function CustomerForm() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <BackButton to={isEditing ? `/customers/${customerId}` : '/customers'} />
+        <BackButton to={isEditing ? `/contacts/${contactId}` : '/contacts'} />
         <div>
           <h1 className="text-2xl font-bold text-white">
-            {isEditing ? 'Edit Customer' : 'New Customer'}
+            {isEditing ? 'Edit Contact' : 'New Contact'}
           </h1>
           <p className="text-dark-400 mt-1">
-            {isEditing ? 'Update customer information' : 'Add a new customer to your CRM'}
+            {isEditing ? 'Update contact information' : 'Add a new contact to your CRM'}
           </p>
         </div>
       </div>
@@ -131,12 +131,12 @@ export default function CustomerForm() {
             label="Notes"
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            placeholder="Any additional notes about this customer..."
+            placeholder="Any additional notes about this contact..."
             rows={4}
           />
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark-700">
-            <Link to={isEditing ? `/customers/${customerId}` : '/customers'}>
+            <Link to={isEditing ? `/contacts/${contactId}` : '/contacts'}>
               <Button type="button" variant="ghost">
                 Cancel
               </Button>
@@ -153,7 +153,7 @@ export default function CustomerForm() {
               ) : isEditing ? (
                 'Save Changes'
               ) : (
-                'Create Customer'
+                'Create Contact'
               )}
             </Button>
           </div>

@@ -16,7 +16,7 @@ export default function SellerList() {
   );
 
   const handleDelete = async (id: number, name: string) => {
-    if (confirm(`Are you sure you want to delete seller "${name}"? This will also delete all their customers and interactions.`)) {
+    if (confirm(`Are you sure you want to delete seller "${name}"? This will also delete all their contacts and interactions.`)) {
       deleteSeller.mutate(id);
     }
   };

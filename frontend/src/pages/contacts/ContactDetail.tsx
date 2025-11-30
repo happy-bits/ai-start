@@ -1,27 +1,27 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useCustomer, useDeleteCustomer } from '../../api/customers';
+import { useContact, useDeleteContact } from '../../api/contacts';
 import { useInteractions, useDeleteInteraction } from '../../api/interactions';
 import { Button, Card, Badge, LoadingSpinner, BackButton, Avatar, EmptyState } from '../../components/ui';
 import InteractionForm from '../interactions/InteractionForm';
 
-export default function CustomerDetail() {
+export default function ContactDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const customerId = parseInt(id!, 10);
+  const contactId = parseInt(id!, 10);
 
-  const { data: customer, isLoading: customerLoading } = useCustomer(customerId);
-  const { data: interactions = [], isLoading: interactionsLoading } = useInteractions(customerId);
-  const deleteCustomer = useDeleteCustomer();
+  const { data: contact, isLoading: contactLoading } = useContact(contactId);
+  const { data: interactions = [], isLoading: interactionsLoading } = useInteractions(contactId);
+  const deleteContact = useDeleteContact();
   const deleteInteraction = useDeleteInteraction();
 
   const [showInteractionForm, setShowInteractionForm] = useState(false);
   const [editingInteraction, setEditingInteraction] = useState<number | null>(null);
 
-  const handleDeleteCustomer = async () => {
-    if (customer && confirm(`Are you sure you want to delete "${customer.name}"?`)) {
-      await deleteCustomer.mutateAsync(customerId);
-      navigate('/customers');
+  const handleDeleteContact = async () => {
+    if (contact && confirm(`Are you sure you want to delete "${contact.name}"?`)) {
+      await deleteContact.mutateAsync(contactId);
+      navigate('/contacts');
     }
   };
 
@@ -62,7 +62,7 @@ export default function CustomerDetail() {
     },
   };
 
-  if (customerLoading) {
+  if (contactLoading) {
     return (
       <div className="flex justify-center py-12">
         <LoadingSpinner size="md" />
@@ -70,13 +70,13 @@ export default function CustomerDetail() {
     );
   }
 
-  if (!customer) {
+  if (!contact) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-xl font-semibold text-white">Customer not found</h2>
-        <p className="text-dark-400 mt-2">The customer you're looking for doesn't exist.</p>
-        <Link to="/customers" className="mt-4 inline-block">
-          <Button variant="secondary">Back to Customers</Button>
+        <h2 className="text-xl font-semibold text-white">Contact not found</h2>
+        <p className="text-dark-400 mt-2">The contact you're looking for doesn't exist.</p>
+        <Link to="/contacts" className="mt-4 inline-block">
+          <Button variant="secondary">Back to Contacts</Button>
         </Link>
       </div>
     );
@@ -87,19 +87,19 @@ export default function CustomerDetail() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <BackButton to="/customers" />
+          <BackButton to="/contacts" />
           <div className="flex items-center gap-4">
-            <Avatar name={customer.name} size="lg" className="shadow-lg shadow-warm-500/25 rounded-2xl" />
+            <Avatar name={contact.name} size="lg" className="shadow-lg shadow-warm-500/25 rounded-2xl" />
             <div>
-              <h1 className="text-2xl font-bold text-white">{customer.name}</h1>
-              {customer.company && (
-                <p className="text-dark-400">{customer.company}</p>
+              <h1 className="text-2xl font-bold text-white">{contact.name}</h1>
+              {contact.company && (
+                <p className="text-dark-400">{contact.company}</p>
               )}
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2 ml-14 sm:ml-0">
-          <Link to={`/customers/${customer.id}/edit`}>
+          <Link to={`/contacts/${contact.id}/edit`}>
             <Button variant="secondary">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -109,8 +109,8 @@ export default function CustomerDetail() {
           </Link>
           <Button
             variant="danger"
-            onClick={handleDeleteCustomer}
-            disabled={deleteCustomer.isPending}
+            onClick={handleDeleteContact}
+            disabled={deleteContact.isPending}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -121,16 +121,16 @@ export default function CustomerDetail() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Customer Info */}
+        {/* Contact Info */}
         <Card>
           <h2 className="text-lg font-semibold text-white mb-4">Contact Information</h2>
           <dl className="space-y-4">
             <div>
               <dt className="text-sm text-dark-500">Email</dt>
               <dd className="text-white mt-1">
-                {customer.email ? (
-                  <a href={`mailto:${customer.email}`} className="text-warm-400 hover:text-warm-300">
-                    {customer.email}
+                {contact.email ? (
+                  <a href={`mailto:${contact.email}`} className="text-warm-400 hover:text-warm-300">
+                    {contact.email}
                   </a>
                 ) : (
                   <span className="text-dark-500">Not provided</span>
@@ -140,9 +140,9 @@ export default function CustomerDetail() {
             <div>
               <dt className="text-sm text-dark-500">Phone</dt>
               <dd className="text-white mt-1">
-                {customer.phone ? (
-                  <a href={`tel:${customer.phone}`} className="text-warm-400 hover:text-warm-300">
-                    {customer.phone}
+                {contact.phone ? (
+                  <a href={`tel:${contact.phone}`} className="text-warm-400 hover:text-warm-300">
+                    {contact.phone}
                   </a>
                 ) : (
                   <span className="text-dark-500">Not provided</span>
@@ -152,13 +152,13 @@ export default function CustomerDetail() {
             <div>
               <dt className="text-sm text-dark-500">Company</dt>
               <dd className="text-white mt-1">
-                {customer.company || <span className="text-dark-500">Not provided</span>}
+                {contact.company || <span className="text-dark-500">Not provided</span>}
               </dd>
             </div>
-            {customer.notes && (
+            {contact.notes && (
               <div>
                 <dt className="text-sm text-dark-500">Notes</dt>
-                <dd className="text-dark-300 mt-1 whitespace-pre-wrap">{customer.notes}</dd>
+                <dd className="text-dark-300 mt-1 whitespace-pre-wrap">{contact.notes}</dd>
               </div>
             )}
           </dl>
@@ -180,7 +180,7 @@ export default function CustomerDetail() {
             {showInteractionForm && (
               <div className="mb-6 p-4 bg-dark-800 rounded-lg border border-dark-600">
                 <InteractionForm
-                  customerId={customerId}
+                  contactId={contactId}
                   onSuccess={() => setShowInteractionForm(false)}
                   onCancel={() => setShowInteractionForm(false)}
                 />
@@ -190,7 +190,7 @@ export default function CustomerDetail() {
             {editingInteraction !== null && (
               <div className="mb-6 p-4 bg-dark-800 rounded-lg border border-dark-600">
                 <InteractionForm
-                  customerId={customerId}
+                  contactId={contactId}
                   interactionId={editingInteraction}
                   onSuccess={() => setEditingInteraction(null)}
                   onCancel={() => setEditingInteraction(null)}
@@ -210,7 +210,7 @@ export default function CustomerDetail() {
                   </svg>
                 }
                 title="No interactions recorded yet"
-                message="Start logging interactions to track your customer relationships"
+                message="Start logging interactions to track your contact relationships"
                 className="py-8"
               />
             ) : (

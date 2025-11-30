@@ -36,17 +36,17 @@ describe('Interaction Routes', () => {
       expect(data.interactions).toHaveLength(1);
     });
 
-    it('should filter by customerId', async () => {
-      const data = await expectOk<{ interactions: { customerId: number }[] }>(
-        await get(ctx.app, `/api/interactions?customerId=${ctx.customerId}`, ctx.sellerToken)
+    it('should filter by contactId', async () => {
+      const data = await expectOk<{ interactions: { contactId: number }[] }>(
+        await get(ctx.app, `/api/interactions?contactId=${ctx.contactId}`, ctx.sellerToken)
       );
       expect(data.interactions).toHaveLength(1);
-      expect(data.interactions[0].customerId).toBe(ctx.customerId);
+      expect(data.interactions[0].contactId).toBe(ctx.contactId);
     });
 
-    it('should return empty for other sellers customer', async () => {
+    it('should return empty for other sellers contact', async () => {
       const data = await expectOk<{ interactions: unknown[] }>(
-        await get(ctx.app, `/api/interactions?customerId=${ctx.customerId}`, ctx.seller2Token)
+        await get(ctx.app, `/api/interactions?contactId=${ctx.contactId}`, ctx.seller2Token)
       );
       expect(data.interactions).toHaveLength(0);
     });
@@ -75,10 +75,10 @@ describe('Interaction Routes', () => {
   });
 
   describe('POST /api/interactions', () => {
-    it('should create interaction for own customer', async () => {
+    it('should create interaction for own contact', async () => {
       const data = await expectCreated<{ interaction: { type: string; date: string; sellerId: number } }>(
         await post(ctx.app, '/api/interactions', ctx.sellerToken, {
-          customerId: ctx.customerId,
+          contactId: ctx.contactId,
           type: 'meeting',
           date: '2024-01-20',
           time: '14:30',
@@ -93,7 +93,7 @@ describe('Interaction Routes', () => {
     it('should create interaction with minimal data', async () => {
       const data = await expectCreated<{ interaction: { type: string; time: string | null; notes: string | null } }>(
         await post(ctx.app, '/api/interactions', ctx.sellerToken, {
-          customerId: ctx.customerId,
+          contactId: ctx.contactId,
           type: 'email',
           date: '2024-01-21',
         })
@@ -103,10 +103,10 @@ describe('Interaction Routes', () => {
       expect(data.interaction.notes).toBeNull();
     });
 
-    it('should reject interaction for other sellers customer', async () => {
+    it('should reject interaction for other sellers contact', async () => {
       await expectForbidden(
         await post(ctx.app, '/api/interactions', ctx.seller2Token, {
-          customerId: ctx.customerId,
+          contactId: ctx.contactId,
           type: 'call',
           date: '2024-01-22',
         })
@@ -116,7 +116,7 @@ describe('Interaction Routes', () => {
     it('should reject invalid interaction type', async () => {
       await expectBadRequest(
         await post(ctx.app, '/api/interactions', ctx.sellerToken, {
-          customerId: ctx.customerId,
+          contactId: ctx.contactId,
           type: 'invalid',
           date: '2024-01-22',
         })
@@ -126,17 +126,17 @@ describe('Interaction Routes', () => {
     it('should reject invalid date format', async () => {
       await expectBadRequest(
         await post(ctx.app, '/api/interactions', ctx.sellerToken, {
-          customerId: ctx.customerId,
+          contactId: ctx.contactId,
           type: 'call',
           date: '01-22-2024',
         })
       );
     });
 
-    it('should reject non-existent customer', async () => {
+    it('should reject non-existent contact', async () => {
       await expectNotFound(
         await post(ctx.app, '/api/interactions', ctx.sellerToken, {
-          customerId: 9999,
+          contactId: 9999,
           type: 'call',
           date: '2024-01-22',
         })
