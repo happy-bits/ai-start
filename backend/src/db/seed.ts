@@ -24,7 +24,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     .values({
       email: 'admin@keepwarm.com',
       passwordHash: adminPassword,
-      name: 'Admin User',
+      name: 'Admin Användare',
       role: ROLES.ADMIN,
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
@@ -37,7 +37,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     .values({
       email: 'alice@keepwarm.com',
       passwordHash: sellerPassword,
-      name: 'Alice Johnson',
+      name: 'Maria Svensson',
       role: ROLES.SELLER,
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
@@ -50,7 +50,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     .values({
       email: 'bob@keepwarm.com',
       passwordHash: sellerPassword,
-      name: 'Bob Smith',
+      name: 'Lars Berg',
       role: ROLES.SELLER,
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
@@ -60,16 +60,16 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
 
   console.log('Created users:', { adminUser, seller1, seller2 });
 
-  // Seed contacts for seller1 (Alice)
+  // Seed contacts for seller1 (Maria)
   const contact1 = db
     .insert(schema.contacts)
     .values({
       sellerId: seller1.id,
-      name: 'Acme Corporation',
-      email: 'contact@acme.com',
-      phone: '+1-555-0101',
-      company: 'Acme Corp',
-      notes: 'Large enterprise client, interested in premium plans',
+      name: 'Erik Andersson',
+      email: 'erik.andersson@volvo.com',
+      phone: '+46 70 123 45 67',
+      company: 'Volvo AB',
+      notes: 'Stor företagskund, intresserad av premiumplaner',
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })
@@ -80,27 +80,27 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     .insert(schema.contacts)
     .values({
       sellerId: seller1.id,
-      name: 'Tech Startup Inc',
-      email: 'hello@techstartup.io',
-      phone: '+1-555-0102',
-      company: 'Tech Startup',
-      notes: 'Growing startup, needs scalable solution',
+      name: 'Anna Larsson',
+      email: 'anna.larsson@spotify.com',
+      phone: '+46 72 234 56 78',
+      company: 'Spotify',
+      notes: 'Växande startup, behöver skalbar lösning',
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })
     .returning()
     .get();
 
-  // Seed contacts for seller2 (Bob)
+  // Seed contacts for seller2 (Lars)
   const contact3 = db
     .insert(schema.contacts)
     .values({
       sellerId: seller2.id,
-      name: 'Global Industries',
-      email: 'sales@globalind.com',
-      phone: '+1-555-0201',
-      company: 'Global Industries Ltd',
-      notes: 'International client, multiple locations',
+      name: 'Johan Nilsson',
+      email: 'johan.nilsson@ikea.se',
+      phone: '+46 73 345 67 89',
+      company: 'IKEA Sverige',
+      notes: 'Internationell kund, flera platser',
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })
@@ -116,7 +116,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     type: 'call',
     date: '2024-01-10',
     time: '09:30',
-    notes: 'Initial discovery call. Discussed their current CRM needs.',
+    notes: 'Inledande upptäcktsamtal. Diskuterade deras nuvarande CRM-behov.',
     createdAt: SEED_DATE,
     updatedAt: SEED_DATE,
   }).run();
@@ -127,7 +127,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     type: 'email',
     date: '2024-01-12',
     time: '14:00',
-    notes: 'Sent product brochure and pricing information.',
+    notes: 'Skickade produktbroschyr och prisinformation.',
     createdAt: SEED_DATE,
     updatedAt: SEED_DATE,
   }).run();
@@ -138,7 +138,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     type: 'meeting',
     date: '2024-01-15',
     time: '10:00',
-    notes: 'Demo presentation with decision makers.',
+    notes: 'Demonstration med beslutsfattare.',
     createdAt: SEED_DATE,
     updatedAt: SEED_DATE,
   }).run();
@@ -150,7 +150,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     type: 'call',
     date: '2024-01-08',
     time: '11:00',
-    notes: 'Cold call converted to lead.',
+    notes: 'Kallt samtal konverterat till lead.',
     createdAt: SEED_DATE,
     updatedAt: SEED_DATE,
   }).run();
@@ -162,7 +162,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     type: 'meeting',
     date: '2024-01-14',
     time: '15:30',
-    notes: 'On-site meeting at their headquarters.',
+    notes: 'Möte på plats vid deras huvudkontor.',
     createdAt: SEED_DATE,
     updatedAt: SEED_DATE,
   }).run();

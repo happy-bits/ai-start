@@ -153,7 +153,7 @@ export default function Login() {
                   disabled={loginMutation.isPending || isResetting}
                 />
                 <QuickLoginButton
-                  label="Alice"
+                  label="Maria"
                   subtitle="Seller"
                   email="alice@keepwarm.com"
                   password="seller123"
@@ -162,7 +162,7 @@ export default function Login() {
                   disabled={loginMutation.isPending || isResetting}
                 />
                 <QuickLoginButton
-                  label="Bob"
+                  label="Lars"
                   subtitle="Seller"
                   email="bob@keepwarm.com"
                   password="seller123"
