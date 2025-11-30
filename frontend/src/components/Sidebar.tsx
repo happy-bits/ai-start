@@ -3,15 +3,6 @@ import { useAuth } from '../context/AuthContext';
 
 const navItems = [
   {
-    to: '/',
-    label: 'Dashboard',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
-    ),
-  },
-  {
     to: '/customers',
     label: 'Customers',
     icon: (
@@ -39,31 +30,38 @@ export default function Sidebar() {
 
   return (
     <aside className="w-64 min-h-screen bg-dark-900 border-r border-dark-700 flex flex-col">
-      {/* Logo */}
-      <div className="p-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-warm-400 to-warm-600 flex items-center justify-center shadow-lg shadow-warm-500/25">
-            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C9 5 7 8 7 11c0 2.5 1.5 4.5 3.5 5.5L9 22h6l-1.5-5.5C15.5 15.5 17 13.5 17 11c0-3-2-6-5-9zm0 4c1.5 2 2.5 4 2.5 5.5 0 1.5-1 2.5-2.5 2.5s-2.5-1-2.5-2.5C9.5 10 10.5 8 12 6z" />
+      {/* Logo and Logout */}
+      <div className="p-6 border-b border-dark-700">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-warm-400 to-warm-600 flex items-center justify-center shadow-lg shadow-warm-500/25">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C9 5 7 8 7 11c0 2.5 1.5 4.5 3.5 5.5L9 22h6l-1.5-5.5C15.5 15.5 17 13.5 17 11c0-3-2-6-5-9zm0 4c1.5 2 2.5 4 2.5 5.5 0 1.5-1 2.5-2.5 2.5s-2.5-1-2.5-2.5C9.5 10 10.5 8 12 6z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">KeepWarm</h1>
+              <p className="text-xs text-dark-500">CRM</p>
+            </div>
+          </div>
+          <button
+            onClick={logout}
+            className="p-2 text-dark-400 hover:text-white hover:bg-dark-800 rounded-lg transition-colors"
+            title="Logout"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-white">KeepWarm</h1>
-            <p className="text-xs text-dark-500">CRM</p>
-          </div>
+          </button>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-2 space-y-1">
-        <p className="px-3 py-2 text-xs font-semibold text-dark-500 uppercase tracking-wider">
-          Main
-        </p>
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === '/'}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 isActive
@@ -101,28 +99,6 @@ export default function Sidebar() {
           </>
         )}
       </nav>
-
-      {/* User section */}
-      <div className="p-4 border-t border-dark-700">
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-dark-800">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-dark-600 to-dark-700 flex items-center justify-center text-white font-medium">
-            {user?.name.charAt(0).toUpperCase()}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">{user?.name}</p>
-            <p className="text-xs text-dark-500 capitalize">{user?.role}</p>
-          </div>
-          <button
-            onClick={logout}
-            className="p-2 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
-            title="Logout"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-          </button>
-        </div>
-      </div>
     </aside>
   );
 }

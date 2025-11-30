@@ -152,9 +152,8 @@ export default function Login() {
           {/* Developer Tools: Quick Login */}
           {config.developerTools && (
             <div className="mt-6 pt-6 border-t border-dark-700">
-              <p className="text-xs text-dark-500 text-center mb-3 flex items-center justify-center gap-2">
-                <span className="inline-block w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                Dev Mode: Quick Login
+              <p className="text-xs text-dark-500 text-center mb-3">
+                Developer tools
               </p>
               <div className="grid grid-cols-3 gap-2">
                 <QuickLoginButton
