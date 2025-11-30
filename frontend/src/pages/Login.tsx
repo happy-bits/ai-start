@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login as loginApi } from '../api/auth';
+import { apiClient } from '../api/client';
 import { config } from '../config';
 
 export default function Login() {
@@ -11,6 +12,33 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+
+  const handleResetDatabase = async () => {
+    setIsResetting(true);
+    setError('');
+    setResetSuccess(false);
+    
+    try {
+      // Log in as admin
+      const response = await loginApi({ email: 'admin@keepwarm.com', password: 'admin123' });
+      apiClient.setToken(response.token);
+      
+      // Reset the database
+      await apiClient.post('/api/dev/reset');
+      
+      // Log out
+      await apiClient.post('/auth/logout').catch(() => {});
+      apiClient.setToken(null);
+      
+      setResetSuccess(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not reset database');
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -135,7 +163,7 @@ export default function Login() {
                   password="admin123"
                   color="amber"
                   onLogin={handleQuickLogin}
-                  disabled={isLoading}
+                  disabled={isLoading || isResetting}
                 />
                 <QuickLoginButton
                   label="Alice"
@@ -144,7 +172,7 @@ export default function Login() {
                   password="seller123"
                   color="blue"
                   onLogin={handleQuickLogin}
-                  disabled={isLoading}
+                  disabled={isLoading || isResetting}
                 />
                 <QuickLoginButton
                   label="Bob"
@@ -153,9 +181,28 @@ export default function Login() {
                   password="seller123"
                   color="violet"
                   onLogin={handleQuickLogin}
-                  disabled={isLoading}
+                  disabled={isLoading || isResetting}
                 />
               </div>
+              
+              {/* Reset Database */}
+              <button
+                type="button"
+                onClick={handleResetDatabase}
+                disabled={isLoading || isResetting}
+                className="w-full mt-3 py-2 px-3 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 text-red-400 rounded-lg text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                {isResetting ? 'Resetting...' : 'Reset database'}
+              </button>
+              
+              {resetSuccess && (
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-lg text-sm mt-3">
+                  Database has been reset!
+                </div>
+              )}
             </div>
           )}
         </div>
