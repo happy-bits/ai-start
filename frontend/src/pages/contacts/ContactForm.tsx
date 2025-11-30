@@ -44,12 +44,8 @@ export default function ContactForm() {
         return await createContact.mutateAsync(data as CreateContactData);
       }
     },
-    onSuccess: (contact) => {
-      if (isEditing) {
-        return `/contacts/${contact.id}`;
-      } else {
-        return '/contacts';
-      }
+    onSuccess: () => {
+      return '/contacts';
     },
     validate: (data) => {
       if (!data.name?.trim()) {

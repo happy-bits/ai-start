@@ -1,9 +1,22 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useContact } from '../../api/contacts';
-import { useInteractions, useDeleteInteraction } from '../../api/interactions';
-import { Button, Card, Badge, LoadingSpinner, BackButton, Avatar, EmptyState } from '../../components/ui';
+import { useInteractions, useDeleteInteraction, useUpdateInteraction } from '../../api/interactions';
+import { 
+  Button, 
+  Card, 
+  Badge, 
+  LoadingSpinner, 
+  BackButton, 
+  Avatar, 
+  EmptyState,
+  InlineEditableSelect,
+  InlineEditableDate,
+  InlineEditableTime,
+  InlineEditableTextarea,
+} from '../../components/ui';
 import InteractionForm from '../interactions/InteractionForm';
+import type { InteractionType } from '../../api/types';
 
 export default function ContactDetail() {
   const { id } = useParams<{ id: string }>();
@@ -12,9 +25,9 @@ export default function ContactDetail() {
   const { data: contact, isLoading: contactLoading } = useContact(contactId);
   const { data: interactions = [], isLoading: interactionsLoading } = useInteractions(contactId);
   const deleteInteraction = useDeleteInteraction();
+  const updateInteraction = useUpdateInteraction();
 
   const [showInteractionForm, setShowInteractionForm] = useState(false);
-  const [editingInteraction, setEditingInteraction] = useState<number | null>(null);
 
   const handleDeleteInteraction = async (interactionId: number) => {
     deleteInteraction.mutate(interactionId);
@@ -23,6 +36,12 @@ export default function ContactDetail() {
   const sortedInteractions = [...interactions].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
+
+  const interactionTypeOptions = [
+    { value: 'call', label: 'Phone Call' },
+    { value: 'meeting', label: 'Meeting' },
+    { value: 'email', label: 'Email' },
+  ];
 
   const typeConfig = {
     call: {
@@ -111,17 +130,6 @@ export default function ContactDetail() {
               </div>
             )}
 
-            {editingInteraction !== null && (
-              <div className="mb-6 p-4 bg-dark-800 rounded-lg border border-dark-600">
-                <InteractionForm
-                  contactId={contactId}
-                  interactionId={editingInteraction}
-                  onSuccess={() => setEditingInteraction(null)}
-                  onCancel={() => setEditingInteraction(null)}
-                />
-              </div>
-            )}
-
             {interactionsLoading ? (
               <div className="flex justify-center py-8">
                 <LoadingSpinner size="sm" />
@@ -149,32 +157,55 @@ export default function ContactDetail() {
                     >
                       {typeConfig[interaction.type].icon}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge variant={typeConfig[interaction.type].color}>
-                          {interaction.type}
-                        </Badge>
-                        <span className="text-sm text-dark-400">
-                          {interaction.date}
-                          {interaction.time && ` at ${interaction.time}`}
-                        </span>
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <InlineEditableSelect
+                          value={interaction.type}
+                          onSave={async (value) => {
+                            await updateInteraction.mutateAsync({
+                              id: interaction.id,
+                              data: { type: value as InteractionType },
+                            });
+                          }}
+                          options={interactionTypeOptions}
+                          badgeVariant={typeConfig[interaction.type].color}
+                        />
+                        <span className="text-sm text-dark-400">on</span>
+                        <InlineEditableDate
+                          value={interaction.date}
+                          onSave={async (value) => {
+                            await updateInteraction.mutateAsync({
+                              id: interaction.id,
+                              data: { date: value },
+                            });
+                          }}
+                        />
+                        <span className="text-sm text-dark-400">at</span>
+                        <InlineEditableTime
+                          value={interaction.time}
+                          onSave={async (value) => {
+                            await updateInteraction.mutateAsync({
+                              id: interaction.id,
+                              data: { time: value },
+                            });
+                          }}
+                        />
                       </div>
-                      {interaction.notes && (
-                        <p className="text-dark-300 text-sm whitespace-pre-wrap">
-                          {interaction.notes}
-                        </p>
-                      )}
+                      <div>
+                        <InlineEditableTextarea
+                          value={interaction.notes}
+                          onSave={async (value) => {
+                            await updateInteraction.mutateAsync({
+                              id: interaction.id,
+                              data: { notes: value },
+                            });
+                          }}
+                          emptyText="Click to add notes"
+                          rows={2}
+                        />
+                      </div>
                     </div>
                     <div className="flex items-start gap-1 shrink-0">
-                      <button
-                        onClick={() => setEditingInteraction(interaction.id)}
-                        className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded transition-colors"
-                        title="Edit"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
                       <button
                         onClick={() => handleDeleteInteraction(interaction.id)}
                         className="p-1.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
