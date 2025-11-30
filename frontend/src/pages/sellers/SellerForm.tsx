@@ -1,11 +1,12 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useSeller, useCreateSeller, useUpdateSeller } from '../../api/sellers';
 import { Button, Card, Input, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
+import { useFormSubmission } from '../../hooks/useFormSubmission';
+import type { Seller, CreateSellerData, UpdateSellerData } from '../../api/types';
 
 export default function SellerForm() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const isEditing = !!id;
   const sellerId = id ? parseInt(id, 10) : 0;
 
@@ -18,7 +19,6 @@ export default function SellerForm() {
     email: '',
     password: '',
   });
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (existingSeller) {
@@ -30,51 +30,60 @@ export default function SellerForm() {
     }
   }, [existingSeller]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!formData.name.trim()) {
-      setError('Name is required');
-      return;
-    }
-
-    if (!formData.email.trim()) {
-      setError('Email is required');
-      return;
-    }
-
-    if (!isEditing && !formData.password) {
-      setError('Password is required');
-      return;
-    }
-
-    if (formData.password && formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
-    try {
+  const { error, isSubmitting, handleSubmit } = useFormSubmission<
+    CreateSellerData | UpdateSellerData,
+    Seller
+  >({
+    onSubmit: async (data) => {
       if (isEditing) {
-        const data: { name?: string; email?: string; password?: string } = {
+        return await updateSeller.mutateAsync({ id: sellerId, data: data as UpdateSellerData });
+      } else {
+        return await createSeller.mutateAsync(data as CreateSellerData);
+      }
+    },
+    onSuccess: () => {
+      return '/sellers';
+    },
+    validate: (data) => {
+      if (!data.name?.trim()) {
+        return 'Name is required';
+      }
+      if (!data.email?.trim()) {
+        return 'Email is required';
+      }
+      // For create, password is required
+      if (!isEditing) {
+        const createData = data as CreateSellerData;
+        if (!createData.password) {
+          return 'Password is required';
+        }
+        if (createData.password.length < 6) {
+          return 'Password must be at least 6 characters';
+        }
+      } else {
+        // For update, password is optional but must be >= 6 chars if provided
+        const updateData = data as UpdateSellerData;
+        if (updateData.password && updateData.password.length < 6) {
+          return 'Password must be at least 6 characters';
+        }
+      }
+      return null;
+    },
+  });
+
+  const onSubmit = (e: FormEvent) => {
+    const data: CreateSellerData | UpdateSellerData = isEditing
+      ? {
           name: formData.name.trim(),
           email: formData.email.trim(),
-        };
-        if (formData.password) {
-          data.password = formData.password;
+          ...(formData.password && { password: formData.password }),
         }
-        await updateSeller.mutateAsync({ id: sellerId, data });
-      } else {
-        await createSeller.mutateAsync({
+      : {
           name: formData.name.trim(),
           email: formData.email.trim(),
           password: formData.password,
-        });
-      }
-      navigate('/sellers');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    }
+        };
+    handleSubmit(e, data);
   };
 
   if (isEditing && isLoading) {
@@ -101,7 +110,7 @@ export default function SellerForm() {
       </div>
 
       <Card>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={onSubmit} className="space-y-6">
           <ErrorMessage error={error} />
 
           <Input
@@ -144,9 +153,9 @@ export default function SellerForm() {
             </Link>
             <Button
               type="submit"
-              disabled={createSeller.isPending || updateSeller.isPending}
+              disabled={isSubmitting}
             >
-              {createSeller.isPending || updateSeller.isPending ? (
+              {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <LoadingSpinner size="sm" />
                   Saving...

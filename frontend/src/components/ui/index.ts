@@ -9,4 +9,5 @@ export { default as ErrorMessage } from './ErrorMessage';
 export { default as BackButton } from './BackButton';
 export { default as EmptyState } from './EmptyState';
 export { default as Avatar } from './Avatar';
+export { default as SearchInput } from './SearchInput';
 

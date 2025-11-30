@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getErrorMessage } from '../utils';
 
 interface UseFormSubmissionOptions<TData, TResponse> {
   onSubmit: (data: TData) => Promise<TResponse>;
@@ -39,7 +40,7 @@ export function useFormSubmission<TData, TResponse>({
         navigate(navigatePath);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

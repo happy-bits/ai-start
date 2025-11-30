@@ -5,6 +5,7 @@ import { useLogin, login as loginApi } from '../api/auth';
 import { apiClient } from '../api/client';
 import { config } from '../config';
 import { ErrorMessage, LoadingSpinner } from '../components/ui';
+import { getErrorMessage } from '../utils';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function Login() {
       
       setResetSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not reset database');
+      setError(getErrorMessage(err) || 'Could not reset database');
     } finally {
       setIsResetting(false);
     }
@@ -50,7 +51,7 @@ export default function Login() {
       login(response.token, response.user);
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(getErrorMessage(err) || 'Login failed');
     }
   };
 
@@ -62,7 +63,7 @@ export default function Login() {
       login(response.token, response.user);
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Quick login failed');
+      setError(getErrorMessage(err) || 'Quick login failed');
     }
   };
 

@@ -1,11 +1,12 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useCustomer, useCreateCustomer, useUpdateCustomer } from '../../api/customers';
 import { Button, Card, Input, Textarea, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
+import { useFormSubmission } from '../../hooks/useFormSubmission';
+import type { Customer, CreateCustomerData, UpdateCustomerData } from '../../api/types';
 
 export default function CustomerForm() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const isEditing = !!id;
   const customerId = id ? parseInt(id, 10) : 0;
 
@@ -20,7 +21,6 @@ export default function CustomerForm() {
     company: '',
     notes: '',
   });
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (existingCustomer) {
@@ -34,15 +34,29 @@ export default function CustomerForm() {
     }
   }, [existingCustomer]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
+  const { error, isSubmitting, handleSubmit } = useFormSubmission<
+    CreateCustomerData | UpdateCustomerData,
+    Customer
+  >({
+    onSubmit: async (data) => {
+      if (isEditing) {
+        return await updateCustomer.mutateAsync({ id: customerId, data: data as UpdateCustomerData });
+      } else {
+        return await createCustomer.mutateAsync(data as CreateCustomerData);
+      }
+    },
+    onSuccess: (customer) => {
+      return `/customers/${customer.id}`;
+    },
+    validate: (data) => {
+      if (!data.name?.trim()) {
+        return 'Name is required';
+      }
+      return null;
+    },
+  });
 
-    if (!formData.name.trim()) {
-      setError('Name is required');
-      return;
-    }
-
+  const onSubmit = (e: FormEvent) => {
     const data = {
       name: formData.name.trim(),
       email: formData.email.trim() || null,
@@ -50,18 +64,7 @@ export default function CustomerForm() {
       company: formData.company.trim() || null,
       notes: formData.notes.trim() || null,
     };
-
-    try {
-      if (isEditing) {
-        await updateCustomer.mutateAsync({ id: customerId, data });
-        navigate(`/customers/${customerId}`);
-      } else {
-        const customer = await createCustomer.mutateAsync(data);
-        navigate(`/customers/${customer.id}`);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    }
+    handleSubmit(e, data);
   };
 
   if (isEditing && isLoading) {
@@ -88,7 +91,7 @@ export default function CustomerForm() {
       </div>
 
       <Card>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={onSubmit} className="space-y-6">
           <ErrorMessage error={error} />
 
           <Input
@@ -140,9 +143,9 @@ export default function CustomerForm() {
             </Link>
             <Button
               type="submit"
-              disabled={createCustomer.isPending || updateCustomer.isPending}
+              disabled={isSubmitting}
             >
-              {createCustomer.isPending || updateCustomer.isPending ? (
+              {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <LoadingSpinner size="sm" />
                   Saving...

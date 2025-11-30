@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSellers, useDeleteSeller } from '../../api/sellers';
-import { Button, Card, Badge, LoadingSpinner, EmptyState, Avatar } from '../../components/ui';
+import { Button, Card, Badge, LoadingSpinner, EmptyState, Avatar, SearchInput } from '../../components/ui';
+import { formatDate } from '../../utils';
 
 export default function SellerList() {
   const { data: sellers = [], isLoading } = useSellers();
@@ -39,25 +40,11 @@ export default function SellerList() {
       </div>
 
       {/* Search */}
-      <Card padding="sm">
-        <div className="relative">
-          <svg
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search sellers..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all"
-          />
-        </div>
-      </Card>
+      <SearchInput
+        placeholder="Search sellers..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
 
       {/* Seller list */}
       <Card padding="none">
@@ -119,7 +106,7 @@ export default function SellerList() {
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-sm text-dark-400">
-                        {new Date(seller.createdAt).toLocaleDateString()}
+                        {formatDate(seller.createdAt)}
                       </p>
                     </td>
                     <td className="px-6 py-4">

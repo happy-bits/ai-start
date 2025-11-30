@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { useInteraction, useCreateInteraction, useUpdateInteraction } from '../../api/interactions';
 import { Button, Input, Select, Textarea, LoadingSpinner, ErrorMessage } from '../../components/ui';
 import type { InteractionType } from '../../api/types';
+import { getErrorMessage } from '../../utils';
 
 interface InteractionFormProps {
   customerId: number;
@@ -80,7 +81,7 @@ export default function InteractionForm({
       }
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(getErrorMessage(err));
     }
   };
 
