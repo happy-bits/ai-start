@@ -107,6 +107,33 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                     {contact.company && (
                       <p className="text-sm text-dark-400 mt-1 truncate">{contact.company}</p>
                     )}
+                    {/* Contact Info */}
+                    <div className="space-y-1 mt-2">
+                      <InlineEditable
+                        value={contact.email}
+                        onSave={async (value) => {
+                          await updateContact.mutateAsync({
+                            id: contact.id,
+                            data: { email: value },
+                          });
+                        }}
+                        type="email"
+                        placeholder="email@example.com"
+                        emptyText="Add email"
+                      />
+                      <InlineEditable
+                        value={contact.phone}
+                        onSave={async (value) => {
+                          await updateContact.mutateAsync({
+                            id: contact.id,
+                            data: { phone: value },
+                          });
+                        }}
+                        type="tel"
+                        placeholder="+46 73 345 67 89"
+                        emptyText="Add phone"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -144,34 +171,6 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                     });
                   }}
                   emptyText="Add follow-up date"
-                />
-              </div>
-
-              {/* Contact Info */}
-              <div className="space-y-2">
-                <InlineEditable
-                  value={contact.email}
-                  onSave={async (value) => {
-                    await updateContact.mutateAsync({
-                      id: contact.id,
-                      data: { email: value },
-                    });
-                  }}
-                  type="email"
-                  placeholder="email@example.com"
-                  emptyText="Add email"
-                />
-                <InlineEditable
-                  value={contact.phone}
-                  onSave={async (value) => {
-                    await updateContact.mutateAsync({
-                      id: contact.id,
-                      data: { phone: value },
-                    });
-                  }}
-                  type="tel"
-                  placeholder="+46 73 345 67 89"
-                  emptyText="Add phone"
                 />
               </div>
 

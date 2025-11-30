@@ -36,9 +36,17 @@ export default function ContactDetail() {
     deleteInteraction.mutate(interactionId);
   };
 
-  const sortedInteractions = [...interactions].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const sortedInteractions = [...interactions].sort((a, b) => {
+    // First sort by date (newest first)
+    const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (dateDiff !== 0) return dateDiff;
+    
+    // If dates are equal, sort by time (newest first)
+    // If time is missing, treat it as earliest (00:00)
+    const aTime = a.time || '00:00';
+    const bTime = b.time || '00:00';
+    return bTime.localeCompare(aTime);
+  });
 
   const typeConfig = {
     call: {
