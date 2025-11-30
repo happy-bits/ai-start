@@ -1,6 +1,6 @@
 import { Context, Next } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { eq, and, gt } from 'drizzle-orm';
+import { eq, and, gt, lt } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 
@@ -120,7 +120,7 @@ export function deleteSession(db: BetterSQLite3Database<typeof schema>, token: s
 // Clean up expired sessions
 export function cleanupExpiredSessions(db: BetterSQLite3Database<typeof schema>): number {
   const now = new Date().toISOString();
-  const result = db.delete(schema.sessions).where(gt(now, schema.sessions.expiresAt)).run();
+  const result = db.delete(schema.sessions).where(lt(schema.sessions.expiresAt, now)).run();
   return result.changes;
 }
 
