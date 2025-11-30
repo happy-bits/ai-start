@@ -17,9 +17,7 @@ export default function ContactDetail() {
   const [editingInteraction, setEditingInteraction] = useState<number | null>(null);
 
   const handleDeleteInteraction = async (interactionId: number) => {
-    if (confirm('Are you sure you want to delete this interaction?')) {
-      deleteInteraction.mutate(interactionId);
-    }
+    deleteInteraction.mutate(interactionId);
   };
 
   const sortedInteractions = [...interactions].sort(

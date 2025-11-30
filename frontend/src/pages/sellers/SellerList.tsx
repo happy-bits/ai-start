@@ -15,10 +15,8 @@ export default function SellerList() {
       seller.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDelete = async (id: number, name: string) => {
-    if (confirm(`Are you sure you want to delete seller "${name}"? This will also delete all their contacts and interactions.`)) {
-      deleteSeller.mutate(id);
-    }
+  const handleDelete = async (id: number) => {
+    deleteSeller.mutate(id);
   };
 
   return (
@@ -119,7 +117,7 @@ export default function SellerList() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(seller.id, seller.name)}
+                          onClick={() => handleDelete(seller.id)}
                           disabled={deleteSeller.isPending}
                           className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                         >

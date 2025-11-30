@@ -16,10 +16,8 @@ export default function ContactList() {
       contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDelete = async (id: number, name: string) => {
-    if (confirm(`Are you sure you want to delete "${name}"?`)) {
-      deleteContact.mutate(id);
-    }
+  const handleDelete = async (id: number) => {
+    deleteContact.mutate(id);
   };
 
   return (
@@ -133,7 +131,7 @@ export default function ContactList() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(contact.id, contact.name)}
+                          onClick={() => handleDelete(contact.id)}
                           disabled={deleteContact.isPending}
                           className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                         >
