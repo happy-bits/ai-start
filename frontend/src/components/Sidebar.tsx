@@ -41,7 +41,9 @@ export default function Sidebar() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-white">KeepWarm</h1>
-              <p className="text-xs text-dark-500">CRM</p>
+              {user && (
+                <p className="text-xs text-dark-400 mt-1">{user.name}</p>
+              )}
             </div>
           </div>
           <button

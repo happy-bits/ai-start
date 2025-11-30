@@ -100,8 +100,3 @@ export interface LoginResponse {
   user: User;
 }
 
-// API Response types
-export interface ApiError {
-  error: string;
-}
-

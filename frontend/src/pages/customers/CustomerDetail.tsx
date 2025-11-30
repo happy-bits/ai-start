@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCustomer, useDeleteCustomer } from '../../api/customers';
 import { useInteractions, useDeleteInteraction } from '../../api/interactions';
-import { Button, Card, Badge } from '../../components/ui';
+import { Button, Card, Badge, LoadingSpinner, BackButton, Avatar, EmptyState } from '../../components/ui';
 import InteractionForm from '../interactions/InteractionForm';
 
 export default function CustomerDetail() {
@@ -65,7 +65,7 @@ export default function CustomerDetail() {
   if (customerLoading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-warm-500" />
+        <LoadingSpinner size="md" />
       </div>
     );
   }
@@ -87,18 +87,9 @@ export default function CustomerDetail() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Link
-            to="/customers"
-            className="p-2 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </Link>
+          <BackButton to="/customers" />
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-warm-500 to-warm-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-warm-500/25">
-              {customer.name.charAt(0).toUpperCase()}
-            </div>
+            <Avatar name={customer.name} size="lg" className="shadow-lg shadow-warm-500/25 rounded-2xl" />
             <div>
               <h1 className="text-2xl font-bold text-white">{customer.name}</h1>
               {customer.company && (
@@ -209,17 +200,19 @@ export default function CustomerDetail() {
 
             {interactionsLoading ? (
               <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-warm-500" />
+                <LoadingSpinner size="sm" />
               </div>
             ) : sortedInteractions.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="w-12 h-12 mx-auto rounded-full bg-dark-800 flex items-center justify-center mb-3">
+              <EmptyState
+                icon={
                   <svg className="w-6 h-6 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                </div>
-                <p className="text-dark-400 text-sm">No interactions recorded yet</p>
-              </div>
+                }
+                title="No interactions recorded yet"
+                message="Start logging interactions to track your customer relationships"
+                className="py-8"
+              />
             ) : (
               <div className="space-y-4">
                 {sortedInteractions.map((interaction) => (

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../api/client';
+import { getCurrentUser, logout as logoutApi } from '../api/auth';
 import type { User } from '../api/types';
 
 interface AuthContextType {
@@ -21,10 +22,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = apiClient.getToken();
     if (token) {
       // Validate token by fetching current user
-      apiClient
-        .get<{ user: User }>('/api/me')
-        .then((response) => {
-          setUser(response.user);
+      getCurrentUser()
+        .then((user) => {
+          setUser(user);
         })
         .catch(() => {
           apiClient.setToken(null);
@@ -45,7 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    apiClient.post('/auth/logout').catch(() => {});
+    logoutApi().catch(() => {
+      // Ignore errors on logout
+    });
     apiClient.setToken(null);
     setUser(null);
     // Clear all cached queries on logout

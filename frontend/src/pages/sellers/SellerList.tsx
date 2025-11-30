@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSellers, useDeleteSeller } from '../../api/sellers';
-import { Button, Card, Badge } from '../../components/ui';
+import { Button, Card, Badge, LoadingSpinner, EmptyState, Avatar } from '../../components/ui';
 
 export default function SellerList() {
   const { data: sellers = [], isLoading } = useSellers();
@@ -63,25 +63,23 @@ export default function SellerList() {
       <Card padding="none">
         {isLoading ? (
           <div className="p-8 flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-warm-500" />
+            <LoadingSpinner size="md" />
           </div>
         ) : filteredSellers.length === 0 ? (
-          <div className="p-8 text-center">
-            <div className="w-16 h-16 mx-auto rounded-full bg-dark-800 flex items-center justify-center mb-4">
+          <EmptyState
+            icon={
               <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
-            </div>
-            <h3 className="text-lg font-medium text-white mb-1">No sellers found</h3>
-            <p className="text-dark-400 text-sm mb-4">
-              {searchTerm ? 'Try a different search term' : 'Get started by adding your first seller'}
-            </p>
-            {!searchTerm && (
+            }
+            title="No sellers found"
+            message={searchTerm ? 'Try a different search term' : 'Get started by adding your first seller'}
+            action={!searchTerm ? (
               <Link to="/sellers/new">
                 <Button size="sm">Add Seller</Button>
               </Link>
-            )}
-          </div>
+            ) : undefined}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -109,9 +107,7 @@ export default function SellerList() {
                   <tr key={seller.id} className="hover:bg-dark-800/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium shrink-0">
-                          {seller.name.charAt(0).toUpperCase()}
-                        </div>
+                        <Avatar name={seller.name} size="md" gradient="blue" />
                         <p className="text-sm font-medium text-white">{seller.name}</p>
                       </div>
                     </td>

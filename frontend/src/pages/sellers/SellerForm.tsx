@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSeller, useCreateSeller, useUpdateSeller } from '../../api/sellers';
-import { Button, Card, Input } from '../../components/ui';
+import { Button, Card, Input, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
 
 export default function SellerForm() {
   const { id } = useParams<{ id: string }>();
@@ -80,7 +80,7 @@ export default function SellerForm() {
   if (isEditing && isLoading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-warm-500" />
+        <LoadingSpinner size="md" />
       </div>
     );
   }
@@ -89,14 +89,7 @@ export default function SellerForm() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link
-          to="/sellers"
-          className="p-2 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </Link>
+        <BackButton to="/sellers" />
         <div>
           <h1 className="text-2xl font-bold text-white">
             {isEditing ? 'Edit Seller' : 'New Seller'}
@@ -109,11 +102,7 @@ export default function SellerForm() {
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
+          <ErrorMessage error={error} />
 
           <Input
             label="Name"
@@ -159,10 +148,7 @@ export default function SellerForm() {
             >
               {createSeller.isPending || updateSeller.isPending ? (
                 <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
+                  <LoadingSpinner size="sm" />
                   Saving...
                 </span>
               ) : isEditing ? (

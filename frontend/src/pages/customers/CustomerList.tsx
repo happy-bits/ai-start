@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCustomers, useDeleteCustomer } from '../../api/customers';
-import { Button, Card } from '../../components/ui';
+import { Button, Card, LoadingSpinner, EmptyState, Avatar } from '../../components/ui';
 
 export default function CustomerList() {
   const { data: customers = [], isLoading } = useCustomers();
@@ -64,25 +64,23 @@ export default function CustomerList() {
       <Card padding="none">
         {isLoading ? (
           <div className="p-8 flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-warm-500" />
+            <LoadingSpinner size="md" />
           </div>
         ) : filteredCustomers.length === 0 ? (
-          <div className="p-8 text-center">
-            <div className="w-16 h-16 mx-auto rounded-full bg-dark-800 flex items-center justify-center mb-4">
+          <EmptyState
+            icon={
               <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-            </div>
-            <h3 className="text-lg font-medium text-white mb-1">No customers found</h3>
-            <p className="text-dark-400 text-sm mb-4">
-              {searchTerm ? 'Try a different search term' : 'Get started by adding your first customer'}
-            </p>
-            {!searchTerm && (
+            }
+            title="No customers found"
+            message={searchTerm ? 'Try a different search term' : 'Get started by adding your first customer'}
+            action={!searchTerm ? (
               <Link to="/customers/new">
                 <Button size="sm">Add Customer</Button>
               </Link>
-            )}
-          </div>
+            ) : undefined}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -107,9 +105,7 @@ export default function CustomerList() {
                   <tr key={customer.id} className="hover:bg-dark-800/50 transition-colors">
                     <td className="px-6 py-4">
                       <Link to={`/customers/${customer.id}`} className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-warm-500 to-warm-600 flex items-center justify-center text-white font-medium shrink-0">
-                          {customer.name.charAt(0).toUpperCase()}
-                        </div>
+                        <Avatar name={customer.name} size="md" />
                         <div>
                           <p className="text-sm font-medium text-white hover:text-warm-400 transition-colors">
                             {customer.name}

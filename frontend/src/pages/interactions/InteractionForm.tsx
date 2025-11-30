@@ -1,6 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useInteraction, useCreateInteraction, useUpdateInteraction } from '../../api/interactions';
-import { Button, Input, Select, Textarea } from '../../components/ui';
+import { Button, Input, Select, Textarea, LoadingSpinner, ErrorMessage } from '../../components/ui';
 import type { InteractionType } from '../../api/types';
 
 interface InteractionFormProps {
@@ -87,22 +87,18 @@ export default function InteractionForm({
   if (isEditing && isLoading) {
     return (
       <div className="flex justify-center py-4">
-        <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-warm-500" />
+        <LoadingSpinner size="sm" />
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <h3 className="text-lg font-semibold text-white">
         {isEditing ? 'Edit Interaction' : 'Log New Interaction'}
       </h3>
 
-      {error && (
-        <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-2 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
+      <ErrorMessage error={error} />
 
       <Select
         label="Type"
