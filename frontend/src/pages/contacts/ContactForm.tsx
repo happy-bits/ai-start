@@ -4,6 +4,7 @@ import { useContact, useCreateContact, useUpdateContact } from '../../api/contac
 import { Button, Card, Input, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
 import { useFormSubmission } from '../../hooks/useFormSubmission';
 import type { Contact, CreateContactData, UpdateContactData } from '../../api/types';
+import { config } from '../../config';
 
 export default function ContactForm() {
   const { id } = useParams<{ id: string }>();
@@ -44,7 +45,11 @@ export default function ContactForm() {
       }
     },
     onSuccess: (contact) => {
-      return `/contacts/${contact.id}`;
+      if (isEditing) {
+        return `/contacts/${contact.id}`;
+      } else {
+        return '/contacts';
+      }
     },
     validate: (data) => {
       if (!data.name?.trim()) {
@@ -62,6 +67,15 @@ export default function ContactForm() {
       company: formData.company.trim() || null,
     };
     handleSubmit(e, data);
+  };
+
+  const fillSampleData = () => {
+    setFormData({
+      name: 'Mikael Pettersson',
+      email: 'mikael.petterson@volvo.com',
+      phone: '+46 70 123 45 67',
+      company: 'Volvo AB',
+    });
   };
 
   if (isEditing && isLoading) {
@@ -90,6 +104,19 @@ export default function ContactForm() {
       <Card>
         <form onSubmit={onSubmit} className="space-y-6">
           <ErrorMessage error={error} />
+
+          {/* Developer Tools: Fill Sample Data */}
+          {config.developerTools && !isEditing && (
+            <div className="mb-4 pb-4 border-b border-dark-700">
+              <button
+                type="button"
+                onClick={fillSampleData}
+                className="text-xs text-dark-400 hover:text-warm-400 transition-colors"
+              >
+                Fill sample data
+              </button>
+            </div>
+          )}
 
           <Input
             label="Name"

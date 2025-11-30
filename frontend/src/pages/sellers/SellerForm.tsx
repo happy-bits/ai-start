@@ -4,6 +4,7 @@ import { useSeller, useCreateSeller, useUpdateSeller } from '../../api/sellers';
 import { Button, Card, Input, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
 import { useFormSubmission } from '../../hooks/useFormSubmission';
 import type { Seller, CreateSellerData, UpdateSellerData } from '../../api/types';
+import { config } from '../../config';
 
 export default function SellerForm() {
   const { id } = useParams<{ id: string }>();
@@ -86,6 +87,14 @@ export default function SellerForm() {
     handleSubmit(e, data);
   };
 
+  const fillSampleData = () => {
+    setFormData({
+      name: 'Sven Karlsson',
+      email: 'sven.karlsson@gmail.com',
+      password: 'seller123',
+    });
+  };
+
   if (isEditing && isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -112,6 +121,19 @@ export default function SellerForm() {
       <Card>
         <form onSubmit={onSubmit} className="space-y-6">
           <ErrorMessage error={error} />
+
+          {/* Developer Tools: Fill Sample Data */}
+          {config.developerTools && !isEditing && (
+            <div className="mb-4 pb-4 border-b border-dark-700">
+              <button
+                type="button"
+                onClick={fillSampleData}
+                className="text-xs text-dark-400 hover:text-warm-400 transition-colors"
+              >
+                Fill sample data
+              </button>
+            </div>
+          )}
 
           <Input
             label="Name"
