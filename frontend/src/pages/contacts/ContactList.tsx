@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useContacts, useDeleteContact } from '../../api/contacts';
-import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput } from '../../components/ui';
+import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
+import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable } from '../../components/ui';
 
 export default function ContactList() {
   const { data: contacts = [], isLoading } = useContacts();
   const deleteContact = useDeleteContact();
+  const updateContact = useUpdateContact();
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredContacts = contacts.filter(
@@ -101,15 +102,30 @@ export default function ContactList() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="space-y-1">
-                        {contact.email && (
-                          <p className="text-sm text-dark-300">{contact.email}</p>
-                        )}
-                        {contact.phone && (
-                          <p className="text-sm text-dark-400">{contact.phone}</p>
-                        )}
-                        {!contact.email && !contact.phone && (
-                          <p className="text-sm text-dark-500">No contact info</p>
-                        )}
+                        <InlineEditable
+                          value={contact.email}
+                          onSave={async (value) => {
+                            await updateContact.mutateAsync({
+                              id: contact.id,
+                              data: { email: value },
+                            });
+                          }}
+                          type="email"
+                          placeholder="email@example.com"
+                          emptyText="Add email"
+                        />
+                        <InlineEditable
+                          value={contact.phone}
+                          onSave={async (value) => {
+                            await updateContact.mutateAsync({
+                              id: contact.id,
+                              data: { phone: value },
+                            });
+                          }}
+                          type="tel"
+                          placeholder="+46 73 345 67 89"
+                          emptyText="Add phone"
+                        />
                       </div>
                     </td>
                     <td className="px-6 py-4">
