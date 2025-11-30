@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
-import { useInteractions, useUpdateInteraction } from '../../api/interactions';
+import { useInteractions, useUpdateInteraction, useDeleteInteraction } from '../../api/interactions';
 import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions, InlineEditableSelect, InlineEditableTime, InlineEditableTextarea } from '../../components/ui';
 import NewInteractionRow from '../../components/NewInteractionRow';
@@ -65,9 +65,14 @@ function getLatestInteractions(interactions: Interaction[], contactId: number, l
 // Component to render priority contacts as cards
 function PriorityContactCards({ contacts, updateContact, deleteContact, interactions = [] }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[] }) {
   const updateInteraction = useUpdateInteraction();
+  const deleteInteraction = useDeleteInteraction();
   
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
+  };
+
+  const handleDeleteInteraction = async (interactionId: number) => {
+    deleteInteraction.mutate(interactionId);
   };
 
   return (
@@ -214,6 +219,15 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                             />
                           </div>
                         </div>
+                        <button
+                          onClick={() => handleDeleteInteraction(interaction.id)}
+                          className="p-1 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors shrink-0 mt-0.5"
+                          title="Delete interaction"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
                       </div>
                     ))}
                   </>
@@ -230,9 +244,14 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
 // Component to render contact table
 function ContactTable({ contacts, updateContact, deleteContact, interactions = [], showInteractions = false, showHeader = true }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[]; showInteractions?: boolean; showHeader?: boolean }) {
   const updateInteraction = useUpdateInteraction();
+  const deleteInteraction = useDeleteInteraction();
   
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
+  };
+
+  const handleDeleteInteraction = async (interactionId: number) => {
+    deleteInteraction.mutate(interactionId);
   };
 
   return (
@@ -398,6 +417,15 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                                 />
                               </div>
                             </div>
+                            <button
+                              onClick={() => handleDeleteInteraction(interaction.id)}
+                              className="p-1 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors shrink-0 mt-0.5"
+                              title="Delete interaction"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
                           </div>
                         </td>
                       </tr>
