@@ -9,12 +9,34 @@ export default function ContactList() {
   const updateContact = useUpdateContact();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredContacts = contacts.filter(
-    (contact) =>
-      contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredContacts = contacts
+    .filter(
+      (contact) =>
+        contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      // If both have followup dates, sort by date (earliest first), then by ID if dates are equal
+      if (a.followUpDate && b.followUpDate) {
+        const dateDiff = new Date(a.followUpDate).getTime() - new Date(b.followUpDate).getTime();
+        if (dateDiff !== 0) {
+          return dateDiff;
+        }
+        // If dates are equal, sort by ID
+        return a.id - b.id;
+      }
+      // If only a has a followup date, it comes first
+      if (a.followUpDate && !b.followUpDate) {
+        return -1;
+      }
+      // If only b has a followup date, it comes first
+      if (!a.followUpDate && b.followUpDate) {
+        return 1;
+      }
+      // If neither has a followup date, sort by ID
+      return a.id - b.id;
+    });
 
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
