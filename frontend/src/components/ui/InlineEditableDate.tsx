@@ -1,15 +1,17 @@
 import { useInlineEdit } from '../../hooks/useInlineEdit';
 
 interface InlineEditableDateProps {
-  value: string;
-  onSave: (value: string) => Promise<void>;
+  value: string | null;
+  onSave: (value: string | null) => Promise<void>;
   className?: string;
+  emptyText?: string;
 }
 
 export default function InlineEditableDate({
   value,
   onSave,
   className = '',
+  emptyText = 'Add follow-up date',
 }: InlineEditableDateProps) {
   const {
     isEditing,
@@ -23,7 +25,7 @@ export default function InlineEditableDate({
   } = useInlineEdit({
     value,
     onSave,
-    transformValue: (trimmed) => trimmed as string,
+    transformValue: (trimmed) => (trimmed === '' ? null : trimmed),
   });
 
   if (isEditing) {
@@ -31,7 +33,7 @@ export default function InlineEditableDate({
       <input
         ref={inputRef as React.RefObject<HTMLInputElement>}
         type="date"
-        value={editValue}
+        value={editValue || ''}
         onChange={(e) => handleChange(e.target.value)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
@@ -41,13 +43,17 @@ export default function InlineEditableDate({
     );
   }
 
+  const isEmpty = !value;
+
   return (
     <span
       onClick={handleClick}
-      className={`text-sm cursor-pointer hover:text-white transition-colors text-dark-400 ${className}`}
-      title="Click to edit"
+      className={`text-sm cursor-pointer hover:text-white transition-colors ${
+        isEmpty ? 'text-dark-500 italic' : 'text-dark-400'
+      } ${className}`}
+      title={isEmpty ? emptyText : 'Click to edit'}
     >
-      {value}
+      {isEmpty ? emptyText : value}
     </span>
   );
 }

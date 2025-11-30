@@ -43,6 +43,7 @@ export function initializeDatabase() {
       email TEXT,
       phone TEXT,
       company TEXT,
+      follow_up_date TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );

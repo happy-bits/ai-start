@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
-import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable } from '../../components/ui';
+import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate } from '../../components/ui';
 
 export default function ContactList() {
   const { data: contacts = [], isLoading } = useContacts();
@@ -88,13 +88,25 @@ export default function ContactList() {
                     <td className="px-6 py-4">
                       <Link to={`/contacts/${contact.id}`} className="flex items-center gap-4">
                         <Avatar name={contact.name} size="md" />
-                        <div>
+                        <div className="flex-1">
                           <p className="text-sm font-medium text-white hover:text-warm-400 transition-colors">
                             {contact.name}
                           </p>
                           {contact.company && (
                             <p className="text-sm text-dark-400 mt-1">{contact.company}</p>
                           )}
+                          <div className="mt-2" onClick={(e) => e.preventDefault()}>
+                            <InlineEditableDate
+                              value={contact.followUpDate}
+                              onSave={async (value) => {
+                                await updateContact.mutateAsync({
+                                  id: contact.id,
+                                  data: { followUpDate: value },
+                                });
+                              }}
+                              emptyText="Add follow-up date"
+                            />
+                          </div>
                         </div>
                       </Link>
                     </td>

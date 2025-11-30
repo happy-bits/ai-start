@@ -16,6 +16,7 @@ export interface Contact {
   email: string | null;
   phone: string | null;
   company: string | null;
+  followUpDate: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,6 +26,7 @@ export interface CreateContactData {
   email?: string | null;
   phone?: string | null;
   company?: string | null;
+  followUpDate?: string | null;
 }
 
 export interface UpdateContactData {
@@ -32,6 +34,7 @@ export interface UpdateContactData {
   email?: string | null;
   phone?: string | null;
   company?: string | null;
+  followUpDate?: string | null;
 }
 
 // Interaction types

@@ -10,6 +10,7 @@ import { createSellerRoutes } from './routes/sellers.js';
 import { createContactRoutes } from './routes/contacts.js';
 import { createInteractionRoutes } from './routes/interactions.js';
 import { seedDatabase } from './db/seed.js';
+import { resetDatabase } from './db/index.js';
 import { ERROR_MESSAGES, ROLES, SUCCESS_MESSAGES } from './constants.js';
 
 export function createApp(db: BetterSQLite3Database<typeof schema>, options?: { enableLogging?: boolean }) {
@@ -58,6 +59,7 @@ export function createApp(db: BetterSQLite3Database<typeof schema>, options?: { 
       return c.json({ error: ERROR_MESSAGES.NOT_AVAILABLE_IN_PRODUCTION }, 403);
     }
 
+    resetDatabase();
     await seedDatabase(db);
     return c.json({ message: SUCCESS_MESSAGES.DATABASE_RESET });
   });
