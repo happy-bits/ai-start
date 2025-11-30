@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login as loginApi } from '../api/auth';
+import { config } from '../config';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,6 +23,21 @@ export default function Login() {
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleQuickLogin = async (quickEmail: string, quickPassword: string) => {
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await loginApi({ email: quickEmail, password: quickPassword });
+      login(response.token, response.user);
+      navigate('/');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Quick login failed');
     } finally {
       setIsLoading(false);
     }
@@ -105,25 +121,83 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Demo credentials hint */}
-          <div className="mt-6 pt-6 border-t border-dark-700">
-            <p className="text-xs text-dark-500 text-center mb-3">Demo credentials</p>
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="bg-dark-800 rounded-lg p-3">
-                <p className="text-dark-400 mb-1">Admin</p>
-                <p className="text-dark-300 font-mono">admin@keepwarm.com</p>
-                <p className="text-dark-500 font-mono">admin123</p>
-              </div>
-              <div className="bg-dark-800 rounded-lg p-3">
-                <p className="text-dark-400 mb-1">Seller</p>
-                <p className="text-dark-300 font-mono">alice@keepwarm.com</p>
-                <p className="text-dark-500 font-mono">seller123</p>
+          {/* Developer Tools: Quick Login */}
+          {config.developerTools && (
+            <div className="mt-6 pt-6 border-t border-dark-700">
+              <p className="text-xs text-dark-500 text-center mb-3 flex items-center justify-center gap-2">
+                <span className="inline-block w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                Dev Mode: Quick Login
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                <QuickLoginButton
+                  label="Admin"
+                  email="admin@keepwarm.com"
+                  password="admin123"
+                  color="amber"
+                  onLogin={handleQuickLogin}
+                  disabled={isLoading}
+                />
+                <QuickLoginButton
+                  label="Alice"
+                  subtitle="Seller"
+                  email="alice@keepwarm.com"
+                  password="seller123"
+                  color="blue"
+                  onLogin={handleQuickLogin}
+                  disabled={isLoading}
+                />
+                <QuickLoginButton
+                  label="Bob"
+                  subtitle="Seller"
+                  email="bob@keepwarm.com"
+                  password="seller123"
+                  color="violet"
+                  onLogin={handleQuickLogin}
+                  disabled={isLoading}
+                />
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
+  );
+}
+
+// Quick login button component for developer tools
+function QuickLoginButton({
+  label,
+  subtitle,
+  email,
+  password,
+  color,
+  onLogin,
+  disabled,
+}: {
+  label: string;
+  subtitle?: string;
+  email: string;
+  password: string;
+  color: 'amber' | 'blue' | 'violet';
+  onLogin: (email: string, password: string) => void;
+  disabled: boolean;
+}) {
+  const colorClasses = {
+    amber: 'bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/50 text-amber-400',
+    blue: 'bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/50 text-blue-400',
+    violet: 'bg-violet-500/10 border-violet-500/30 hover:bg-violet-500/20 hover:border-violet-500/50 text-violet-400',
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={() => onLogin(email, password)}
+      disabled={disabled}
+      className={`${colorClasses[color]} border rounded-lg p-2 text-center transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
+    >
+      <p className="font-medium text-sm">{label}</p>
+      {subtitle && <p className="text-xs opacity-70">{subtitle}</p>}
+    </button>
   );
 }
 
