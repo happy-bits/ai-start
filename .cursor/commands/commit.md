@@ -9,4 +9,4 @@ If the code changes fit as a commit, write
 Otherwise write
 ⚠️ Recommend splitting into multiple commits due to [...]
 
-Do not call any tools.
+Do not commit (the user will do that)
