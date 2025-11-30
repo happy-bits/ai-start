@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { setupTest, authHeader, type TestContext } from './setup.js';
+import { setupTest, get, post, type TestContext } from './setup.js';
 
 describe('Auth Routes', () => {
   let ctx: TestContext;
@@ -10,13 +10,9 @@ describe('Auth Routes', () => {
 
   describe('POST /auth/login', () => {
     it('should login with valid credentials', async () => {
-      const res = await ctx.app.request('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'admin@test.com',
-          password: 'password123',
-        }),
+      const res = await post(ctx.app, '/auth/login', null, {
+        email: 'admin@test.com',
+        password: 'password123',
       });
 
       expect(res.status).toBe(200);
@@ -27,13 +23,9 @@ describe('Auth Routes', () => {
     });
 
     it('should reject invalid password', async () => {
-      const res = await ctx.app.request('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'admin@test.com',
-          password: 'wrongpassword',
-        }),
+      const res = await post(ctx.app, '/auth/login', null, {
+        email: 'admin@test.com',
+        password: 'wrongpassword',
       });
 
       expect(res.status).toBe(401);
@@ -42,26 +34,18 @@ describe('Auth Routes', () => {
     });
 
     it('should reject non-existent user', async () => {
-      const res = await ctx.app.request('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'nobody@test.com',
-          password: 'password123',
-        }),
+      const res = await post(ctx.app, '/auth/login', null, {
+        email: 'nobody@test.com',
+        password: 'password123',
       });
 
       expect(res.status).toBe(401);
     });
 
     it('should reject invalid email format', async () => {
-      const res = await ctx.app.request('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'not-an-email',
-          password: 'password123',
-        }),
+      const res = await post(ctx.app, '/auth/login', null, {
+        email: 'not-an-email',
+        password: 'password123',
       });
 
       expect(res.status).toBe(400);
@@ -70,10 +54,7 @@ describe('Auth Routes', () => {
 
   describe('POST /auth/logout', () => {
     it('should logout successfully', async () => {
-      const res = await ctx.app.request('/auth/logout', {
-        method: 'POST',
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await post(ctx.app, '/auth/logout', ctx.adminToken, {});
 
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -82,15 +63,10 @@ describe('Auth Routes', () => {
 
     it('should invalidate session after logout', async () => {
       // Logout
-      await ctx.app.request('/auth/logout', {
-        method: 'POST',
-        headers: authHeader(ctx.adminToken),
-      });
+      await post(ctx.app, '/auth/logout', ctx.adminToken, {});
 
       // Try to use the invalidated token
-      const res = await ctx.app.request('/api/me', {
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await get(ctx.app, '/api/me', ctx.adminToken);
 
       expect(res.status).toBe(401);
     });
@@ -98,9 +74,7 @@ describe('Auth Routes', () => {
 
   describe('GET /api/me', () => {
     it('should return current user info', async () => {
-      const res = await ctx.app.request('/api/me', {
-        headers: authHeader(ctx.sellerToken),
-      });
+      const res = await get(ctx.app, '/api/me', ctx.sellerToken);
 
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -115,9 +89,7 @@ describe('Auth Routes', () => {
     });
 
     it('should reject invalid token', async () => {
-      const res = await ctx.app.request('/api/me', {
-        headers: authHeader('invalid-token'),
-      });
+      const res = await get(ctx.app, '/api/me', 'invalid-token');
 
       expect(res.status).toBe(401);
     });

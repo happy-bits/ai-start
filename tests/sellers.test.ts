@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { setupTest, authHeader, type TestContext } from './setup.js';
+import { setupTest, get, post, put, del, type TestContext } from './setup.js';
 
 describe('Seller Routes', () => {
   let ctx: TestContext;
@@ -10,9 +10,7 @@ describe('Seller Routes', () => {
 
   describe('GET /api/sellers', () => {
     it('should list all sellers as admin', async () => {
-      const res = await ctx.app.request('/api/sellers', {
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await get(ctx.app, '/api/sellers', ctx.adminToken);
 
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -22,9 +20,7 @@ describe('Seller Routes', () => {
     });
 
     it('should reject seller access', async () => {
-      const res = await ctx.app.request('/api/sellers', {
-        headers: authHeader(ctx.sellerToken),
-      });
+      const res = await get(ctx.app, '/api/sellers', ctx.sellerToken);
 
       expect(res.status).toBe(403);
     });
@@ -38,9 +34,7 @@ describe('Seller Routes', () => {
 
   describe('GET /api/sellers/:id', () => {
     it('should get seller details as admin', async () => {
-      const res = await ctx.app.request(`/api/sellers/${ctx.sellerId}`, {
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken);
 
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -49,17 +43,13 @@ describe('Seller Routes', () => {
     });
 
     it('should return 404 for non-existent seller', async () => {
-      const res = await ctx.app.request('/api/sellers/9999', {
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await get(ctx.app, '/api/sellers/9999', ctx.adminToken);
 
       expect(res.status).toBe(404);
     });
 
     it('should return 404 for admin user (not a seller)', async () => {
-      const res = await ctx.app.request(`/api/sellers/${ctx.adminId}`, {
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await get(ctx.app, `/api/sellers/${ctx.adminId}`, ctx.adminToken);
 
       expect(res.status).toBe(404);
     });
@@ -67,17 +57,10 @@ describe('Seller Routes', () => {
 
   describe('POST /api/sellers', () => {
     it('should create new seller as admin', async () => {
-      const res = await ctx.app.request('/api/sellers', {
-        method: 'POST',
-        headers: {
-          ...authHeader(ctx.adminToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: 'newseller@test.com',
-          password: 'newpassword123',
-          name: 'New Seller',
-        }),
+      const res = await post(ctx.app, '/api/sellers', ctx.adminToken, {
+        email: 'newseller@test.com',
+        password: 'newpassword123',
+        name: 'New Seller',
       });
 
       expect(res.status).toBe(201);
@@ -88,51 +71,30 @@ describe('Seller Routes', () => {
     });
 
     it('should reject duplicate email', async () => {
-      const res = await ctx.app.request('/api/sellers', {
-        method: 'POST',
-        headers: {
-          ...authHeader(ctx.adminToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: 'seller@test.com',
-          password: 'password123',
-          name: 'Duplicate Seller',
-        }),
+      const res = await post(ctx.app, '/api/sellers', ctx.adminToken, {
+        email: 'seller@test.com',
+        password: 'password123',
+        name: 'Duplicate Seller',
       });
 
       expect(res.status).toBe(409);
     });
 
     it('should reject short password', async () => {
-      const res = await ctx.app.request('/api/sellers', {
-        method: 'POST',
-        headers: {
-          ...authHeader(ctx.adminToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: 'newseller@test.com',
-          password: '123',
-          name: 'New Seller',
-        }),
+      const res = await post(ctx.app, '/api/sellers', ctx.adminToken, {
+        email: 'newseller@test.com',
+        password: '123',
+        name: 'New Seller',
       });
 
       expect(res.status).toBe(400);
     });
 
     it('should reject seller creating sellers', async () => {
-      const res = await ctx.app.request('/api/sellers', {
-        method: 'POST',
-        headers: {
-          ...authHeader(ctx.sellerToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: 'newseller@test.com',
-          password: 'newpassword123',
-          name: 'New Seller',
-        }),
+      const res = await post(ctx.app, '/api/sellers', ctx.sellerToken, {
+        email: 'newseller@test.com',
+        password: 'newpassword123',
+        name: 'New Seller',
       });
 
       expect(res.status).toBe(403);
@@ -141,15 +103,8 @@ describe('Seller Routes', () => {
 
   describe('PUT /api/sellers/:id', () => {
     it('should update seller as admin', async () => {
-      const res = await ctx.app.request(`/api/sellers/${ctx.sellerId}`, {
-        method: 'PUT',
-        headers: {
-          ...authHeader(ctx.adminToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: 'Updated Seller Name',
-        }),
+      const res = await put(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken, {
+        name: 'Updated Seller Name',
       });
 
       expect(res.status).toBe(200);
@@ -158,15 +113,8 @@ describe('Seller Routes', () => {
     });
 
     it('should update seller email', async () => {
-      const res = await ctx.app.request(`/api/sellers/${ctx.sellerId}`, {
-        method: 'PUT',
-        headers: {
-          ...authHeader(ctx.adminToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: 'updated@test.com',
-        }),
+      const res = await put(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken, {
+        email: 'updated@test.com',
       });
 
       expect(res.status).toBe(200);
@@ -175,30 +123,16 @@ describe('Seller Routes', () => {
     });
 
     it('should reject duplicate email on update', async () => {
-      const res = await ctx.app.request(`/api/sellers/${ctx.sellerId}`, {
-        method: 'PUT',
-        headers: {
-          ...authHeader(ctx.adminToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: 'seller2@test.com',
-        }),
+      const res = await put(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken, {
+        email: 'seller2@test.com',
       });
 
       expect(res.status).toBe(409);
     });
 
     it('should return 404 for non-existent seller', async () => {
-      const res = await ctx.app.request('/api/sellers/9999', {
-        method: 'PUT',
-        headers: {
-          ...authHeader(ctx.adminToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: 'Updated',
-        }),
+      const res = await put(ctx.app, '/api/sellers/9999', ctx.adminToken, {
+        name: 'Updated',
       });
 
       expect(res.status).toBe(404);
@@ -207,39 +141,25 @@ describe('Seller Routes', () => {
 
   describe('DELETE /api/sellers/:id', () => {
     it('should delete seller as admin', async () => {
-      const res = await ctx.app.request(`/api/sellers/${ctx.sellerId}`, {
-        method: 'DELETE',
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await del(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken);
 
       expect(res.status).toBe(200);
 
       // Verify deleted
-      const getRes = await ctx.app.request(`/api/sellers/${ctx.sellerId}`, {
-        headers: authHeader(ctx.adminToken),
-      });
+      const getRes = await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken);
       expect(getRes.status).toBe(404);
     });
 
     it('should return 404 for non-existent seller', async () => {
-      const res = await ctx.app.request('/api/sellers/9999', {
-        method: 'DELETE',
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await del(ctx.app, '/api/sellers/9999', ctx.adminToken);
 
       expect(res.status).toBe(404);
     });
 
     it('should reject seller deleting sellers', async () => {
-      const res = await ctx.app.request(`/api/sellers/${ctx.seller2Id}`, {
-        method: 'DELETE',
-        headers: authHeader(ctx.sellerToken),
-      });
+      const res = await del(ctx.app, `/api/sellers/${ctx.seller2Id}`, ctx.sellerToken);
 
       expect(res.status).toBe(403);
     });
   });
 });
-
-
-

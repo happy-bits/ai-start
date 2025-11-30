@@ -1,9 +1,8 @@
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { hash } from '@node-rs/argon2';
 import * as schema from '../src/db/schema.js';
 import { createApp } from '../src/app.js';
-import { createSession } from '../src/middleware/auth.js';
+import { createSession, hashPassword } from '../src/middleware/auth.js';
 
 export type TestContext = {
   db: ReturnType<typeof drizzle<typeof schema>>;
@@ -92,13 +91,7 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
   seller2Token: string;
 }> {
   const now = '2024-01-15T10:00:00.000Z';
-
-  // Create password hash
-  const passwordHash = await hash('password123', {
-    memoryCost: 19456,
-    timeCost: 2,
-    parallelism: 1,
-  });
+  const passwordHash = await hashPassword('password123');
 
   // Create admin
   const admin = db
@@ -225,5 +218,28 @@ export function authHeader(token: string) {
   return { Authorization: `Bearer ${token}` };
 }
 
+// Request helpers for cleaner tests
+export function get(app: TestContext['app'], url: string, token: string) {
+  return app.request(url, { headers: authHeader(token) });
+}
 
+export function post(app: TestContext['app'], url: string, token: string | null, body: object) {
+  return app.request(url, {
+    method: 'POST',
+    headers: { ...(token ? authHeader(token) : {}), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
+export function put(app: TestContext['app'], url: string, token: string, body: object) {
+  return app.request(url, {
+    method: 'PUT',
+    headers: { ...authHeader(token), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
+export function del(app: TestContext['app'], url: string, token: string) {
+  return app.request(url, { method: 'DELETE', headers: authHeader(token) });
+}
 

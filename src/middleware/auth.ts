@@ -1,8 +1,17 @@
 import { Context, Next } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { hash } from '@node-rs/argon2';
 import { eq, and, gt, lt } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
+
+// Argon2 options for password hashing
+const ARGON_OPTIONS = { memoryCost: 19456, timeCost: 2, parallelism: 1 };
+
+// Hash a password using Argon2
+export function hashPassword(password: string) {
+  return hash(password, ARGON_OPTIONS);
+}
 
 export type AuthUser = {
   id: number;

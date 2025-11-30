@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { setupTest, authHeader, type TestContext } from './setup.js';
+import { setupTest, get, post, put, del, type TestContext } from './setup.js';
 
 describe('Interaction Routes', () => {
   let ctx: TestContext;
@@ -10,9 +10,7 @@ describe('Interaction Routes', () => {
 
   describe('GET /api/interactions', () => {
     it('should list own interactions as seller', async () => {
-      const res = await ctx.app.request('/api/interactions', {
-        headers: authHeader(ctx.sellerToken),
-      });
+      const res = await get(ctx.app, '/api/interactions', ctx.sellerToken);
 
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -21,9 +19,7 @@ describe('Interaction Routes', () => {
     });
 
     it('should list all interactions as admin', async () => {
-      const res = await ctx.app.request('/api/interactions', {
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await get(ctx.app, '/api/interactions', ctx.adminToken);
 
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -31,9 +27,7 @@ describe('Interaction Routes', () => {
     });
 
     it('should filter by customerId', async () => {
-      const res = await ctx.app.request(`/api/interactions?customerId=${ctx.customerId}`, {
-        headers: authHeader(ctx.sellerToken),
-      });
+      const res = await get(ctx.app, `/api/interactions?customerId=${ctx.customerId}`, ctx.sellerToken);
 
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -42,9 +36,7 @@ describe('Interaction Routes', () => {
     });
 
     it('should return empty for other sellers customer', async () => {
-      const res = await ctx.app.request(`/api/interactions?customerId=${ctx.customerId}`, {
-        headers: authHeader(ctx.seller2Token),
-      });
+      const res = await get(ctx.app, `/api/interactions?customerId=${ctx.customerId}`, ctx.seller2Token);
 
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -54,9 +46,7 @@ describe('Interaction Routes', () => {
 
   describe('GET /api/interactions/:id', () => {
     it('should get own interaction details', async () => {
-      const res = await ctx.app.request(`/api/interactions/${ctx.interactionId}`, {
-        headers: authHeader(ctx.sellerToken),
-      });
+      const res = await get(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.sellerToken);
 
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -65,25 +55,19 @@ describe('Interaction Routes', () => {
     });
 
     it('should get any interaction as admin', async () => {
-      const res = await ctx.app.request(`/api/interactions/${ctx.interactionId}`, {
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await get(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.adminToken);
 
       expect(res.status).toBe(200);
     });
 
     it('should deny access to other sellers interaction', async () => {
-      const res = await ctx.app.request(`/api/interactions/${ctx.interactionId}`, {
-        headers: authHeader(ctx.seller2Token),
-      });
+      const res = await get(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.seller2Token);
 
       expect(res.status).toBe(403);
     });
 
     it('should return 404 for non-existent interaction', async () => {
-      const res = await ctx.app.request('/api/interactions/9999', {
-        headers: authHeader(ctx.sellerToken),
-      });
+      const res = await get(ctx.app, '/api/interactions/9999', ctx.sellerToken);
 
       expect(res.status).toBe(404);
     });
@@ -91,19 +75,12 @@ describe('Interaction Routes', () => {
 
   describe('POST /api/interactions', () => {
     it('should create interaction for own customer', async () => {
-      const res = await ctx.app.request('/api/interactions', {
-        method: 'POST',
-        headers: {
-          ...authHeader(ctx.sellerToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerId: ctx.customerId,
-          type: 'meeting',
-          date: '2024-01-20',
-          time: '14:30',
-          notes: 'Follow-up meeting',
-        }),
+      const res = await post(ctx.app, '/api/interactions', ctx.sellerToken, {
+        customerId: ctx.customerId,
+        type: 'meeting',
+        date: '2024-01-20',
+        time: '14:30',
+        notes: 'Follow-up meeting',
       });
 
       expect(res.status).toBe(201);
@@ -114,17 +91,10 @@ describe('Interaction Routes', () => {
     });
 
     it('should create interaction with minimal data', async () => {
-      const res = await ctx.app.request('/api/interactions', {
-        method: 'POST',
-        headers: {
-          ...authHeader(ctx.sellerToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerId: ctx.customerId,
-          type: 'email',
-          date: '2024-01-21',
-        }),
+      const res = await post(ctx.app, '/api/interactions', ctx.sellerToken, {
+        customerId: ctx.customerId,
+        type: 'email',
+        date: '2024-01-21',
       });
 
       expect(res.status).toBe(201);
@@ -135,68 +105,40 @@ describe('Interaction Routes', () => {
     });
 
     it('should reject interaction for other sellers customer', async () => {
-      const res = await ctx.app.request('/api/interactions', {
-        method: 'POST',
-        headers: {
-          ...authHeader(ctx.seller2Token),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerId: ctx.customerId,
-          type: 'call',
-          date: '2024-01-22',
-        }),
+      const res = await post(ctx.app, '/api/interactions', ctx.seller2Token, {
+        customerId: ctx.customerId,
+        type: 'call',
+        date: '2024-01-22',
       });
 
       expect(res.status).toBe(403);
     });
 
     it('should reject invalid interaction type', async () => {
-      const res = await ctx.app.request('/api/interactions', {
-        method: 'POST',
-        headers: {
-          ...authHeader(ctx.sellerToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerId: ctx.customerId,
-          type: 'invalid',
-          date: '2024-01-22',
-        }),
+      const res = await post(ctx.app, '/api/interactions', ctx.sellerToken, {
+        customerId: ctx.customerId,
+        type: 'invalid',
+        date: '2024-01-22',
       });
 
       expect(res.status).toBe(400);
     });
 
     it('should reject invalid date format', async () => {
-      const res = await ctx.app.request('/api/interactions', {
-        method: 'POST',
-        headers: {
-          ...authHeader(ctx.sellerToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerId: ctx.customerId,
-          type: 'call',
-          date: '01-22-2024',
-        }),
+      const res = await post(ctx.app, '/api/interactions', ctx.sellerToken, {
+        customerId: ctx.customerId,
+        type: 'call',
+        date: '01-22-2024',
       });
 
       expect(res.status).toBe(400);
     });
 
     it('should reject non-existent customer', async () => {
-      const res = await ctx.app.request('/api/interactions', {
-        method: 'POST',
-        headers: {
-          ...authHeader(ctx.sellerToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerId: 9999,
-          type: 'call',
-          date: '2024-01-22',
-        }),
+      const res = await post(ctx.app, '/api/interactions', ctx.sellerToken, {
+        customerId: 9999,
+        type: 'call',
+        date: '2024-01-22',
       });
 
       expect(res.status).toBe(404);
@@ -205,16 +147,9 @@ describe('Interaction Routes', () => {
 
   describe('PUT /api/interactions/:id', () => {
     it('should update own interaction', async () => {
-      const res = await ctx.app.request(`/api/interactions/${ctx.interactionId}`, {
-        method: 'PUT',
-        headers: {
-          ...authHeader(ctx.sellerToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'meeting',
-          notes: 'Changed to meeting',
-        }),
+      const res = await put(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.sellerToken, {
+        type: 'meeting',
+        notes: 'Changed to meeting',
       });
 
       expect(res.status).toBe(200);
@@ -224,15 +159,8 @@ describe('Interaction Routes', () => {
     });
 
     it('should update any interaction as admin', async () => {
-      const res = await ctx.app.request(`/api/interactions/${ctx.interactionId}`, {
-        method: 'PUT',
-        headers: {
-          ...authHeader(ctx.adminToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          notes: 'Admin updated',
-        }),
+      const res = await put(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.adminToken, {
+        notes: 'Admin updated',
       });
 
       expect(res.status).toBe(200);
@@ -241,30 +169,16 @@ describe('Interaction Routes', () => {
     });
 
     it('should deny update of other sellers interaction', async () => {
-      const res = await ctx.app.request(`/api/interactions/${ctx.interactionId}`, {
-        method: 'PUT',
-        headers: {
-          ...authHeader(ctx.seller2Token),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          notes: 'Hacked',
-        }),
+      const res = await put(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.seller2Token, {
+        notes: 'Hacked',
       });
 
       expect(res.status).toBe(403);
     });
 
     it('should return 404 for non-existent interaction', async () => {
-      const res = await ctx.app.request('/api/interactions/9999', {
-        method: 'PUT',
-        headers: {
-          ...authHeader(ctx.sellerToken),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          notes: 'Updated',
-        }),
+      const res = await put(ctx.app, '/api/interactions/9999', ctx.sellerToken, {
+        notes: 'Updated',
       });
 
       expect(res.status).toBe(404);
@@ -273,48 +187,31 @@ describe('Interaction Routes', () => {
 
   describe('DELETE /api/interactions/:id', () => {
     it('should delete own interaction', async () => {
-      const res = await ctx.app.request(`/api/interactions/${ctx.interactionId}`, {
-        method: 'DELETE',
-        headers: authHeader(ctx.sellerToken),
-      });
+      const res = await del(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.sellerToken);
 
       expect(res.status).toBe(200);
 
       // Verify deleted
-      const getRes = await ctx.app.request(`/api/interactions/${ctx.interactionId}`, {
-        headers: authHeader(ctx.sellerToken),
-      });
+      const getRes = await get(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.sellerToken);
       expect(getRes.status).toBe(404);
     });
 
     it('should delete any interaction as admin', async () => {
-      const res = await ctx.app.request(`/api/interactions/${ctx.interactionId}`, {
-        method: 'DELETE',
-        headers: authHeader(ctx.adminToken),
-      });
+      const res = await del(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.adminToken);
 
       expect(res.status).toBe(200);
     });
 
     it('should deny delete of other sellers interaction', async () => {
-      const res = await ctx.app.request(`/api/interactions/${ctx.interactionId}`, {
-        method: 'DELETE',
-        headers: authHeader(ctx.seller2Token),
-      });
+      const res = await del(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.seller2Token);
 
       expect(res.status).toBe(403);
     });
 
     it('should return 404 for non-existent interaction', async () => {
-      const res = await ctx.app.request('/api/interactions/9999', {
-        method: 'DELETE',
-        headers: authHeader(ctx.sellerToken),
-      });
+      const res = await del(ctx.app, '/api/interactions/9999', ctx.sellerToken);
 
       expect(res.status).toBe(404);
     });
   });
 });
-
-
-

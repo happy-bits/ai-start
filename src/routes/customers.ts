@@ -1,10 +1,11 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { type AuthVariables } from '../middleware/auth.js';
+import { parseIdParam, checkSellerAccess } from './helpers.js';
 
 const createCustomerSchema = z.object({
   name: z.string().min(1),
@@ -43,21 +44,18 @@ export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
   // GET /customers/:id - Get customer details
   app.get('/:id', (c) => {
     const user = c.get('user');
-    const id = parseInt(c.req.param('id'), 10);
+    const parsed = parseIdParam(c, 'id', 'customer');
+    if (!parsed.success) return parsed.response;
 
-    if (isNaN(id)) {
-      return c.json({ error: 'Invalid customer ID' }, 400);
-    }
-
-    const customer = db.select().from(schema.customers).where(eq(schema.customers.id, id)).get();
+    const customer = db.select().from(schema.customers).where(eq(schema.customers.id, parsed.id)).get();
 
     if (!customer) {
       return c.json({ error: 'Customer not found' }, 404);
     }
 
-    // Sellers can only view their own customers
-    if (user.role === 'seller' && customer.sellerId !== user.id) {
-      return c.json({ error: 'Access denied' }, 403);
+    const accessDenied = checkSellerAccess(user, customer.sellerId);
+    if (accessDenied) {
+      return c.json({ error: accessDenied.error }, 403);
     }
 
     return c.json({ customer });
@@ -91,21 +89,18 @@ export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
   // PUT /customers/:id - Update customer
   app.put('/:id', zValidator('json', updateCustomerSchema), (c) => {
     const user = c.get('user');
-    const id = parseInt(c.req.param('id'), 10);
+    const parsed = parseIdParam(c, 'id', 'customer');
+    if (!parsed.success) return parsed.response;
 
-    if (isNaN(id)) {
-      return c.json({ error: 'Invalid customer ID' }, 400);
-    }
-
-    const existing = db.select().from(schema.customers).where(eq(schema.customers.id, id)).get();
+    const existing = db.select().from(schema.customers).where(eq(schema.customers.id, parsed.id)).get();
 
     if (!existing) {
       return c.json({ error: 'Customer not found' }, 404);
     }
 
-    // Sellers can only edit their own customers
-    if (user.role === 'seller' && existing.sellerId !== user.id) {
-      return c.json({ error: 'Access denied' }, 403);
+    const accessDenied = checkSellerAccess(user, existing.sellerId);
+    if (accessDenied) {
+      return c.json({ error: accessDenied.error }, 403);
     }
 
     const updates = c.req.valid('json');
@@ -123,7 +118,7 @@ export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
     const customer = db
       .update(schema.customers)
       .set(updateValues)
-      .where(eq(schema.customers.id, id))
+      .where(eq(schema.customers.id, parsed.id))
       .returning()
       .get();
 
@@ -133,24 +128,21 @@ export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
   // DELETE /customers/:id - Delete customer
   app.delete('/:id', (c) => {
     const user = c.get('user');
-    const id = parseInt(c.req.param('id'), 10);
+    const parsed = parseIdParam(c, 'id', 'customer');
+    if (!parsed.success) return parsed.response;
 
-    if (isNaN(id)) {
-      return c.json({ error: 'Invalid customer ID' }, 400);
-    }
-
-    const existing = db.select().from(schema.customers).where(eq(schema.customers.id, id)).get();
+    const existing = db.select().from(schema.customers).where(eq(schema.customers.id, parsed.id)).get();
 
     if (!existing) {
       return c.json({ error: 'Customer not found' }, 404);
     }
 
-    // Sellers can only delete their own customers
-    if (user.role === 'seller' && existing.sellerId !== user.id) {
-      return c.json({ error: 'Access denied' }, 403);
+    const accessDenied = checkSellerAccess(user, existing.sellerId);
+    if (accessDenied) {
+      return c.json({ error: accessDenied.error }, 403);
     }
 
-    db.delete(schema.customers).where(eq(schema.customers.id, id)).run();
+    db.delete(schema.customers).where(eq(schema.customers.id, parsed.id)).run();
 
     return c.json({ message: 'Customer deleted successfully' });
   });

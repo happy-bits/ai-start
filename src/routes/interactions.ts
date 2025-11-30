@@ -5,6 +5,7 @@ import { eq, and } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { type AuthVariables } from '../middleware/auth.js';
+import { parseIdParam, checkSellerAccess } from './helpers.js';
 
 const createInteractionSchema = z.object({
   customerId: z.number().int().positive(),
@@ -57,25 +58,22 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
   // GET /interactions/:id - Get interaction details
   app.get('/:id', (c) => {
     const user = c.get('user');
-    const id = parseInt(c.req.param('id'), 10);
-
-    if (isNaN(id)) {
-      return c.json({ error: 'Invalid interaction ID' }, 400);
-    }
+    const parsed = parseIdParam(c, 'id', 'interaction');
+    if (!parsed.success) return parsed.response;
 
     const interaction = db
       .select()
       .from(schema.interactions)
-      .where(eq(schema.interactions.id, id))
+      .where(eq(schema.interactions.id, parsed.id))
       .get();
 
     if (!interaction) {
       return c.json({ error: 'Interaction not found' }, 404);
     }
 
-    // Sellers can only view their own interactions
-    if (user.role === 'seller' && interaction.sellerId !== user.id) {
-      return c.json({ error: 'Access denied' }, 403);
+    const accessDenied = checkSellerAccess(user, interaction.sellerId);
+    if (accessDenied) {
+      return c.json({ error: accessDenied.error }, 403);
     }
 
     return c.json({ interaction });
@@ -97,9 +95,9 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
       return c.json({ error: 'Customer not found' }, 404);
     }
 
-    // Sellers can only add interactions for their own customers
-    if (user.role === 'seller' && customer.sellerId !== user.id) {
-      return c.json({ error: 'Access denied' }, 403);
+    const accessDenied = checkSellerAccess(user, customer.sellerId);
+    if (accessDenied) {
+      return c.json({ error: accessDenied.error }, 403);
     }
 
     const now = new Date().toISOString();
@@ -125,25 +123,22 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
   // PUT /interactions/:id - Update interaction
   app.put('/:id', zValidator('json', updateInteractionSchema), (c) => {
     const user = c.get('user');
-    const id = parseInt(c.req.param('id'), 10);
-
-    if (isNaN(id)) {
-      return c.json({ error: 'Invalid interaction ID' }, 400);
-    }
+    const parsed = parseIdParam(c, 'id', 'interaction');
+    if (!parsed.success) return parsed.response;
 
     const existing = db
       .select()
       .from(schema.interactions)
-      .where(eq(schema.interactions.id, id))
+      .where(eq(schema.interactions.id, parsed.id))
       .get();
 
     if (!existing) {
       return c.json({ error: 'Interaction not found' }, 404);
     }
 
-    // Sellers can only edit their own interactions
-    if (user.role === 'seller' && existing.sellerId !== user.id) {
-      return c.json({ error: 'Access denied' }, 403);
+    const accessDenied = checkSellerAccess(user, existing.sellerId);
+    if (accessDenied) {
+      return c.json({ error: accessDenied.error }, 403);
     }
 
     const updates = c.req.valid('json');
@@ -160,7 +155,7 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
     const interaction = db
       .update(schema.interactions)
       .set(updateValues)
-      .where(eq(schema.interactions.id, id))
+      .where(eq(schema.interactions.id, parsed.id))
       .returning()
       .get();
 
@@ -170,28 +165,25 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
   // DELETE /interactions/:id - Delete interaction
   app.delete('/:id', (c) => {
     const user = c.get('user');
-    const id = parseInt(c.req.param('id'), 10);
-
-    if (isNaN(id)) {
-      return c.json({ error: 'Invalid interaction ID' }, 400);
-    }
+    const parsed = parseIdParam(c, 'id', 'interaction');
+    if (!parsed.success) return parsed.response;
 
     const existing = db
       .select()
       .from(schema.interactions)
-      .where(eq(schema.interactions.id, id))
+      .where(eq(schema.interactions.id, parsed.id))
       .get();
 
     if (!existing) {
       return c.json({ error: 'Interaction not found' }, 404);
     }
 
-    // Sellers can only delete their own interactions
-    if (user.role === 'seller' && existing.sellerId !== user.id) {
-      return c.json({ error: 'Access denied' }, 403);
+    const accessDenied = checkSellerAccess(user, existing.sellerId);
+    if (accessDenied) {
+      return c.json({ error: accessDenied.error }, 403);
     }
 
-    db.delete(schema.interactions).where(eq(schema.interactions.id, id)).run();
+    db.delete(schema.interactions).where(eq(schema.interactions.id, parsed.id)).run();
 
     return c.json({ message: 'Interaction deleted successfully' });
   });
