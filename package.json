@@ -1,0 +1,32 @@
+{
+  "name": "keepwarm-crm",
+  "version": "1.0.0",
+  "description": "KeepWarm CRM REST API Backend",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "db:seed": "tsx src/db/seed.ts"
+  },
+  "dependencies": {
+    "hono": "^4.6.0",
+    "@hono/node-server": "^1.13.0",
+    "@hono/zod-validator": "^0.4.0",
+    "zod": "^3.23.0",
+    "drizzle-orm": "^0.33.0",
+    "better-sqlite3": "^11.3.0",
+    "@node-rs/argon2": "^1.8.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0",
+    "@types/better-sqlite3": "^7.6.11",
+    "vitest": "^2.1.0",
+    "drizzle-kit": "^0.24.0"
+  }
+}
+
