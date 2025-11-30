@@ -52,7 +52,6 @@ export function createTestDatabase() {
       email TEXT,
       phone TEXT,
       company TEXT,
-      notes TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -144,7 +143,6 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
       email: 'contact@test.com',
       phone: '+1-555-0100',
       company: 'Test Corp',
-      notes: 'Test notes',
       createdAt: now,
       updatedAt: now,
     })
@@ -159,7 +157,6 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
       email: 'other@test.com',
       phone: '+1-555-0200',
       company: 'Other Corp',
-      notes: 'Other notes',
       createdAt: now,
       updatedAt: now,
     })
@@ -313,7 +310,6 @@ export function createTestContact(
     email: string;
     phone: string;
     company: string;
-    notes: string;
   }>
 ) {
   const now = '2024-01-15T10:00:00.000Z';
@@ -325,7 +321,6 @@ export function createTestContact(
       email: overrides?.email ?? 'contact@test.com',
       phone: overrides?.phone ?? '+1-555-0100',
       company: overrides?.company ?? 'Test Corp',
-      notes: overrides?.notes ?? 'Test notes',
       createdAt: now,
       updatedAt: now,
     })

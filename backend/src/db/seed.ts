@@ -69,7 +69,6 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
       email: 'erik.andersson@volvo.com',
       phone: '+46 70 123 45 67',
       company: 'Volvo AB',
-      notes: 'Stor företagskund, intresserad av premiumplaner',
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })
@@ -84,7 +83,6 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
       email: 'anna.larsson@spotify.com',
       phone: '+46 72 234 56 78',
       company: 'Spotify',
-      notes: 'Växande startup, behöver skalbar lösning',
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })
@@ -100,7 +98,6 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
       email: 'johan.nilsson@ikea.se',
       phone: '+46 73 345 67 89',
       company: 'IKEA Sverige',
-      notes: 'Internationell kund, flera platser',
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })

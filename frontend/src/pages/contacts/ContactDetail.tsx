@@ -155,12 +155,6 @@ export default function ContactDetail() {
                 {contact.company || <span className="text-dark-500">Not provided</span>}
               </dd>
             </div>
-            {contact.notes && (
-              <div>
-                <dt className="text-sm text-dark-500">Notes</dt>
-                <dd className="text-dark-300 mt-1 whitespace-pre-wrap">{contact.notes}</dd>
-              </div>
-            )}
           </dl>
         </Card>
 

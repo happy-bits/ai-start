@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useContact, useCreateContact, useUpdateContact } from '../../api/contacts';
-import { Button, Card, Input, Textarea, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
+import { Button, Card, Input, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
 import { useFormSubmission } from '../../hooks/useFormSubmission';
 import type { Contact, CreateContactData, UpdateContactData } from '../../api/types';
 
@@ -19,7 +19,6 @@ export default function ContactForm() {
     email: '',
     phone: '',
     company: '',
-    notes: '',
   });
 
   useEffect(() => {
@@ -29,7 +28,6 @@ export default function ContactForm() {
         email: existingContact.email || '',
         phone: existingContact.phone || '',
         company: existingContact.company || '',
-        notes: existingContact.notes || '',
       });
     }
   }, [existingContact]);
@@ -62,7 +60,6 @@ export default function ContactForm() {
       email: formData.email.trim() || null,
       phone: formData.phone.trim() || null,
       company: formData.company.trim() || null,
-      notes: formData.notes.trim() || null,
     };
     handleSubmit(e, data);
   };
@@ -125,14 +122,6 @@ export default function ContactForm() {
             value={formData.company}
             onChange={(e) => setFormData({ ...formData, company: e.target.value })}
             placeholder="Acme Inc."
-          />
-
-          <Textarea
-            label="Notes"
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            placeholder="Any additional notes about this contact..."
-            rows={4}
           />
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark-700">

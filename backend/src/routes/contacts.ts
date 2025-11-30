@@ -13,7 +13,6 @@ const createContactSchema = z.object({
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
 });
 
 const updateContactSchema = z.object({
@@ -21,7 +20,6 @@ const updateContactSchema = z.object({
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
 });
 
 export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
@@ -65,7 +63,6 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
         email: data.email ?? null,
         phone: data.phone ?? null,
         company: data.company ?? null,
-        notes: data.notes ?? null,
         createdAt: now,
         updatedAt: now,
       })
@@ -81,7 +78,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
     if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
-    const updateValues = buildUpdateValues(updates, ['name', 'email', 'phone', 'company', 'notes']);
+    const updateValues = buildUpdateValues(updates, ['name', 'email', 'phone', 'company']);
 
     const contact = db
       .update(schema.contacts)

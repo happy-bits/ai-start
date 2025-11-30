@@ -96,11 +96,6 @@ export default function ContactList() {
                           <p className="text-sm font-medium text-white hover:text-warm-400 transition-colors">
                             {contact.name}
                           </p>
-                          {contact.notes && (
-                            <p className="text-xs text-dark-500 truncate max-w-xs">
-                              {contact.notes}
-                            </p>
-                          )}
                         </div>
                       </Link>
                     </td>

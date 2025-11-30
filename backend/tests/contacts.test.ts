@@ -78,7 +78,6 @@ describe('Contact Routes', () => {
           email: 'new@contact.com',
           phone: '+1-555-1234',
           company: 'New Corp',
-          notes: 'New notes',
         })
       );
       expect(data.contact.name).toBe('New Contact');
@@ -115,14 +114,14 @@ describe('Contact Routes', () => {
 
   describe('PUT /api/contacts/:id', () => {
     it('should update own contact', async () => {
-      const data = await expectOk<{ contact: { name: string; notes: string } }>(
+      const data = await expectOk<{ contact: { name: string; company: string } }>(
         await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
           name: 'Updated Contact',
-          notes: 'Updated notes',
+          company: 'Updated Company',
         })
       );
       expect(data.contact.name).toBe('Updated Contact');
-      expect(data.contact.notes).toBe('Updated notes');
+      expect(data.contact.company).toBe('Updated Company');
     });
 
     it('should update any contact as admin', async () => {

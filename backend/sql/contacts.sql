@@ -2,7 +2,7 @@
 .headers on
 .mode column
 
-select id,seller_id,name,email,phone,company,notes from contacts;
+select id,seller_id,name,email,phone,company from contacts;
 
 .print ''
 
