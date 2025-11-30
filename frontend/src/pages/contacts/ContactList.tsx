@@ -86,16 +86,16 @@ export default function ContactList() {
                 {filteredContacts.map((contact) => (
                   <tr key={contact.id} className="hover:bg-dark-800/50 transition-colors">
                     <td className="px-6 py-4">
-                      <Link to={`/contacts/${contact.id}`} className="flex items-center gap-4">
+                      <div className="flex items-center gap-4">
                         <Avatar name={contact.name} size="md" />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-white hover:text-warm-400 transition-colors">
+                          <p className="text-sm font-medium text-white">
                             {contact.name}
                           </p>
                           {contact.company && (
                             <p className="text-sm text-dark-400 mt-1">{contact.company}</p>
                           )}
-                          <div className="mt-2" onClick={(e) => e.preventDefault()}>
+                          <div className="mt-2">
                             <InlineEditableDate
                               value={contact.followUpDate}
                               onSave={async (value) => {
@@ -108,7 +108,7 @@ export default function ContactList() {
                             />
                           </div>
                         </div>
-                      </Link>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="space-y-1">
@@ -140,6 +140,15 @@ export default function ContactList() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
+                        <Link to={`/contacts/${contact.id}`}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-warm-400 hover:text-warm-300 hover:bg-warm-500/10"
+                          >
+                            Interactions
+                          </Button>
+                        </Link>
                         <Button
                           variant="ghost"
                           size="sm"
