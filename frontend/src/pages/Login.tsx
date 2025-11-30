@@ -84,7 +84,6 @@ export default function Login() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">KeepWarm</h1>
-          <p className="text-dark-400">Sign in to manage your relationships</p>
         </div>
 
         {/* Login card */}
