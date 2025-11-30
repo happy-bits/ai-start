@@ -5,7 +5,7 @@ import { eq, and } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { type AuthVariables } from '../middleware/auth.js';
-import { parseIdParam, checkSellerAccess } from './helpers.js';
+import { withEntityAccess, buildUpdateValues, checkSellerAccess } from './helpers.js';
 
 const createInteractionSchema = z.object({
   customerId: z.number().int().positive(),
@@ -57,26 +57,10 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
   // GET /interactions/:id - Get interaction details
   app.get('/:id', (c) => {
-    const user = c.get('user');
-    const parsed = parseIdParam(c, 'id', 'interaction');
-    if (!parsed.success) return parsed.response;
+    const result = withEntityAccess<schema.Interaction>(c, db, schema.interactions, 'Interaction');
+    if (!result.success) return result.response;
 
-    const interaction = db
-      .select()
-      .from(schema.interactions)
-      .where(eq(schema.interactions.id, parsed.id))
-      .get();
-
-    if (!interaction) {
-      return c.json({ error: 'Interaction not found' }, 404);
-    }
-
-    const accessDenied = checkSellerAccess(user, interaction.sellerId);
-    if (accessDenied) {
-      return c.json({ error: accessDenied.error }, 403);
-    }
-
-    return c.json({ interaction });
+    return c.json({ interaction: result.entity });
   });
 
   // POST /interactions - Create new interaction
@@ -122,40 +106,16 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
   // PUT /interactions/:id - Update interaction
   app.put('/:id', zValidator('json', updateInteractionSchema), (c) => {
-    const user = c.get('user');
-    const parsed = parseIdParam(c, 'id', 'interaction');
-    if (!parsed.success) return parsed.response;
-
-    const existing = db
-      .select()
-      .from(schema.interactions)
-      .where(eq(schema.interactions.id, parsed.id))
-      .get();
-
-    if (!existing) {
-      return c.json({ error: 'Interaction not found' }, 404);
-    }
-
-    const accessDenied = checkSellerAccess(user, existing.sellerId);
-    if (accessDenied) {
-      return c.json({ error: accessDenied.error }, 403);
-    }
+    const result = withEntityAccess<schema.Interaction>(c, db, schema.interactions, 'Interaction');
+    if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
-
-    const updateValues: Record<string, string | null> = {
-      updatedAt: new Date().toISOString(),
-    };
-
-    if (updates.type !== undefined) updateValues.type = updates.type;
-    if (updates.date !== undefined) updateValues.date = updates.date;
-    if (updates.time !== undefined) updateValues.time = updates.time;
-    if (updates.notes !== undefined) updateValues.notes = updates.notes;
+    const updateValues = buildUpdateValues(updates, ['type', 'date', 'time', 'notes']);
 
     const interaction = db
       .update(schema.interactions)
       .set(updateValues)
-      .where(eq(schema.interactions.id, parsed.id))
+      .where(eq(schema.interactions.id, result.entity.id))
       .returning()
       .get();
 
@@ -164,26 +124,10 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
   // DELETE /interactions/:id - Delete interaction
   app.delete('/:id', (c) => {
-    const user = c.get('user');
-    const parsed = parseIdParam(c, 'id', 'interaction');
-    if (!parsed.success) return parsed.response;
+    const result = withEntityAccess<schema.Interaction>(c, db, schema.interactions, 'Interaction');
+    if (!result.success) return result.response;
 
-    const existing = db
-      .select()
-      .from(schema.interactions)
-      .where(eq(schema.interactions.id, parsed.id))
-      .get();
-
-    if (!existing) {
-      return c.json({ error: 'Interaction not found' }, 404);
-    }
-
-    const accessDenied = checkSellerAccess(user, existing.sellerId);
-    if (accessDenied) {
-      return c.json({ error: accessDenied.error }, 403);
-    }
-
-    db.delete(schema.interactions).where(eq(schema.interactions.id, parsed.id)).run();
+    db.delete(schema.interactions).where(eq(schema.interactions.id, result.entity.id)).run();
 
     return c.json({ message: 'Interaction deleted successfully' });
   });

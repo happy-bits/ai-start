@@ -5,7 +5,7 @@ import { eq, and, ne } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { type AuthVariables, adminOnly, hashPassword } from '../middleware/auth.js';
-import { parseIdParam } from './helpers.js';
+import { parseIdParam, buildUpdateValues } from './helpers.js';
 
 const createSellerSchema = z.object({
   email: z.string().email(),
@@ -126,12 +126,9 @@ export function createSellerRoutes(db: BetterSQLite3Database<typeof schema>) {
     }
 
     // Prepare update values
-    const updateValues: Record<string, string> = {
-      updatedAt: new Date().toISOString(),
-    };
+    const updateValues = buildUpdateValues(updates, ['email', 'name']);
 
-    if (updates.email) updateValues.email = updates.email;
-    if (updates.name) updateValues.name = updates.name;
+    // Handle password separately (requires async hashing)
     if (updates.password) {
       updateValues.passwordHash = await hashPassword(updates.password);
     }

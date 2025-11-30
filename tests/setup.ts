@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { expect } from 'vitest';
 import * as schema from '../src/db/schema.js';
 import { createApp } from '../src/app.js';
 import { createSession, hashPassword } from '../src/middleware/auth.js';
@@ -241,5 +242,94 @@ export function put(app: TestContext['app'], url: string, token: string, body: o
 
 export function del(app: TestContext['app'], url: string, token: string) {
   return app.request(url, { method: 'DELETE', headers: authHeader(token) });
+}
+
+// Test assertion helpers for cleaner tests
+export async function expectStatus(res: Response, status: number) {
+  expect(res.status).toBe(status);
+  return res;
+}
+
+export async function expectJson<T = unknown>(res: Response, status: number): Promise<T> {
+  expect(res.status).toBe(status);
+  return res.json() as Promise<T>;
+}
+
+export async function expectNotFound(res: Response) {
+  expect(res.status).toBe(404);
+}
+
+export async function expectForbidden(res: Response) {
+  expect(res.status).toBe(403);
+}
+
+export async function expectUnauthorized(res: Response) {
+  expect(res.status).toBe(401);
+}
+
+export async function expectBadRequest(res: Response) {
+  expect(res.status).toBe(400);
+}
+
+export async function expectCreated<T = unknown>(res: Response): Promise<T> {
+  return expectJson<T>(res, 201);
+}
+
+export async function expectOk<T = unknown>(res: Response): Promise<T> {
+  return expectJson<T>(res, 200);
+}
+
+// Helper to create test user with defaults
+export function createTestUser(
+  db: ReturnType<typeof drizzle<typeof schema>>,
+  overrides: Partial<{
+    email: string;
+    name: string;
+    role: 'admin' | 'seller';
+    passwordHash: string;
+  }> & { passwordHash: string }
+) {
+  const now = '2024-01-15T10:00:00.000Z';
+  return db
+    .insert(schema.users)
+    .values({
+      email: overrides.email ?? `user-${Date.now()}@test.com`,
+      passwordHash: overrides.passwordHash,
+      name: overrides.name ?? 'Test User',
+      role: overrides.role ?? 'seller',
+      createdAt: now,
+      updatedAt: now,
+    })
+    .returning()
+    .get();
+}
+
+// Helper to create test customer with defaults
+export function createTestCustomer(
+  db: ReturnType<typeof drizzle<typeof schema>>,
+  sellerId: number,
+  overrides?: Partial<{
+    name: string;
+    email: string;
+    phone: string;
+    company: string;
+    notes: string;
+  }>
+) {
+  const now = '2024-01-15T10:00:00.000Z';
+  return db
+    .insert(schema.customers)
+    .values({
+      sellerId,
+      name: overrides?.name ?? 'Test Customer',
+      email: overrides?.email ?? 'customer@test.com',
+      phone: overrides?.phone ?? '+1-555-0100',
+      company: overrides?.company ?? 'Test Corp',
+      notes: overrides?.notes ?? 'Test notes',
+      createdAt: now,
+      updatedAt: now,
+    })
+    .returning()
+    .get();
 }
 

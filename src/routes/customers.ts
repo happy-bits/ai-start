@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { type AuthVariables } from '../middleware/auth.js';
-import { parseIdParam, checkSellerAccess } from './helpers.js';
+import { withEntityAccess, buildUpdateValues } from './helpers.js';
 
 const createCustomerSchema = z.object({
   name: z.string().min(1),
@@ -43,22 +43,10 @@ export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   // GET /customers/:id - Get customer details
   app.get('/:id', (c) => {
-    const user = c.get('user');
-    const parsed = parseIdParam(c, 'id', 'customer');
-    if (!parsed.success) return parsed.response;
+    const result = withEntityAccess<schema.Customer>(c, db, schema.customers, 'Customer');
+    if (!result.success) return result.response;
 
-    const customer = db.select().from(schema.customers).where(eq(schema.customers.id, parsed.id)).get();
-
-    if (!customer) {
-      return c.json({ error: 'Customer not found' }, 404);
-    }
-
-    const accessDenied = checkSellerAccess(user, customer.sellerId);
-    if (accessDenied) {
-      return c.json({ error: accessDenied.error }, 403);
-    }
-
-    return c.json({ customer });
+    return c.json({ customer: result.entity });
   });
 
   // POST /customers - Create new customer
@@ -88,37 +76,16 @@ export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   // PUT /customers/:id - Update customer
   app.put('/:id', zValidator('json', updateCustomerSchema), (c) => {
-    const user = c.get('user');
-    const parsed = parseIdParam(c, 'id', 'customer');
-    if (!parsed.success) return parsed.response;
-
-    const existing = db.select().from(schema.customers).where(eq(schema.customers.id, parsed.id)).get();
-
-    if (!existing) {
-      return c.json({ error: 'Customer not found' }, 404);
-    }
-
-    const accessDenied = checkSellerAccess(user, existing.sellerId);
-    if (accessDenied) {
-      return c.json({ error: accessDenied.error }, 403);
-    }
+    const result = withEntityAccess<schema.Customer>(c, db, schema.customers, 'Customer');
+    if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
-
-    const updateValues: Record<string, string | null> = {
-      updatedAt: new Date().toISOString(),
-    };
-
-    if (updates.name !== undefined) updateValues.name = updates.name;
-    if (updates.email !== undefined) updateValues.email = updates.email;
-    if (updates.phone !== undefined) updateValues.phone = updates.phone;
-    if (updates.company !== undefined) updateValues.company = updates.company;
-    if (updates.notes !== undefined) updateValues.notes = updates.notes;
+    const updateValues = buildUpdateValues(updates, ['name', 'email', 'phone', 'company', 'notes']);
 
     const customer = db
       .update(schema.customers)
       .set(updateValues)
-      .where(eq(schema.customers.id, parsed.id))
+      .where(eq(schema.customers.id, result.entity.id))
       .returning()
       .get();
 
@@ -127,22 +94,10 @@ export function createCustomerRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   // DELETE /customers/:id - Delete customer
   app.delete('/:id', (c) => {
-    const user = c.get('user');
-    const parsed = parseIdParam(c, 'id', 'customer');
-    if (!parsed.success) return parsed.response;
+    const result = withEntityAccess<schema.Customer>(c, db, schema.customers, 'Customer');
+    if (!result.success) return result.response;
 
-    const existing = db.select().from(schema.customers).where(eq(schema.customers.id, parsed.id)).get();
-
-    if (!existing) {
-      return c.json({ error: 'Customer not found' }, 404);
-    }
-
-    const accessDenied = checkSellerAccess(user, existing.sellerId);
-    if (accessDenied) {
-      return c.json({ error: accessDenied.error }, 403);
-    }
-
-    db.delete(schema.customers).where(eq(schema.customers.id, parsed.id)).run();
+    db.delete(schema.customers).where(eq(schema.customers.id, result.entity.id)).run();
 
     return c.json({ message: 'Customer deleted successfully' });
   });
