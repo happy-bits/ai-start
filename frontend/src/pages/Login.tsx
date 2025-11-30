@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+
 import { useLogin, login as loginApi } from '../api/auth';
 import { apiClient } from '../api/client';
-import { config } from '../config';
 import { ErrorMessage, LoadingSpinner } from '../components/ui';
+import { useAuth } from '../context/AuthContext';
+import { config } from '../config';
 import { getErrorMessage } from '../utils';
 
 export default function Login() {

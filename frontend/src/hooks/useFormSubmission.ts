@@ -4,13 +4,15 @@ import { getErrorMessage } from '../utils';
 
 interface UseFormSubmissionOptions<TData, TResponse> {
   onSubmit: (data: TData) => Promise<TResponse>;
-  onSuccess?: (response: TResponse) => void | string; // Return string to navigate, void to use default
+  onSuccess?: (response: TResponse) => void | string; // Return string to navigate, void to call callback
+  onSuccessCallback?: () => void; // Optional callback function (for embedded forms)
   validate?: (data: TData) => string | null; // Return error message or null
 }
 
 export function useFormSubmission<TData, TResponse>({
   onSubmit,
   onSuccess,
+  onSuccessCallback,
   validate,
 }: UseFormSubmissionOptions<TData, TResponse>) {
   const navigate = useNavigate();
@@ -36,6 +38,9 @@ export function useFormSubmission<TData, TResponse>({
       const navigatePath = onSuccess ? onSuccess(response) : undefined;
       if (navigatePath) {
         navigate(navigatePath);
+      } else if (onSuccessCallback) {
+        // Call callback if no navigation path returned
+        onSuccessCallback();
       }
     } catch (err) {
       setError(getErrorMessage(err));

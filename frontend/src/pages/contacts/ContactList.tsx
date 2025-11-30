@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+
 import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
 import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate } from '../../components/ui';
+
 import type { Contact } from '../../api/types';
 
 // Helper function to check if a follow-up date is today or earlier

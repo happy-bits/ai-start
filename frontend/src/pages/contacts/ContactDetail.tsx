@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+
 import { useContact } from '../../api/contacts';
 import { useInteractions, useDeleteInteraction, useUpdateInteraction } from '../../api/interactions';
+import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 import { 
   Button, 
   Card, 
@@ -16,6 +18,7 @@ import {
   InlineEditableTextarea,
 } from '../../components/ui';
 import InteractionForm from '../interactions/InteractionForm';
+
 import type { InteractionType } from '../../api/types';
 
 export default function ContactDetail() {
@@ -36,12 +39,6 @@ export default function ContactDetail() {
   const sortedInteractions = [...interactions].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
-
-  const interactionTypeOptions = [
-    { value: 'call', label: 'Phone Call' },
-    { value: 'meeting', label: 'Meeting' },
-    { value: 'email', label: 'Email' },
-  ];
 
   const typeConfig = {
     call: {
@@ -167,7 +164,7 @@ export default function ContactDetail() {
                               data: { type: value as InteractionType },
                             });
                           }}
-                          options={interactionTypeOptions}
+                          options={INTERACTION_TYPE_OPTIONS}
                           badgeVariant={typeConfig[interaction.type].color}
                         />
                         <span className="text-sm text-dark-400">on</span>

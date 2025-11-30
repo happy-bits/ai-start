@@ -1,8 +1,11 @@
 import { useState, useEffect, type FormEvent } from 'react';
+
 import { useInteraction, useCreateInteraction, useUpdateInteraction } from '../../api/interactions';
+import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 import { Button, Input, Select, Textarea, LoadingSpinner, ErrorMessage } from '../../components/ui';
-import type { InteractionType } from '../../api/types';
-import { getErrorMessage } from '../../utils';
+import { useFormSubmission } from '../../hooks/useFormSubmission';
+
+import type { InteractionType, Interaction, CreateInteractionData, UpdateInteractionData } from '../../api/types';
 
 interface InteractionFormProps {
   contactId: number;
@@ -10,12 +13,6 @@ interface InteractionFormProps {
   onSuccess: () => void;
   onCancel: () => void;
 }
-
-const interactionTypes = [
-  { value: 'call', label: 'Phone Call' },
-  { value: 'meeting', label: 'Meeting' },
-  { value: 'email', label: 'Email' },
-];
 
 export default function InteractionForm({
   contactId,
@@ -37,7 +34,6 @@ export default function InteractionForm({
     time: now,
     notes: '',
   });
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (existingInteraction) {
@@ -50,39 +46,45 @@ export default function InteractionForm({
     }
   }, [existingInteraction]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!formData.date) {
-      setError('Date is required');
-      return;
-    }
-
-    try {
+  const { error, isSubmitting, handleSubmit } = useFormSubmission<
+    CreateInteractionData | UpdateInteractionData,
+    Interaction
+  >({
+    onSubmit: async (data) => {
       if (isEditing && interactionId) {
-        await updateInteraction.mutateAsync({
+        return await updateInteraction.mutateAsync({
           id: interactionId,
-          data: {
-            type: formData.type,
-            date: formData.date,
-            time: formData.time || null,
-            notes: formData.notes.trim() || null,
-          },
+          data: data as UpdateInteractionData,
         });
       } else {
-        await createInteraction.mutateAsync({
+        return await createInteraction.mutateAsync(data as CreateInteractionData);
+      }
+    },
+    onSuccessCallback: onSuccess,
+    validate: (data) => {
+      if (!data.date) {
+        return 'Date is required';
+      }
+      return null;
+    },
+  });
+
+  const onSubmit = (e: FormEvent) => {
+    const data = isEditing
+      ? {
+          type: formData.type,
+          date: formData.date,
+          time: formData.time || null,
+          notes: formData.notes.trim() || null,
+        }
+      : {
           contactId,
           type: formData.type,
           date: formData.date,
           time: formData.time || null,
           notes: formData.notes.trim() || null,
-        });
-      }
-      onSuccess();
-    } catch (err) {
-      setError(getErrorMessage(err));
-    }
+        };
+    handleSubmit(e, data);
   };
 
   if (isEditing && isLoading) {
@@ -94,7 +96,7 @@ export default function InteractionForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-6">
       <h3 className="text-lg font-semibold text-white">
         {isEditing ? 'Edit Interaction' : 'Log New Interaction'}
       </h3>
@@ -107,7 +109,7 @@ export default function InteractionForm({
         onChange={(e) =>
           setFormData({ ...formData, type: e.target.value as InteractionType })
         }
-        options={interactionTypes}
+        options={INTERACTION_TYPE_OPTIONS}
       />
 
       <div className="grid grid-cols-2 gap-4">
@@ -142,13 +144,18 @@ export default function InteractionForm({
         <Button
           type="submit"
           size="sm"
-          disabled={createInteraction.isPending || updateInteraction.isPending}
+          disabled={isSubmitting}
         >
-          {createInteraction.isPending || updateInteraction.isPending
-            ? 'Saving...'
-            : isEditing
-            ? 'Update'
-            : 'Log Interaction'}
+          {isSubmitting ? (
+            <span className="flex items-center gap-2">
+              <LoadingSpinner size="sm" />
+              Saving...
+            </span>
+          ) : isEditing ? (
+            'Update'
+          ) : (
+            'Log Interaction'
+          )}
         </Button>
       </div>
     </form>

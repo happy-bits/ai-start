@@ -1,10 +1,12 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
+
 import { useContact, useCreateContact, useUpdateContact } from '../../api/contacts';
 import { Button, Card, Input, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
-import { useFormSubmission } from '../../hooks/useFormSubmission';
-import type { Contact, CreateContactData, UpdateContactData } from '../../api/types';
 import { config } from '../../config';
+import { useFormSubmission } from '../../hooks/useFormSubmission';
+
+import type { Contact, CreateContactData, UpdateContactData } from '../../api/types';
 
 export default function ContactForm() {
   const { id } = useParams<{ id: string }>();
