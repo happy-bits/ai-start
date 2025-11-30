@@ -33,19 +33,25 @@ export function useInlineEdit<TValue extends string | null>({
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
       // Select text for input/textarea elements (not select elements)
+      // Only select if there's content to select
       if (
-        inputRef.current instanceof HTMLInputElement ||
-        inputRef.current instanceof HTMLTextAreaElement
+        (inputRef.current instanceof HTMLInputElement ||
+        inputRef.current instanceof HTMLTextAreaElement) &&
+        editValue
       ) {
         inputRef.current.select();
       }
     }
-  }, [isEditing]);
+  }, [isEditing, editValue]);
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsEditing(true);
     setError(null);
+    // Reset editValue to empty string when clicking on empty field
+    if (!value) {
+      setEditValue('');
+    }
   };
 
   const handleBlur = async () => {
