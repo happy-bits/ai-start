@@ -2,7 +2,7 @@ interface AvatarProps {
   name: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
-  gradient?: 'warm' | 'blue';
+  gradient?: 'warm';
 }
 
 const sizeClasses = {
@@ -13,7 +13,6 @@ const sizeClasses = {
 
 const gradientClasses = {
   warm: 'bg-gradient-to-br from-warm-500 to-warm-600',
-  blue: 'bg-gradient-to-br from-blue-500 to-blue-600',
 };
 
 export default function Avatar({ name, size = 'md', className = '', gradient = 'warm' }: AvatarProps) {

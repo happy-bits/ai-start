@@ -94,7 +94,7 @@ export default function SellerList() {
                   <tr key={seller.id} className="hover:bg-dark-800/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <Avatar name={seller.name} size="md" gradient="blue" />
+                        <Avatar name={seller.name} size="md" gradient="warm" />
                         <p className="text-sm font-medium text-white">{seller.name}</p>
                       </div>
                     </td>
@@ -102,7 +102,7 @@ export default function SellerList() {
                       <p className="text-sm text-dark-300">{seller.email}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <Badge variant="blue">Seller</Badge>
+                      <Badge variant="warm">Seller</Badge>
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-sm text-dark-400">

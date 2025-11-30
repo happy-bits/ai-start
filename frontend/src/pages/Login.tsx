@@ -148,7 +148,7 @@ export default function Login() {
                   label="Admin"
                   email="admin@keepwarm.com"
                   password="admin123"
-                  color="amber"
+                  color="warm"
                   onLogin={handleQuickLogin}
                   disabled={loginMutation.isPending || isResetting}
                 />
@@ -157,7 +157,7 @@ export default function Login() {
                   subtitle="Seller"
                   email="alice@keepwarm.com"
                   password="seller123"
-                  color="blue"
+                  color="warm"
                   onLogin={handleQuickLogin}
                   disabled={loginMutation.isPending || isResetting}
                 />
@@ -166,7 +166,7 @@ export default function Login() {
                   subtitle="Seller"
                   email="bob@keepwarm.com"
                   password="seller123"
-                  color="violet"
+                  color="warm"
                   onLogin={handleQuickLogin}
                   disabled={loginMutation.isPending || isResetting}
                 />
@@ -186,7 +186,7 @@ export default function Login() {
               </button>
               
               {resetSuccess && (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-lg text-sm mt-3">
+                <div className="bg-warm-500/10 border border-warm-500/20 text-warm-400 px-4 py-3 rounded-lg text-sm mt-3">
                   Database has been reset!
                 </div>
               )}
@@ -212,14 +212,12 @@ function QuickLoginButton({
   subtitle?: string;
   email: string;
   password: string;
-  color: 'amber' | 'blue' | 'violet';
+  color: 'warm';
   onLogin: (email: string, password: string) => void;
   disabled: boolean;
 }) {
   const colorClasses = {
-    amber: 'bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/50 text-amber-400',
-    blue: 'bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/50 text-blue-400',
-    violet: 'bg-violet-500/10 border-violet-500/30 hover:bg-violet-500/20 hover:border-violet-500/50 text-violet-400',
+    warm: 'bg-warm-500/10 border-warm-500/30 hover:bg-warm-500/20 hover:border-warm-500/50 text-warm-400',
   };
 
   return (
