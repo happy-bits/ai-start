@@ -68,3 +68,4 @@ export function createAuthRoutes(db: BetterSQLite3Database<typeof schema>) {
   return app;
 }
 
+

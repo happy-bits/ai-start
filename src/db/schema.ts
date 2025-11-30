@@ -56,3 +56,4 @@ export type NewCustomer = typeof customers.$inferInsert;
 export type Interaction = typeof interactions.$inferSelect;
 export type NewInteraction = typeof interactions.$inferInsert;
 
+
