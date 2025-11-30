@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useInlineEdit } from '../../hooks/useInlineEdit';
 import Badge from './Badge';
 
@@ -16,6 +17,8 @@ export default function InlineEditableSelect({
   className = '',
   badgeVariant = 'warm',
 }: InlineEditableSelectProps) {
+  const isSavingFromChangeRef = useRef(false);
+  
   const {
     isEditing,
     editValue,
@@ -32,8 +35,42 @@ export default function InlineEditableSelect({
   });
 
   const handleSelectChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    handleChange(e.target.value);
-    // Auto-save on change for select
+    const newValue = e.target.value.trim();
+    
+    // Prevent onBlur from also saving
+    isSavingFromChangeRef.current = true;
+    
+    // Update local state
+    handleChange(newValue);
+    
+    // Auto-save on change for select - save directly with the new value
+    if (newValue !== value) {
+      try {
+        await onSave(newValue);
+        // The value prop will update via React Query, and handleBlur will exit edit mode
+        // We need to wait a bit for the prop to update, then call handleBlur to exit edit mode
+        setTimeout(() => {
+          isSavingFromChangeRef.current = false;
+          // Force exit edit mode by calling handleBlur
+          // At this point value prop should be updated, so handleBlur will just exit
+          handleBlur();
+        }, 100);
+      } catch (err) {
+        isSavingFromChangeRef.current = false;
+        // Revert on error
+        handleChange(value || '');
+      }
+    } else {
+      isSavingFromChangeRef.current = false;
+      handleBlur();
+    }
+  };
+
+  const handleSelectBlur = async () => {
+    // Don't save if we're already saving from onChange
+    if (isSavingFromChangeRef.current) {
+      return;
+    }
     await handleBlur();
   };
 
@@ -46,7 +83,7 @@ export default function InlineEditableSelect({
         ref={inputRef as React.RefObject<HTMLSelectElement>}
         value={editValue}
         onChange={handleSelectChange}
-        onBlur={handleBlur}
+        onBlur={handleSelectBlur}
         onKeyDown={handleKeyDown}
         disabled={isSaving}
         className={`px-2 py-1 bg-dark-800 border border-warm-500 rounded text-xs text-white focus:outline-none focus:ring-2 focus:ring-warm-500/50 transition-all ${className}`}

@@ -2,10 +2,12 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
-import { useInteractions } from '../../api/interactions';
-import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions } from '../../components/ui';
+import { useInteractions, useUpdateInteraction } from '../../api/interactions';
+import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
+import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions, InlineEditableSelect, InlineEditableTime, InlineEditableTextarea } from '../../components/ui';
+import NewInteractionRow from '../../components/NewInteractionRow';
 
-import type { Contact, Interaction } from '../../api/types';
+import type { Contact, Interaction, InteractionType } from '../../api/types';
 
 // Helper function to check if a follow-up date is today or earlier
 function isFollowUpDue(followUpDate: string | null): boolean {
@@ -50,41 +52,20 @@ function getLatestInteractions(interactions: Interaction[], contactId: number, l
       const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
       if (dateDiff !== 0) return dateDiff;
       // If dates are equal, sort by time if available
-      if (a.time && b.time) {
-        return b.time.localeCompare(a.time);
-      }
-      return 0;
+      const aTime = a.time || '00:00';
+      const bTime = b.time || '00:00';
+      const timeDiff = bTime.localeCompare(aTime);
+      if (timeDiff !== 0) return timeDiff;
+      // If date and time are equal, sort by createdAt (newest first)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     })
     .slice(0, limit);
 }
 
-// Type config for interaction icons
-const typeConfig = {
-  call: {
-    icon: (
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-      </svg>
-    ),
-  },
-  meeting: {
-    icon: (
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-    ),
-  },
-  email: {
-    icon: (
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    ),
-  },
-};
-
 // Component to render priority contacts as cards
 function PriorityContactCards({ contacts, updateContact, deleteContact, interactions = [] }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[] }) {
+  const updateInteraction = useUpdateInteraction();
+  
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
   };
@@ -175,49 +156,69 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
               </div>
 
               {/* Interactions */}
-              {latestInteractions.length > 0 && (
-                <div className="pt-4 border-t border-dark-700 space-y-3">
-                  {latestInteractions.map((interaction) => (
-                    <div key={interaction.id} className="flex items-start gap-3">
-                      <div className="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center bg-warm-500/10 text-warm-400 mt-0.5">
-                        {typeConfig[interaction.type]?.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                          <span className="text-sm text-dark-400">
-                            {new Date(interaction.date).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                            })}
-                          </span>
-                          {interaction.time && (
-                            <>
-                              <span className="text-dark-500">•</span>
-                              <span className="text-sm text-dark-400">
-                                {interaction.time}
-                              </span>
-                            </>
-                          )}
+              <div className="pt-4 border-t border-dark-700 space-y-3">
+                <NewInteractionRow contactId={contact.id} variant="card" />
+                {latestInteractions.length > 0 && (
+                  <>
+                    {latestInteractions.map((interaction) => (
+                      <div key={interaction.id} className="flex items-start gap-3">
+                        <div className="shrink-0 mt-0.5 w-24">
+                          <InlineEditableSelect
+                            value={interaction.type}
+                            onSave={async (value) => {
+                              await updateInteraction.mutateAsync({
+                                id: interaction.id,
+                                data: { type: value as InteractionType },
+                              });
+                            }}
+                            options={INTERACTION_TYPE_OPTIONS}
+                            badgeVariant="warm"
+                          />
                         </div>
-                        {interaction.notes && (
-                          <p className="text-sm text-dark-300 leading-relaxed whitespace-pre-wrap">
-                            {interaction.notes}
-                          </p>
-                        )}
-                        {!interaction.notes && (
-                          <p className="text-xs text-dark-500 italic">No notes</p>
-                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                            <InlineEditableDate
+                              value={interaction.date}
+                              onSave={async (value) => {
+                                await updateInteraction.mutateAsync({
+                                  id: interaction.id,
+                                  data: { date: value || interaction.date },
+                                });
+                              }}
+                              className="text-sm"
+                            />
+                            <InlineEditableTime
+                              value={interaction.time}
+                              onSave={async (value) => {
+                                await updateInteraction.mutateAsync({
+                                  id: interaction.id,
+                                  data: { time: value },
+                                });
+                              }}
+                              className="text-sm"
+                              emptyText="Add time"
+                            />
+                          </div>
+                          <div>
+                            <InlineEditableTextarea
+                              value={interaction.notes}
+                              onSave={async (value) => {
+                                await updateInteraction.mutateAsync({
+                                  id: interaction.id,
+                                  data: { notes: value },
+                                });
+                              }}
+                              emptyText="Click to add notes"
+                              rows={2}
+                              className="text-xs"
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {latestInteractions.length === 0 && (
-                <div className="pt-4 border-t border-dark-700">
-                  <span className="text-xs text-dark-500">No interactions</span>
-                </div>
-              )}
+                    ))}
+                  </>
+                )}
+              </div>
             </div>
           </Card>
         );
@@ -228,6 +229,8 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
 
 // Component to render contact table
 function ContactTable({ contacts, updateContact, deleteContact, interactions = [], showInteractions = false, showHeader = true }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[]; showInteractions?: boolean; showHeader?: boolean }) {
+  const updateInteraction = useUpdateInteraction();
+  
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
   };
@@ -343,35 +346,57 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                       <tr key={`interaction-${interaction.id}`} className="bg-dark-800/30 hover:bg-dark-800/40 transition-colors">
                         <td colSpan={3} className="px-6 py-3">
                           <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center bg-warm-500/10 text-warm-400 mt-0.5">
-                              {typeConfig[interaction.type]?.icon}
+                            <div className="shrink-0 mt-0.5 w-24">
+                              <InlineEditableSelect
+                                value={interaction.type}
+                                onSave={async (value) => {
+                                  await updateInteraction.mutateAsync({
+                                    id: interaction.id,
+                                    data: { type: value as InteractionType },
+                                  });
+                                }}
+                                options={INTERACTION_TYPE_OPTIONS}
+                                badgeVariant="warm"
+                              />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                                <span className="text-sm text-dark-400">
-                                  {new Date(interaction.date).toLocaleDateString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: 'numeric',
-                                  })}
-                                </span>
-                                {interaction.time && (
-                                  <>
-                                    <span className="text-dark-500">•</span>
-                                    <span className="text-sm text-dark-400">
-                                      {interaction.time}
-                                    </span>
-                                  </>
-                                )}
+                                <InlineEditableDate
+                                  value={interaction.date}
+                                  onSave={async (value) => {
+                                    await updateInteraction.mutateAsync({
+                                      id: interaction.id,
+                                      data: { date: value || interaction.date },
+                                    });
+                                  }}
+                                  className="text-sm"
+                                />
+                                <InlineEditableTime
+                                  value={interaction.time}
+                                  onSave={async (value) => {
+                                    await updateInteraction.mutateAsync({
+                                      id: interaction.id,
+                                      data: { time: value },
+                                    });
+                                  }}
+                                  className="text-sm"
+                                  emptyText="Add time"
+                                />
                               </div>
-                              {interaction.notes && (
-                                <p className="text-sm text-dark-300 leading-relaxed whitespace-pre-wrap">
-                                  {interaction.notes}
-                                </p>
-                              )}
-                              {!interaction.notes && (
-                                <p className="text-xs text-dark-500 italic">No notes</p>
-                              )}
+                              <div>
+                                <InlineEditableTextarea
+                                  value={interaction.notes}
+                                  onSave={async (value) => {
+                                    await updateInteraction.mutateAsync({
+                                      id: interaction.id,
+                                      data: { notes: value },
+                                    });
+                                  }}
+                                  emptyText="Click to add notes"
+                                  rows={2}
+                                  className="text-xs"
+                                />
+                              </div>
                             </div>
                           </div>
                         </td>

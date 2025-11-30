@@ -18,6 +18,7 @@ import {
   InlineEditableTextarea,
 } from '../../components/ui';
 import InteractionForm from '../interactions/InteractionForm';
+import NewInteractionRow from '../../components/NewInteractionRow';
 
 import type { InteractionType } from '../../api/types';
 
@@ -45,7 +46,11 @@ export default function ContactDetail() {
     // If time is missing, treat it as earliest (00:00)
     const aTime = a.time || '00:00';
     const bTime = b.time || '00:00';
-    return bTime.localeCompare(aTime);
+    const timeDiff = bTime.localeCompare(aTime);
+    if (timeDiff !== 0) return timeDiff;
+    
+    // If date and time are equal, sort by createdAt (newest first)
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
   const typeConfig = {
@@ -139,20 +144,22 @@ export default function ContactDetail() {
               <div className="flex justify-center py-8">
                 <LoadingSpinner size="sm" />
               </div>
-            ) : sortedInteractions.length === 0 ? (
-              <EmptyState
-                icon={
-                  <svg className="w-6 h-6 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                }
-                title="No interactions recorded yet"
-                message="Start logging interactions to track your contact relationships"
-                className="py-8"
-              />
             ) : (
               <div className="space-y-4">
-                {sortedInteractions.map((interaction) => (
+                <NewInteractionRow contactId={contactId} variant="detail" />
+                {sortedInteractions.length === 0 ? (
+                  <EmptyState
+                    icon={
+                      <svg className="w-6 h-6 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                    }
+                    title="No interactions recorded yet"
+                    message="Start logging interactions to track your contact relationships"
+                    className="py-8"
+                  />
+                ) : (
+                  sortedInteractions.map((interaction) => (
                   <div
                     key={interaction.id}
                     className="flex gap-4 p-4 bg-dark-800/50 rounded-lg border border-dark-700"
@@ -222,7 +229,8 @@ export default function ContactDetail() {
                       </button>
                     </div>
                   </div>
-                ))}
+                  ))
+                )}
               </div>
             )}
           </Card>
