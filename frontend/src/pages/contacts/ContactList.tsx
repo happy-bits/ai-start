@@ -183,7 +183,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
               </div>
 
               {/* Interactions */}
-              <div className="pt-4 border-t border-dark-700 space-y-3">
+              <div className="pt-4 space-y-3">
                 <NewInteractionRow contactId={contact.id} variant="card" />
                 {latestInteractions.length > 0 && (
                   <>

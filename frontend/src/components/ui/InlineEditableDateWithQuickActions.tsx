@@ -29,21 +29,38 @@ export default function InlineEditableDateWithQuickActions({
   ];
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
-      <InlineEditableDate
-        value={value}
-        onSave={onSave}
-        emptyText={emptyText}
-      />
+    <div className={`bg-dark-800/50 border border-dark-700 rounded-lg p-3 ${className}`}>
+      {/* Header with title */}
+      <div className="mb-3">
+        <h3 className="text-sm font-medium text-dark-300">Follow-up Date</h3>
+      </div>
+      
+      {/* Date field */}
+      <div className="mb-3">
+        <div className="bg-dark-900/50 px-2 py-1.5 rounded border border-dark-600 min-h-[2rem] inline-flex items-center">
+          <InlineEditableDate
+            value={value}
+            onSave={onSave}
+            emptyText={emptyText}
+          />
+        </div>
+      </div>
+      
+      {/* Set reminder label */}
+      <div className="mb-2">
+        <label className="text-xs font-medium text-dark-500">Set reminder</label>
+      </div>
+      
+      {/* Quick action buttons */}
       <div className="flex flex-wrap gap-1.5">
         {quickActions.map((action) => (
           <button
             key={action.label}
             onClick={() => handleQuickAction(action.offset)}
             className="px-2 py-1 text-xs font-medium text-dark-400 hover:text-warm-400 hover:bg-warm-500/10 border border-dark-700 hover:border-warm-500/30 rounded transition-colors"
-            title={`Move forward ${action.label}`}
+            title={`Set follow-up date ${action.label} from now`}
           >
-            {action.label}
+            +{action.label}
           </button>
         ))}
       </div>
