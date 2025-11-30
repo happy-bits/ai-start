@@ -1,0 +1,221 @@
+# KeepWarm CRM API - Manual Testing
+# ===================================
+# Use the REST Client extension to send requests.
+# Click "Send Request" above each request.
+#
+# Test Credentials:
+# - Admin: admin@keepwarm.com / admin123
+# - Seller: alice@keepwarm.com / seller123
+# - Seller: bob@keepwarm.com / seller123
+#
+# Start server: SEED_DB=true npm run dev
+
+@baseUrl = http://localhost:3000
+@token = {{login.response.body.token}}
+
+###############################################################################
+# HEALTH CHECK (No auth required)
+###############################################################################
+
+### Health Check
+GET {{baseUrl}}/health
+
+###############################################################################
+# AUTHENTICATION
+###############################################################################
+
+### Login as Admin
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@keepwarm.com",
+  "password": "admin123"
+}
+
+### Login as Seller (Alice)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@keepwarm.com",
+  "password": "seller123"
+}
+
+### Login as Seller (Bob)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "bob@keepwarm.com",
+  "password": "seller123"
+}
+
+### Logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}
+
+### Get Current User (via /auth/me - no auth middleware)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+###############################################################################
+# CURRENT USER (Protected)
+###############################################################################
+
+### Get Current User Info
+GET {{baseUrl}}/api/me
+Authorization: Bearer {{token}}
+
+###############################################################################
+# SELLERS (Admin only)
+###############################################################################
+
+### List All Sellers
+GET {{baseUrl}}/api/sellers
+Authorization: Bearer {{token}}
+
+### Get Seller by ID
+GET {{baseUrl}}/api/sellers/2
+Authorization: Bearer {{token}}
+
+### Create New Seller
+POST {{baseUrl}}/api/sellers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "newseller@keepwarm.com",
+  "password": "password123",
+  "name": "New Seller"
+}
+
+### Update Seller
+PUT {{baseUrl}}/api/sellers/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Alice Johnson Updated"
+}
+
+### Delete Seller
+DELETE {{baseUrl}}/api/sellers/4
+Authorization: Bearer {{token}}
+
+###############################################################################
+# CUSTOMERS
+###############################################################################
+
+### List All Customers (Admin sees all, Seller sees own)
+GET {{baseUrl}}/api/customers
+Authorization: Bearer {{token}}
+
+### Get Customer by ID
+GET {{baseUrl}}/api/customers/1
+Authorization: Bearer {{token}}
+
+### Create New Customer
+POST {{baseUrl}}/api/customers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "New Customer Inc",
+  "email": "contact@newcustomer.com",
+  "phone": "+1-555-9999",
+  "company": "New Customer Inc",
+  "notes": "Potential enterprise client"
+}
+
+### Update Customer
+PUT {{baseUrl}}/api/customers/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "notes": "Updated notes - Very interested in premium plan"
+}
+
+### Delete Customer
+DELETE {{baseUrl}}/api/customers/5
+Authorization: Bearer {{token}}
+
+###############################################################################
+# INTERACTIONS
+###############################################################################
+
+### List All Interactions (Admin sees all, Seller sees own)
+GET {{baseUrl}}/api/interactions
+Authorization: Bearer {{token}}
+
+### List Interactions for Specific Customer
+GET {{baseUrl}}/api/interactions?customerId=13
+Authorization: Bearer {{token}}
+
+### Get Interaction by ID
+GET {{baseUrl}}/api/interactions/1
+Authorization: Bearer {{token}}
+
+### Create New Interaction
+POST {{baseUrl}}/api/interactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "customerId": 13,
+  "type": "call",
+  "date": "2025-12-01",
+  "time": "17:30",
+  "notes": "Follow-up call to discuss pricing"
+}
+
+### Create Meeting Interaction
+POST {{baseUrl}}/api/interactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "type": "meeting",
+  "date": "2024-01-25",
+  "time": "10:00",
+  "notes": "On-site demo presentation"
+}
+
+### Create Email Interaction
+POST {{baseUrl}}/api/interactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "customerId": 2,
+  "type": "email",
+  "date": "2024-01-18",
+  "notes": "Sent contract proposal"
+}
+
+### Update Interaction
+PUT {{baseUrl}}/api/interactions/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "notes": "Updated: Client confirmed interest, scheduling demo"
+}
+
+### Delete Interaction
+DELETE {{baseUrl}}/api/interactions/10
+Authorization: Bearer {{token}}
+
+###############################################################################
+# DEV TOOLS (Admin only, non-production)
+###############################################################################
+
+### Reset and Reseed Database
+POST {{baseUrl}}/api/dev/reset
+Authorization: Bearer {{token}}
+
