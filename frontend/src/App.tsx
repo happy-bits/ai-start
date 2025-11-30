@@ -52,7 +52,6 @@ export default function App() {
         <Route path="contacts" element={<ContactList />} />
         <Route path="contacts/new" element={<ContactForm />} />
         <Route path="contacts/:id" element={<ContactDetail />} />
-        <Route path="contacts/:id/edit" element={<ContactForm />} />
         <Route
           path="sellers"
           element={

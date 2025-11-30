@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useContact, useDeleteContact } from '../../api/contacts';
+import { useContact, useDeleteContact, useUpdateContact } from '../../api/contacts';
 import { useInteractions, useDeleteInteraction } from '../../api/interactions';
-import { Button, Card, Badge, LoadingSpinner, BackButton, Avatar, EmptyState } from '../../components/ui';
+import { Button, Card, Badge, LoadingSpinner, BackButton, EmptyState, Input, ErrorMessage } from '../../components/ui';
 import InteractionForm from '../interactions/InteractionForm';
+import { useFormSubmission } from '../../hooks/useFormSubmission';
+import type { UpdateContactData, Contact } from '../../api/types';
 
 export default function ContactDetail() {
   const { id } = useParams<{ id: string }>();
@@ -14,9 +16,57 @@ export default function ContactDetail() {
   const { data: interactions = [], isLoading: interactionsLoading } = useInteractions(contactId);
   const deleteContact = useDeleteContact();
   const deleteInteraction = useDeleteInteraction();
+  const updateContact = useUpdateContact();
 
   const [showInteractionForm, setShowInteractionForm] = useState(false);
   const [editingInteraction, setEditingInteraction] = useState<number | null>(null);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+  });
+
+  useEffect(() => {
+    if (contact) {
+      setFormData({
+        name: contact.name,
+        email: contact.email || '',
+        phone: contact.phone || '',
+        company: contact.company || '',
+      });
+    }
+  }, [contact]);
+
+  const { error, isSubmitting, handleSubmit } = useFormSubmission<
+    UpdateContactData,
+    Contact
+  >({
+    onSubmit: async (data) => {
+      return await updateContact.mutateAsync({ id: contactId, data });
+    },
+    onSuccess: () => {
+      // Don't navigate, just stay on the page
+      return undefined;
+    },
+    validate: (data) => {
+      if (!data.name?.trim()) {
+        return 'Name is required';
+      }
+      return null;
+    },
+  });
+
+  const onSubmit = (e: FormEvent) => {
+    const data = {
+      name: formData.name.trim(),
+      email: formData.email.trim() || null,
+      phone: formData.phone.trim() || null,
+      company: formData.company.trim() || null,
+    };
+    handleSubmit(e, data);
+  };
 
   const handleDeleteContact = async () => {
     if (contact && confirm(`Are you sure you want to delete "${contact.name}"?`)) {
@@ -88,25 +138,12 @@ export default function ContactDetail() {
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex items-center gap-4">
           <BackButton to="/contacts" />
-          <div className="flex items-center gap-4">
-            <Avatar name={contact.name} size="lg" className="shadow-lg shadow-warm-500/25 rounded-2xl" />
-            <div>
-              <h1 className="text-2xl font-bold text-white">{contact.name}</h1>
-              {contact.company && (
-                <p className="text-dark-400">{contact.company}</p>
-              )}
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white">Edit Contact</h1>
+            <p className="text-dark-400 mt-1">Update contact information</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 ml-14 sm:ml-0">
-          <Link to={`/contacts/${contact.id}/edit`}>
-            <Button variant="secondary">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              Edit
-            </Button>
-          </Link>
+        <div className="flex items-center gap-2">
           <Button
             variant="danger"
             onClick={handleDeleteContact}
@@ -120,46 +157,65 @@ export default function ContactDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Contact Info */}
+      <div className="space-y-6">
+        {/* Contact Form */}
         <Card>
-          <h2 className="text-lg font-semibold text-white mb-4">Contact Information</h2>
-          <dl className="space-y-4">
-            <div>
-              <dt className="text-sm text-dark-500">Email</dt>
-              <dd className="text-white mt-1">
-                {contact.email ? (
-                  <a href={`mailto:${contact.email}`} className="text-warm-400 hover:text-warm-300">
-                    {contact.email}
-                  </a>
+          <form onSubmit={onSubmit} className="space-y-6">
+            <ErrorMessage error={error} />
+
+            <Input
+              label="Name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="John Doe"
+              required
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <Input
+                label="Email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="john@company.com"
+              />
+
+              <Input
+                label="Phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+1 (555) 123-4567"
+              />
+            </div>
+
+            <Input
+              label="Company"
+              value={formData.company}
+              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+              placeholder="Acme Inc."
+            />
+
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark-700">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <LoadingSpinner size="sm" />
+                    Saving...
+                  </span>
                 ) : (
-                  <span className="text-dark-500">Not provided</span>
+                  'Save Changes'
                 )}
-              </dd>
+              </Button>
             </div>
-            <div>
-              <dt className="text-sm text-dark-500">Phone</dt>
-              <dd className="text-white mt-1">
-                {contact.phone ? (
-                  <a href={`tel:${contact.phone}`} className="text-warm-400 hover:text-warm-300">
-                    {contact.phone}
-                  </a>
-                ) : (
-                  <span className="text-dark-500">Not provided</span>
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm text-dark-500">Company</dt>
-              <dd className="text-white mt-1">
-                {contact.company || <span className="text-dark-500">Not provided</span>}
-              </dd>
-            </div>
-          </dl>
+          </form>
         </Card>
 
         {/* Interactions */}
-        <div className="lg:col-span-2">
+        <div>
           <Card>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-white">Interactions</h2>

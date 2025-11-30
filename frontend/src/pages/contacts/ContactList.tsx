@@ -78,9 +78,6 @@ export default function ContactList() {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
                     Contact Info
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
-                    Company
-                  </th>
                   <th className="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
                     Actions
                   </th>
@@ -96,6 +93,9 @@ export default function ContactList() {
                           <p className="text-sm font-medium text-white hover:text-warm-400 transition-colors">
                             {contact.name}
                           </p>
+                          {contact.company && (
+                            <p className="text-sm text-dark-400 mt-1">{contact.company}</p>
+                          )}
                         </div>
                       </Link>
                     </td>
@@ -113,22 +113,7 @@ export default function ContactList() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm text-dark-300">
-                        {contact.company || <span className="text-dark-500">—</span>}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        <Link to={`/contacts/${contact.id}`}>
-                          <Button variant="ghost" size="sm">
-                            View
-                          </Button>
-                        </Link>
-                        <Link to={`/contacts/${contact.id}/edit`}>
-                          <Button variant="ghost" size="sm">
-                            Edit
-                          </Button>
-                        </Link>
                         <Button
                           variant="ghost"
                           size="sm"
