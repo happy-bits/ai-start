@@ -16,3 +16,37 @@ export function formatDate(
   return date.toLocaleDateString(undefined, options);
 }
 
+/**
+ * Add days to a date string
+ * @param dateString - ISO date string (YYYY-MM-DD)
+ * @param days - Number of days to add
+ * @returns New ISO date string (YYYY-MM-DD)
+ */
+export function addDays(dateString: string | null, days: number): string {
+  if (!dateString) {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date.toISOString().split('T')[0];
+  }
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + days);
+  return date.toISOString().split('T')[0];
+}
+
+/**
+ * Add months to a date string
+ * @param dateString - ISO date string (YYYY-MM-DD)
+ * @param months - Number of months to add
+ * @returns New ISO date string (YYYY-MM-DD)
+ */
+export function addMonths(dateString: string | null, months: number): string {
+  if (!dateString) {
+    const date = new Date();
+    date.setMonth(date.getMonth() + months);
+    return date.toISOString().split('T')[0];
+  }
+  const date = new Date(dateString);
+  date.setMonth(date.getMonth() + months);
+  return date.toISOString().split('T')[0];
+}
+

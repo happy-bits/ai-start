@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
 import { useInteractions } from '../../api/interactions';
-import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate } from '../../components/ui';
+import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions } from '../../components/ui';
 
 import type { Contact, Interaction } from '../../api/types';
 
@@ -135,7 +135,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
 
               {/* Follow-up Date */}
               <div>
-                <InlineEditableDate
+                <InlineEditableDateWithQuickActions
                   value={contact.followUpDate}
                   onSave={async (value) => {
                     await updateContact.mutateAsync({
