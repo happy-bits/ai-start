@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type KeyboardEvent } from 'react';
+import { useInlineEdit } from '../../hooks/useInlineEdit';
 import Badge from './Badge';
 
 interface InlineEditableSelectProps {
@@ -16,57 +16,25 @@ export default function InlineEditableSelect({
   className = '',
   badgeVariant = 'warm',
 }: InlineEditableSelectProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(value);
-  const [isSaving, setIsSaving] = useState(false);
-  const selectRef = useRef<HTMLSelectElement>(null);
+  const {
+    isEditing,
+    editValue,
+    isSaving,
+    inputRef,
+    handleClick,
+    handleBlur,
+    handleKeyDown,
+    handleChange,
+  } = useInlineEdit({
+    value,
+    onSave,
+    transformValue: (trimmed) => trimmed as string,
+  });
 
-  useEffect(() => {
-    setEditValue(value);
-  }, [value]);
-
-  useEffect(() => {
-    if (isEditing && selectRef.current) {
-      selectRef.current.focus();
-    }
-  }, [isEditing]);
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsEditing(true);
-  };
-
-  const handleBlur = async () => {
-    if (editValue !== value) {
-      setIsSaving(true);
-      try {
-        await onSave(editValue);
-        setIsEditing(false);
-      } catch (err) {
-        setEditValue(value);
-        setIsEditing(true);
-      } finally {
-        setIsSaving(false);
-      }
-    } else {
-      setIsEditing(false);
-    }
-  };
-
-  const handleKeyDown = async (e: KeyboardEvent<HTMLSelectElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      await handleBlur();
-    } else if (e.key === 'Escape') {
-      setEditValue(value);
-      setIsEditing(false);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setEditValue(e.target.value);
+  const handleSelectChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    handleChange(e.target.value);
     // Auto-save on change for select
-    handleBlur();
+    await handleBlur();
   };
 
   const selectedOption = options.find((opt) => opt.value === value);
@@ -75,9 +43,9 @@ export default function InlineEditableSelect({
     // When editing, show select outside of badge context
     return (
       <select
-        ref={selectRef}
+        ref={inputRef as React.RefObject<HTMLSelectElement>}
         value={editValue}
-        onChange={handleChange}
+        onChange={handleSelectChange}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         disabled={isSaving}

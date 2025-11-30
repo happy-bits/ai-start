@@ -16,14 +16,3 @@ export function formatDate(
   return date.toLocaleDateString(undefined, options);
 }
 
-/**
- * Format a date string to a short date format (MM/DD/YYYY)
- */
-export function formatDateShort(dateString: string | Date): string {
-  return formatDate(dateString, {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-}
-

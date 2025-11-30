@@ -81,9 +81,9 @@ export interface CreateSellerData {
 }
 
 export interface UpdateSellerData {
-  email?: string;
-  password?: string;
-  name?: string;
+  email?: string | null;
+  password?: string | null;
+  name?: string | null;
 }
 
 // Auth types

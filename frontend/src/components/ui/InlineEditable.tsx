@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type KeyboardEvent } from 'react';
+import { useInlineEdit } from '../../hooks/useInlineEdit';
 
 interface InlineEditableProps {
   value: string | null;
@@ -17,23 +17,6 @@ export default function InlineEditable({
   className = '',
   emptyText = 'Click to edit',
 }: InlineEditableProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(value || '');
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setEditValue(value || '');
-  }, [value]);
-
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isEditing]);
-
   const validate = (val: string): string | null => {
     const trimmed = val.trim();
     
@@ -59,68 +42,31 @@ export default function InlineEditable({
     return null;
   };
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsEditing(true);
-    setError(null);
-  };
-
-  const handleBlur = async () => {
-    const trimmed = editValue.trim();
-    const validationError = validate(editValue);
-
-    if (validationError) {
-      setError(validationError);
-      // Keep editing mode open if there's an error, but allow user to click away
-      // They can press Escape to cancel or fix the error
-      return;
-    }
-
-    setError(null);
-
-    // Only save if value changed
-    const newValue = trimmed === '' ? null : trimmed;
-    if (newValue !== value) {
-      setIsSaving(true);
-      try {
-        await onSave(newValue);
-        setIsEditing(false);
-      } catch (err) {
-        // Revert on error
-        setEditValue(value || '');
-        setError('Failed to save');
-        setIsEditing(true); // Keep editing mode on save error
-      } finally {
-        setIsSaving(false);
-      }
-    } else {
-      // Value didn't change, just exit edit mode
-      setIsEditing(false);
-    }
-  };
-
-  const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      await handleBlur();
-    } else if (e.key === 'Escape') {
-      setEditValue(value || '');
-      setError(null);
-      setIsEditing(false);
-    }
-  };
+  const {
+    isEditing,
+    editValue,
+    isSaving,
+    error,
+    inputRef,
+    handleClick,
+    handleBlur,
+    handleKeyDown,
+    handleChange,
+  } = useInlineEdit({
+    value,
+    onSave,
+    validate,
+    transformValue: (trimmed) => (trimmed === '' ? null : trimmed),
+  });
 
   if (isEditing) {
     return (
       <div className="min-w-0">
         <input
-          ref={inputRef}
+          ref={inputRef as React.RefObject<HTMLInputElement>}
           type={type}
           value={editValue}
-          onChange={(e) => {
-            setEditValue(e.target.value);
-            setError(null); // Clear error on change
-          }}
+          onChange={(e) => handleChange(e.target.value)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}

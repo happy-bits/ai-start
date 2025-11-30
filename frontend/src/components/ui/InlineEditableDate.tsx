@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type KeyboardEvent } from 'react';
+import { useInlineEdit } from '../../hooks/useInlineEdit';
 
 interface InlineEditableDateProps {
   value: string;
@@ -11,61 +11,28 @@ export default function InlineEditableDate({
   onSave,
   className = '',
 }: InlineEditableDateProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(value);
-  const [isSaving, setIsSaving] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setEditValue(value);
-  }, [value]);
-
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isEditing]);
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsEditing(true);
-  };
-
-  const handleBlur = async () => {
-    if (editValue !== value) {
-      setIsSaving(true);
-      try {
-        await onSave(editValue);
-        setIsEditing(false);
-      } catch (err) {
-        setEditValue(value);
-        setIsEditing(true);
-      } finally {
-        setIsSaving(false);
-      }
-    } else {
-      setIsEditing(false);
-    }
-  };
-
-  const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      await handleBlur();
-    } else if (e.key === 'Escape') {
-      setEditValue(value);
-      setIsEditing(false);
-    }
-  };
+  const {
+    isEditing,
+    editValue,
+    isSaving,
+    inputRef,
+    handleClick,
+    handleBlur,
+    handleKeyDown,
+    handleChange,
+  } = useInlineEdit({
+    value,
+    onSave,
+    transformValue: (trimmed) => trimmed as string,
+  });
 
   if (isEditing) {
     return (
       <input
-        ref={inputRef}
+        ref={inputRef as React.RefObject<HTMLInputElement>}
         type="date"
         value={editValue}
-        onChange={(e) => setEditValue(e.target.value)}
+        onChange={(e) => handleChange(e.target.value)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         disabled={isSaving}

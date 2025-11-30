@@ -7,6 +7,7 @@ import ContactDetail from './pages/contacts/ContactDetail';
 import ContactForm from './pages/contacts/ContactForm';
 import SellerList from './pages/sellers/SellerList';
 import SellerForm from './pages/sellers/SellerForm';
+import { LoadingSpinner } from './components/ui';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -14,7 +15,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-dark-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-warm-500" />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }

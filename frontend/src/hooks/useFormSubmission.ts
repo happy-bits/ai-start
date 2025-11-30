@@ -5,14 +5,12 @@ import { getErrorMessage } from '../utils';
 interface UseFormSubmissionOptions<TData, TResponse> {
   onSubmit: (data: TData) => Promise<TResponse>;
   onSuccess?: (response: TResponse) => void | string; // Return string to navigate, void to use default
-  defaultNavigatePath?: string;
   validate?: (data: TData) => string | null; // Return error message or null
 }
 
 export function useFormSubmission<TData, TResponse>({
   onSubmit,
   onSuccess,
-  defaultNavigatePath,
   validate,
 }: UseFormSubmissionOptions<TData, TResponse>) {
   const navigate = useNavigate();
@@ -35,7 +33,7 @@ export function useFormSubmission<TData, TResponse>({
     setIsSubmitting(true);
     try {
       const response = await onSubmit(data);
-      const navigatePath = onSuccess ? onSuccess(response) : defaultNavigatePath;
+      const navigatePath = onSuccess ? onSuccess(response) : undefined;
       if (navigatePath) {
         navigate(navigatePath);
       }
@@ -48,7 +46,6 @@ export function useFormSubmission<TData, TResponse>({
 
   return {
     error,
-    setError,
     isSubmitting,
     handleSubmit,
   };
