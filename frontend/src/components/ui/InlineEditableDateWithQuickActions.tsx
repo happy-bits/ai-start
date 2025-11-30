@@ -1,5 +1,5 @@
 import InlineEditableDate from './InlineEditableDate';
-import { addDays, addMonths } from '../../utils/dates';
+import { addWorkDaysFromToday, addDaysFromToday, addMonthsFromToday } from '../../utils/dates';
 
 interface InlineEditableDateWithQuickActionsProps {
   value: string | null;
@@ -20,12 +20,12 @@ export default function InlineEditableDateWithQuickActions({
   };
 
   const quickActions = [
-    { label: '1 day', offset: () => addDays(value, 1) },
-    { label: '3 days', offset: () => addDays(value, 3) },
-    { label: '1 week', offset: () => addDays(value, 7) },
-    { label: '2 weeks', offset: () => addDays(value, 14) },
-    { label: '1 month', offset: () => addMonths(value, 1) },
-    { label: '3 months', offset: () => addMonths(value, 3) },
+    { label: '1 day', offset: () => addWorkDaysFromToday(1) },
+    { label: '3 days', offset: () => addWorkDaysFromToday(3) },
+    { label: '1 week', offset: () => addDaysFromToday(7) },
+    { label: '2 weeks', offset: () => addDaysFromToday(14) },
+    { label: '1 month', offset: () => addMonthsFromToday(1) },
+    { label: '3 months', offset: () => addMonthsFromToday(3) },
   ];
 
   return (
