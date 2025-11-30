@@ -87,12 +87,34 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <Avatar name={contact.name} size="md" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
-                      {contact.name}
-                    </p>
-                    {contact.company && (
-                      <p className="text-sm text-dark-400 mt-1 truncate">{contact.company}</p>
-                    )}
+                    <InlineEditable
+                      value={contact.name}
+                      onSave={async (value) => {
+                        await updateContact.mutateAsync({
+                          id: contact.id,
+                          data: { name: value || '' },
+                        });
+                      }}
+                      type="text"
+                      placeholder="Contact name"
+                      className="text-white font-medium hover:text-white truncate"
+                      emptyText="Add name"
+                    />
+                    <div className="mt-1">
+                      <InlineEditable
+                        value={contact.company}
+                        onSave={async (value) => {
+                          await updateContact.mutateAsync({
+                            id: contact.id,
+                            data: { company: value },
+                          });
+                        }}
+                        type="text"
+                        placeholder="Company name"
+                        className="text-dark-400 hover:text-white truncate"
+                        emptyText="Add company"
+                      />
+                    </div>
                     {/* Contact Info */}
                     <div className="space-y-1 mt-2">
                       <InlineEditable
@@ -287,12 +309,34 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                     <div className="flex items-center gap-4">
                       <Avatar name={contact.name} size="md" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-white">
-                          {contact.name}
-                        </p>
-                        {contact.company && (
-                          <p className="text-sm text-dark-400 mt-1">{contact.company}</p>
-                        )}
+                        <InlineEditable
+                          value={contact.name}
+                          onSave={async (value) => {
+                            await updateContact.mutateAsync({
+                              id: contact.id,
+                              data: { name: value || '' },
+                            });
+                          }}
+                          type="text"
+                          placeholder="Contact name"
+                          className="text-white font-medium hover:text-white"
+                          emptyText="Add name"
+                        />
+                        <div className="mt-1">
+                          <InlineEditable
+                            value={contact.company}
+                            onSave={async (value) => {
+                              await updateContact.mutateAsync({
+                                id: contact.id,
+                                data: { company: value },
+                              });
+                            }}
+                            type="text"
+                            placeholder="Company name"
+                            className="text-dark-400 hover:text-white"
+                            emptyText="Add company"
+                          />
+                        </div>
                         <div className="mt-2">
                           <InlineEditableDate
                             value={contact.followUpDate}

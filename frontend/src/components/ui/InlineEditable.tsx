@@ -89,16 +89,21 @@ export default function InlineEditable({
   const displayValue = value || '';
   const isEmpty = !displayValue;
 
+  // Check if className contains a text color class (any class starting with "text-")
+  const hasTextColor = /\btext-/.test(className);
+
   return (
     <p
       onClick={handleClick}
-      className={`text-sm cursor-pointer hover:text-white transition-colors ${
-        isEmpty
-          ? 'text-dark-500 italic'
-          : type === 'email'
-          ? 'text-dark-300'
-          : 'text-dark-400'
-      } ${className}`}
+      className={`text-sm cursor-pointer hover:text-white transition-colors ${className} ${
+        !hasTextColor
+          ? isEmpty
+            ? 'text-dark-500 italic'
+            : type === 'email'
+            ? 'text-dark-300'
+            : 'text-dark-400'
+          : ''
+      }`}
       title={isEmpty ? emptyText : 'Click to edit'}
     >
       {isEmpty ? emptyText : displayValue}
