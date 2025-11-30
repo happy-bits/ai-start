@@ -6,23 +6,8 @@ alwaysApply: true
 
 # Basic Principles
 
-Do not use modals on the website
-
 Avoid removing tests
 
-# Architecture & Code Quality
+Do not use modals on the website
 
-## Basic Principles
-
-**DRY (Don't Repeat Yourself)**
-- Avoid code duplication
-- Create reusable components
-
-**You ain't gonna need it (YAGNI)**
-- Develop only what is needed
-- Avoid over-complexity
-
-**Reusability**
-- Check existing functionality before developing new
-- Use and extend existing components
 
