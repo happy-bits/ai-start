@@ -144,6 +144,23 @@ export default function Login() {
               <p className="text-xs text-dark-500 text-center mb-3">
                 Developer tools
               </p>
+              
+              {/* Credentials Display */}
+              <div className="mb-4 space-y-1.5">
+                <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
+                  <span className="text-dark-400 font-medium">Admin:</span>{' '}
+                  <span className="text-warm-400 select-all">admin@keepwarm.com</span> / <span className="text-warm-400 select-all">admin123</span>
+                </div>
+                <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
+                  <span className="text-dark-400 font-medium">Maria:</span>{' '}
+                  <span className="text-warm-400 select-all">alice@keepwarm.com</span> / <span className="text-warm-400 select-all">seller123</span>
+                </div>
+                <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
+                  <span className="text-dark-400 font-medium">Lars:</span>{' '}
+                  <span className="text-warm-400 select-all">bob@keepwarm.com</span> / <span className="text-warm-400 select-all">seller123</span>
+                </div>
+              </div>
+              
               <div className="grid grid-cols-3 gap-2">
                 <QuickLoginButton
                   label="Admin"
