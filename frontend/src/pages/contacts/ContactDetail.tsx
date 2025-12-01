@@ -7,7 +7,6 @@ import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 import { 
   Button, 
   Card, 
-  Badge, 
   LoadingSpinner, 
   BackButton, 
   Avatar, 
@@ -19,6 +18,7 @@ import {
 } from '../../components/ui';
 import InteractionForm from '../interactions/InteractionForm';
 import NewInteractionRow from '../../components/NewInteractionRow';
+import { deleteButtonBase, deleteButtonSize, iconContainer, cardContainer, cn } from '../../utils/styles';
 
 import type { InteractionType } from '../../api/types';
 
@@ -162,11 +162,9 @@ export default function ContactDetail() {
                   sortedInteractions.map((interaction) => (
                   <div
                     key={interaction.id}
-                    className="flex gap-4 p-4 bg-dark-800/50 rounded-lg border border-dark-700"
+                    className={cn('flex gap-4 p-4', cardContainer)}
                   >
-                    <div
-                      className="w-10 h-10 shrink-0 rounded-lg flex items-center justify-center bg-warm-500/10 text-warm-400"
-                    >
+                    <div className={iconContainer}>
                       {typeConfig[interaction.type].icon}
                     </div>
                     <div className="flex-1 min-w-0 space-y-2">
@@ -188,7 +186,7 @@ export default function ContactDetail() {
                           onSave={async (value) => {
                             await updateInteraction.mutateAsync({
                               id: interaction.id,
-                              data: { date: value },
+                              data: { date: value || undefined },
                             });
                           }}
                         />
@@ -220,7 +218,7 @@ export default function ContactDetail() {
                     <div className="flex items-start gap-1 shrink-0">
                       <button
                         onClick={() => handleDeleteInteraction(interaction.id)}
-                        className="p-1.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                        className={cn(deleteButtonBase, deleteButtonSize.md)}
                         title="Delete"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

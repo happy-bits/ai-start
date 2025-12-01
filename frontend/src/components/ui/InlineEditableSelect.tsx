@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { useInlineEdit } from '../../hooks/useInlineEdit';
 import Badge from './Badge';
+import { inlineEditableInputBase, cn } from '../../utils/styles';
 
 interface InlineEditableSelectProps {
   value: string;
@@ -86,7 +87,7 @@ export default function InlineEditableSelect({
         onBlur={handleSelectBlur}
         onKeyDown={handleKeyDown}
         disabled={isSaving}
-        className={`px-2 py-1 bg-dark-800 border border-warm-500 rounded text-xs text-white focus:outline-none focus:ring-2 focus:ring-warm-500/50 transition-all ${className}`}
+        className={cn(inlineEditableInputBase, 'text-xs', className)}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value} className="bg-dark-800 text-white">
@@ -110,4 +111,3 @@ export default function InlineEditableSelect({
     </Badge>
   );
 }
-

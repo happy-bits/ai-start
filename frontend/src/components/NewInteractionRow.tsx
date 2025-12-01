@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCreateInteraction } from '../api/interactions';
 import { INTERACTION_TYPE_OPTIONS } from '../api/types';
 import { InlineEditableTextarea, InlineEditableSelect, InlineEditableDate, InlineEditableTime } from './ui';
+import { iconContainer, cardContainerDashed, cn } from '../utils/styles';
 import type { InteractionType } from '../api/types';
 
 interface NewInteractionRowProps {
@@ -132,8 +133,8 @@ export default function NewInteractionRow({ contactId, variant = 'detail', onCre
 
   // Detail variant for ContactDetail
   return (
-    <div className="flex gap-4 p-4 bg-dark-800/30 rounded-lg border border-dashed border-dark-600 hover:border-warm-500/30 transition-colors">
-      <div className="w-10 h-10 shrink-0 rounded-lg flex items-center justify-center bg-warm-500/10 text-warm-400">
+    <div className={cn('flex gap-4 p-4', cardContainerDashed)}>
+      <div className={iconContainer}>
         {typeConfig[type].icon}
       </div>
       <div className="flex-1 min-w-0 space-y-2">

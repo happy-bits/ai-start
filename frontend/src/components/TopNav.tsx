@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { navItems, adminItems } from '../config/navigation';
+import { navLinkBase, navLinkActive, navLinkInactive, cn } from '../utils/styles';
 
 export default function TopNav() {
   const { user, logout } = useAuth();
@@ -26,11 +27,7 @@ export default function TopNav() {
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-warm-500/10 text-warm-400 border border-warm-500/20'
-                      : 'text-dark-400 hover:text-white hover:bg-dark-800'
-                  }`
+                  cn(navLinkBase, isActive ? navLinkActive : navLinkInactive)
                 }
               >
                 {item.icon}
@@ -46,11 +43,7 @@ export default function TopNav() {
                     key={item.to}
                     to={item.to}
                     className={({ isActive }) =>
-                      `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        isActive
-                          ? 'bg-warm-500/10 text-warm-400 border border-warm-500/20'
-                          : 'text-dark-400 hover:text-white hover:bg-dark-800'
-                      }`
+                      cn(navLinkBase, isActive ? navLinkActive : navLinkInactive)
                     }
                   >
                     {item.icon}

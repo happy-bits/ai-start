@@ -1,4 +1,11 @@
 import { useInlineEdit } from '../../hooks/useInlineEdit';
+import {
+  inlineEditableInputBase,
+  inlineEditableDisplayBase,
+  inlineEditableEmpty,
+  inlineEditableTextNormal,
+  cn,
+} from '../../utils/styles';
 
 interface InlineEditableDateProps {
   value: string | null;
@@ -38,7 +45,7 @@ export default function InlineEditableDate({
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         disabled={isSaving}
-        className={`px-2 py-1 bg-dark-800 border border-warm-500 rounded text-sm text-white focus:outline-none focus:ring-2 focus:ring-warm-500/50 transition-all ${className}`}
+        className={cn(inlineEditableInputBase, className)}
       />
     );
   }
@@ -48,9 +55,11 @@ export default function InlineEditableDate({
   return (
     <span
       onClick={handleClick}
-      className={`text-sm cursor-pointer hover:text-white transition-colors ${
-        isEmpty ? 'text-dark-500 italic' : 'text-dark-400'
-      } ${className}`}
+      className={cn(
+        inlineEditableDisplayBase,
+        isEmpty ? inlineEditableEmpty : inlineEditableTextNormal,
+        className
+      )}
       title={isEmpty ? emptyText : 'Click to edit'}
     >
       {isEmpty ? emptyText : value}

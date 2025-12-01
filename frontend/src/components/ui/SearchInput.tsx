@@ -1,5 +1,6 @@
 import { type InputHTMLAttributes } from 'react';
 import Card from './Card';
+import { formInputBase, formInputBorderNormal, cn } from '../../utils/styles';
 
 interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   placeholder?: string;
@@ -24,7 +25,7 @@ export default function SearchInput({ placeholder = 'Search...', value, onChange
           placeholder={placeholder}
           value={value}
           onChange={onChange}
-          className={`w-full pl-12 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${className}`}
+          className={cn(formInputBase.replace('px-4', 'pl-12 pr-4'), formInputBorderNormal, 'py-3', className)}
           {...props}
         />
       </div>

@@ -1,4 +1,14 @@
 import { useInlineEdit } from '../../hooks/useInlineEdit';
+import {
+  inlineEditableInputBase,
+  inlineEditableDisplayBase,
+  inlineEditableEmpty,
+  inlineEditableTextNormal,
+  inlineEditableTextEmail,
+  formInputBorderError,
+  formErrorTextSmall,
+  cn,
+} from '../../utils/styles';
 
 interface InlineEditableProps {
   value: string | null;
@@ -70,15 +80,17 @@ export default function InlineEditable({
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className={`w-full px-2 py-1 bg-dark-800 border rounded text-sm text-white placeholder-dark-500 focus:outline-none focus:ring-2 transition-all ${
-            error
-              ? 'border-red-500 focus:ring-red-500/50'
-              : 'border-warm-500 focus:ring-warm-500/50'
-          } ${className}`}
+          className={cn(
+            'w-full',
+            inlineEditableInputBase,
+            error ? formInputBorderError : '',
+            error ? 'focus:ring-red-500/50' : '',
+            className
+          )}
           disabled={isSaving}
         />
         {error && (
-          <p className="mt-1 text-xs text-red-400">
+          <p className={cn('mt-1', formErrorTextSmall)}>
             {error}
           </p>
         )}
@@ -95,15 +107,15 @@ export default function InlineEditable({
   return (
     <p
       onClick={handleClick}
-      className={`text-sm cursor-pointer hover:text-white transition-colors ${className} ${
-        !hasTextColor
-          ? isEmpty
-            ? 'text-dark-500 italic'
-            : type === 'email'
-            ? 'text-dark-300'
-            : 'text-dark-400'
-          : ''
-      }`}
+      className={cn(
+        inlineEditableDisplayBase,
+        className,
+        !hasTextColor && (isEmpty
+          ? inlineEditableEmpty
+          : type === 'email'
+          ? inlineEditableTextEmail
+          : inlineEditableTextNormal)
+      )}
       title={isEmpty ? emptyText : 'Click to edit'}
     >
       {isEmpty ? emptyText : displayValue}

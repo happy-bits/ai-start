@@ -1,4 +1,5 @@
 import { type SelectHTMLAttributes, forwardRef } from 'react';
+import { formInputBase, formLabel, formErrorText, getFormInputBorder, cn } from '../../utils/styles';
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -15,7 +16,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="block text-sm font-medium text-dark-300"
+            className={formLabel}
           >
             {label}
           </label>
@@ -23,9 +24,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           id={selectId}
-          className={`w-full px-4 py-2.5 bg-dark-800 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all appearance-none cursor-pointer ${
-            error ? 'border-red-500' : 'border-dark-600'
-          } ${className}`}
+          className={cn(formInputBase, getFormInputBorder(!!error), 'appearance-none cursor-pointer', className)}
           style={{
             backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
             backgroundPosition: 'right 0.75rem center',
@@ -40,7 +39,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className={formErrorText}>{error}</p>}
       </div>
     );
   }

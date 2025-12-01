@@ -7,6 +7,7 @@ import { ErrorMessage, LoadingSpinner } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
 import { config } from '../config';
 import { getErrorMessage } from '../utils';
+import { formInputBase, formInputBorderNormal, formLabel, cn } from '../utils/styles';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -93,7 +94,7 @@ export default function Login() {
             <ErrorMessage error={error} />
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-dark-300 mb-2">
+              <label htmlFor="email" className={cn(formLabel, 'mb-2')}>
                 Email
               </label>
               <input
@@ -101,14 +102,14 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all"
+                className={cn(formInputBase.replace('py-2.5', 'py-3'), formInputBorderNormal)}
                 placeholder="you@company.com"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-dark-300 mb-2">
+              <label htmlFor="password" className={cn(formLabel, 'mb-2')}>
                 Password
               </label>
               <input
@@ -116,7 +117,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all"
+                className={cn(formInputBase.replace('py-2.5', 'py-3'), formInputBorderNormal)}
                 placeholder="••••••••"
                 required
               />

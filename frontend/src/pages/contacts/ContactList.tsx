@@ -6,6 +6,7 @@ import { useInteractions, useUpdateInteraction, useDeleteInteraction } from '../
 import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions, InlineEditableSelect, InlineEditableTime, InlineEditableTextarea } from '../../components/ui';
 import NewInteractionRow from '../../components/NewInteractionRow';
+import { deleteButtonBase, deleteButtonSize, actionButtonBase, cn } from '../../utils/styles';
 
 import type { Contact, Interaction, InteractionType } from '../../api/types';
 
@@ -149,7 +150,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-warm-400 hover:text-warm-300 hover:bg-warm-500/10"
+                      className={actionButtonBase}
                     >
                       View
                     </Button>
@@ -243,7 +244,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                         </div>
                         <button
                           onClick={() => handleDeleteInteraction(interaction.id)}
-                          className="p-1 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors shrink-0 mt-0.5"
+                          className={`${deleteButtonBase} ${deleteButtonSize.sm} shrink-0 mt-0.5`}
                           title="Delete interaction"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -386,7 +387,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-warm-400 hover:text-warm-300 hover:bg-warm-500/10"
+                          className={actionButtonBase}
                         >
                           Interactions
                         </Button>
@@ -463,7 +464,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                             </div>
                             <button
                               onClick={() => handleDeleteInteraction(interaction.id)}
-                              className="p-1 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors shrink-0 mt-0.5"
+                              className={cn(deleteButtonBase, deleteButtonSize.sm, 'shrink-0 mt-0.5')}
                               title="Delete interaction"
                             >
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

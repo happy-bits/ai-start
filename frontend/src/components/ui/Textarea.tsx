@@ -1,4 +1,5 @@
 import { type TextareaHTMLAttributes, forwardRef } from 'react';
+import { formInputBase, formLabel, formErrorText, getFormInputBorder, cn } from '../../utils/styles';
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -14,7 +15,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label
             htmlFor={textareaId}
-            className="block text-sm font-medium text-dark-300"
+            className={formLabel}
           >
             {label}
           </label>
@@ -22,12 +23,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           ref={ref}
           id={textareaId}
-          className={`w-full px-4 py-2.5 bg-dark-800 border rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all resize-none ${
-            error ? 'border-red-500' : 'border-dark-600'
-          } ${className}`}
+          className={cn(formInputBase, getFormInputBorder(!!error), 'resize-none', className)}
           {...props}
         />
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className={formErrorText}>{error}</p>}
       </div>
     );
   }

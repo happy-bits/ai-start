@@ -1,4 +1,11 @@
 import { useInlineEdit } from '../../hooks/useInlineEdit';
+import {
+  inlineEditableInputBase,
+  inlineEditableDisplayBase,
+  inlineEditableEmpty,
+  inlineEditableTextareaDisplay,
+  cn,
+} from '../../utils/styles';
 
 interface InlineEditableTextareaProps {
   value: string | null;
@@ -43,7 +50,7 @@ export default function InlineEditableTextarea({
           onKeyDown={handleKeyDown}
           disabled={isSaving}
           rows={rows}
-          className={`w-full px-2 py-1 bg-dark-800 border border-warm-500 rounded text-sm text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-warm-500/50 transition-all resize-none ${className}`}
+          className={cn('w-full', inlineEditableInputBase, 'placeholder-dark-500 resize-none', className)}
           placeholder={emptyText}
         />
         <p className="mt-1 text-xs text-dark-500">
@@ -59,9 +66,12 @@ export default function InlineEditableTextarea({
   return (
     <p
       onClick={handleClick}
-      className={`text-sm cursor-pointer hover:text-white transition-colors whitespace-pre-wrap ${
-        isEmpty ? 'text-dark-500 italic' : 'text-dark-300'
-      } ${className}`}
+      className={cn(
+        inlineEditableDisplayBase,
+        'whitespace-pre-wrap',
+        isEmpty ? inlineEditableEmpty : inlineEditableTextareaDisplay,
+        className
+      )}
       title={isEmpty ? emptyText : 'Click to edit'}
     >
       {isEmpty ? emptyText : displayValue}
