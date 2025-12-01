@@ -44,30 +44,6 @@ export const formErrorTextSmall = 'text-xs text-red-400';
 export const errorMessageContainer = 'bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm';
 
 // ============================================================================
-// InlineEditable Styles
-// ============================================================================
-
-/** Base styles for InlineEditable inputs when editing */
-export const inlineEditableInputBase =
-  'px-2 py-1 bg-dark-800 border border-warm-500 rounded text-sm text-white focus:outline-none focus:ring-2 focus:ring-warm-500/50 transition-all';
-
-/** Base styles for InlineEditable display mode */
-export const inlineEditableDisplayBase =
-  'text-sm cursor-pointer hover:text-white transition-colors';
-
-/** Empty state text styles for InlineEditable */
-export const inlineEditableEmpty = 'text-dark-500 italic';
-
-/** Normal state text color for InlineEditable */
-export const inlineEditableTextNormal = 'text-dark-400';
-
-/** Email type text color for InlineEditable */
-export const inlineEditableTextEmail = 'text-dark-300';
-
-/** Textarea display text color */
-export const inlineEditableTextareaDisplay = 'text-dark-300';
-
-// ============================================================================
 // Button Styles
 // ============================================================================
 

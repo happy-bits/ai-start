@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
-import { Button, Card, LoadingSpinner, EmptyState, Avatar, InlineEditable } from '../../components/ui';
-import { actionButtonBase } from '../../utils/styles';
+import { useContacts, useDeleteContact } from '../../api/contacts';
+import { Button, Card, LoadingSpinner, EmptyState, Avatar } from '../../components/ui';
 
 import type { Contact } from '../../api/types';
 
@@ -19,7 +18,7 @@ function sortContacts(contacts: Contact[]): Contact[] {
 }
 
 // Component to render contact table
-function ContactTable({ contacts, updateContact, deleteContact, showHeader = true }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; showHeader?: boolean }) {
+function ContactTable({ contacts, deleteContact, showHeader = true }: { contacts: Contact[]; deleteContact: ReturnType<typeof useDeleteContact>; showHeader?: boolean }) {
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
   };
@@ -56,60 +55,30 @@ function ContactTable({ contacts, updateContact, deleteContact, showHeader = tru
                     <div className="flex items-center gap-4">
                       <Avatar name={contact.name} size="md" />
                       <div className="flex-1">
-                        <InlineEditable
-                          value={contact.name}
-                          onSave={async (value) => {
-                            await updateContact.mutateAsync({
-                              id: contact.id,
-                              data: { name: value || '' },
-                            });
-                          }}
-                          type="text"
-                          placeholder="Contact name"
-                          className="text-white font-medium hover:text-white"
-                          emptyText="Add name"
-                        />
-                        <div className="mt-1">
-                          <InlineEditable
-                            value={contact.company}
-                            onSave={async (value) => {
-                              await updateContact.mutateAsync({
-                                id: contact.id,
-                                data: { company: value },
-                              });
-                            }}
-                            type="text"
-                            placeholder="Company name"
-                            className="text-dark-400 hover:text-white"
-                            emptyText="Add company"
-                          />
-                        </div>
+                        <p className="text-white font-medium">
+                          {contact.name || 'No name'}
+                        </p>
+                        {contact.company && (
+                          <p className="text-sm text-dark-400 mt-1">
+                            {contact.company}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <InlineEditable
-                      value={contact.email}
-                      onSave={async (value) => {
-                        await updateContact.mutateAsync({
-                          id: contact.id,
-                          data: { email: value },
-                        });
-                      }}
-                      type="email"
-                      placeholder="email@example.com"
-                      emptyText="Add email"
-                    />
+                    {contact.email ? (
+                      <p className="text-sm text-dark-300">
+                        {contact.email}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-dark-500 italic">
+                        No email
+                      </p>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className={actionButtonBase}
-                      >
-                        View
-                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -134,7 +103,6 @@ function ContactTable({ contacts, updateContact, deleteContact, showHeader = tru
 export default function ContactList() {
   const { data: contacts = [], isLoading } = useContacts();
   const deleteContact = useDeleteContact();
-  const updateContact = useUpdateContact();
 
   // Sort contacts alphabetically
   const sortedContacts = useMemo(() => {
@@ -184,7 +152,7 @@ export default function ContactList() {
         </Card>
       ) : (
         <Card padding="none">
-          <ContactTable contacts={sortedContacts} updateContact={updateContact} deleteContact={deleteContact} />
+          <ContactTable contacts={sortedContacts} deleteContact={deleteContact} />
         </Card>
       )}
     </div>
