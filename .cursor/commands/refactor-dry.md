@@ -7,3 +7,5 @@ Do not create shared code if it results in overly complex abstractions, such as 
 Ensure that the final result remains readable, clear, and easy to follow, even after refactoring.
 
 Analyze if the code can be made more modular and reusable.
+
+Don't change any code yet
