@@ -28,21 +28,12 @@ export function useInlineEdit<TValue extends string | null>({
     setEditValue(value || '');
   }, [value]);
 
-  // Focus and select when entering edit mode
+  // Focus when entering edit mode
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
-      // Select text for input/textarea elements (not select elements)
-      // Only select if there's content to select
-      if (
-        (inputRef.current instanceof HTMLInputElement ||
-        inputRef.current instanceof HTMLTextAreaElement) &&
-        editValue
-      ) {
-        inputRef.current.select();
-      }
     }
-  }, [isEditing, editValue]);
+  }, [isEditing]);
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
