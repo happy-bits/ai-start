@@ -35,7 +35,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   const seller1 = db
     .insert(schema.users)
     .values({
-      email: 'alice@keepwarm.com',
+      email: 'maria@sellmore.se',
       passwordHash: sellerPassword,
       name: 'Maria Svensson',
       role: ROLES.SELLER,
@@ -48,7 +48,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   const seller2 = db
     .insert(schema.users)
     .values({
-      email: 'bob@keepwarm.com',
+      email: 'lars@hotmail.com',
       passwordHash: sellerPassword,
       name: 'Lars Berg',
       role: ROLES.SELLER,

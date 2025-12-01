@@ -153,11 +153,11 @@ export default function Login() {
                 </div>
                 <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
                   <span className="text-dark-400 font-medium">Maria:</span>{' '}
-                  <span className="text-warm-400 select-all">alice@keepwarm.com</span> / <span className="text-warm-400 select-all">seller123</span>
+                  <span className="text-warm-400 select-all">maria@sellmore.se</span> / <span className="text-warm-400 select-all">seller123</span>
                 </div>
                 <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
                   <span className="text-dark-400 font-medium">Lars:</span>{' '}
-                  <span className="text-warm-400 select-all">bob@keepwarm.com</span> / <span className="text-warm-400 select-all">seller123</span>
+                  <span className="text-warm-400 select-all">lars@hotmail.com</span> / <span className="text-warm-400 select-all">seller123</span>
                 </div>
               </div>
               
@@ -173,7 +173,7 @@ export default function Login() {
                 <QuickLoginButton
                   label="Maria"
                   subtitle="Seller"
-                  email="alice@keepwarm.com"
+                  email="maria@sellmore.se"
                   password="seller123"
                   color="warm"
                   onLogin={handleQuickLogin}
@@ -182,7 +182,7 @@ export default function Login() {
                 <QuickLoginButton
                   label="Lars"
                   subtitle="Seller"
-                  email="bob@keepwarm.com"
+                  email="lars@hotmail.com"
                   password="seller123"
                   color="warm"
                   onLogin={handleQuickLogin}
