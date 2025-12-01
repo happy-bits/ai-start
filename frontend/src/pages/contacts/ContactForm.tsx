@@ -1,21 +1,15 @@
-import { useState, useEffect, type FormEvent } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 
-import { useContact, useCreateContact, useUpdateContact } from '../../api/contacts';
+import { useCreateContact } from '../../api/contacts';
 import { Button, Card, Input, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
 import { config } from '../../config';
 import { useFormSubmission } from '../../hooks/useFormSubmission';
 
-import type { Contact, CreateContactData, UpdateContactData } from '../../api/types';
+import type { Contact, CreateContactData } from '../../api/types';
 
 export default function ContactForm() {
-  const { id } = useParams<{ id: string }>();
-  const isEditing = !!id;
-  const contactId = id ? parseInt(id, 10) : 0;
-
-  const { data: existingContact, isLoading } = useContact(contactId);
   const createContact = useCreateContact();
-  const updateContact = useUpdateContact();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -23,26 +17,12 @@ export default function ContactForm() {
     company: '',
   });
 
-  useEffect(() => {
-    if (existingContact) {
-      setFormData({
-        name: existingContact.name,
-        email: existingContact.email || '',
-        company: existingContact.company || '',
-      });
-    }
-  }, [existingContact]);
-
   const { error, isSubmitting, handleSubmit } = useFormSubmission<
-    CreateContactData | UpdateContactData,
+    CreateContactData,
     Contact
   >({
     onSubmit: async (data) => {
-      if (isEditing) {
-        return await updateContact.mutateAsync({ id: contactId, data: data as UpdateContactData });
-      } else {
-        return await createContact.mutateAsync(data as CreateContactData);
-      }
+      return await createContact.mutateAsync(data as CreateContactData);
     },
     onSuccess: () => {
       return '/contacts';
@@ -72,26 +52,14 @@ export default function ContactForm() {
     });
   };
 
-  if (isEditing && isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <LoadingSpinner size="md" />
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <BackButton to={isEditing ? `/contacts/${contactId}` : '/contacts'} />
+        <BackButton to="/contacts" />
         <div>
-          <h1 className="text-2xl font-bold text-white">
-            {isEditing ? 'Edit Contact' : 'New Contact'}
-          </h1>
-          <p className="text-dark-400 mt-1">
-            {isEditing ? 'Update contact information' : 'Add a new contact to your CRM'}
-          </p>
+          <h1 className="text-2xl font-bold text-white">New Contact</h1>
+          <p className="text-dark-400 mt-1">Add a new contact to your CRM</p>
         </div>
       </div>
 
@@ -100,7 +68,7 @@ export default function ContactForm() {
           <ErrorMessage error={error} />
 
           {/* Developer Tools: Fill Sample Data */}
-          {config.developerTools && !isEditing && (
+          {config.developerTools && (
             <div className="mb-4 pb-4 border-b border-dark-700">
               <button
                 type="button"
@@ -136,7 +104,7 @@ export default function ContactForm() {
           />
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark-700">
-            <Link to={isEditing ? `/contacts/${contactId}` : '/contacts'}>
+            <Link to="/contacts">
               <Button type="button" variant="ghost">
                 Cancel
               </Button>
@@ -148,10 +116,8 @@ export default function ContactForm() {
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <LoadingSpinner size="sm" />
-                  Saving...
+                  Creating...
                 </span>
-              ) : isEditing ? (
-                'Save Changes'
               ) : (
                 'Create Contact'
               )}

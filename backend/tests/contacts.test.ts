@@ -3,7 +3,6 @@ import {
   setupTest,
   get,
   post,
-  put,
   del,
   expectOk,
   expectCreated,
@@ -114,48 +113,6 @@ describe('Contact Routes', () => {
         await post(ctx.app, '/api/contacts', ctx.sellerToken, {
           name: 'Bad Email Contact',
           email: 'not-an-email',
-        })
-      );
-    });
-  });
-
-  describe('PUT /api/contacts/:id', () => {
-    it('should update own contact', async () => {
-      await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
-        name: 'Updated Contact',
-        company: 'Updated Company',
-      });
-
-      const retrieved = await expectOk<{ contact: { name: string; company: string } }>(
-        await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken)
-      );
-      expect(retrieved.contact.name).toBe('Updated Contact');
-      expect(retrieved.contact.company).toBe('Updated Company');
-    });
-
-    it('should update any contact as admin', async () => {
-      await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.adminToken, {
-        company: 'Admin Updated Corp',
-      });
-
-      const retrieved = await expectOk<{ contact: { company: string } }>(
-        await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.adminToken)
-      );
-      expect(retrieved.contact.company).toBe('Admin Updated Corp');
-    });
-
-    it('should deny update of other sellers contact', async () => {
-      await expectForbidden(
-        await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.seller2Token, {
-          name: 'Hacked',
-        })
-      );
-    });
-
-    it('should return 404 for non-existent contact', async () => {
-      await expectNotFound(
-        await put(ctx.app, '/api/contacts/9999', ctx.sellerToken, {
-          name: 'Updated',
         })
       );
     });

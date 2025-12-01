@@ -25,12 +25,6 @@ export interface CreateContactData {
   company?: string | null;
 }
 
-export interface UpdateContactData {
-  name?: string;
-  email?: string | null;
-  company?: string | null;
-}
-
 // Seller types (for admin)
 export interface Seller {
   id: number;
