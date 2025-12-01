@@ -61,7 +61,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
 
   // Swedish names and companies for seed data
   const swedishNames = [
-    'Erik Andersson', 'Anna Larsson', 'Johan Nilsson', 'Maria Johansson', 'Lars Eriksson',
+    'Erik Andersson', 'Anna Larsson', 'Johan Nilsson', 'Lisa Johansson', 'Lars Eriksson',
     'Emma Svensson', 'Anders Gustafsson', 'Sara Berg', 'Peter Lindqvist', 'Lisa Holm',
     'Mikael Persson', 'Jenny Lundberg', 'Daniel Olsson', 'Karin Nordström', 'Thomas Ek',
     'Helena Forsberg', 'Magnus Dahl', 'Camilla Sandberg', 'Fredrik Åberg', 'Malin Bergström',
@@ -78,9 +78,9 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     'SAS', 'Swedish Match', 'Trelleborg', 'Vattenfall', 'Össur'
   ];
 
-  // Seed 30 contacts for seller1 (Maria)
+  // Seed 5 contacts for seller1 (Maria)
   const mariaContacts = [];
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 4; i++) {
     const contact = db
       .insert(schema.contacts)
       .values({
