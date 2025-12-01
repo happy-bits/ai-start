@@ -61,21 +61,5 @@ export function resetDatabase() {
   initializeDatabase();
 }
 
-// Close database connection
-export function closeDatabase() {
-  sqlite.close();
-}
-
-// Create a new database instance (useful for testing)
-export function createDatabase(dbPath: string = ':memory:') {
-  const testSqlite = new Database(dbPath);
-  testSqlite.pragma('journal_mode = WAL');
-  testSqlite.pragma('foreign_keys = ON');
-  return {
-    db: drizzle(testSqlite, { schema }),
-    rawDb: testSqlite,
-  };
-}
-
 
 

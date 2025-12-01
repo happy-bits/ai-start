@@ -1,5 +1,4 @@
 import { hash } from '@node-rs/argon2';
-import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from './schema.js';
 import { ARGON_OPTIONS, ROLES } from '../constants.js';

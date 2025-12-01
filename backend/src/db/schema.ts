@@ -33,11 +33,8 @@ export const contacts = sqliteTable('contacts', {
 
 // Type exports
 export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
 export type Session = typeof sessions.$inferSelect;
-export type NewSession = typeof sessions.$inferInsert;
 export type Contact = typeof contacts.$inferSelect;
-export type NewContact = typeof contacts.$inferInsert;
 
 
 
