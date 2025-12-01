@@ -76,7 +76,7 @@ describe('Interaction Routes', () => {
 
   describe('POST /api/interactions', () => {
     it('should create interaction for own contact', async () => {
-      const data = await expectCreated<{ interaction: { type: string; date: string; sellerId: number } }>(
+      const data = await expectCreated<{ interaction: { type: string; date: string; sellerId: number; id: number } }>(
         await post(ctx.app, '/api/interactions', ctx.sellerToken, {
           contactId: ctx.contactId,
           type: 'meeting',
@@ -85,22 +85,30 @@ describe('Interaction Routes', () => {
           notes: 'Follow-up meeting',
         })
       );
-      expect(data.interaction.type).toBe('meeting');
-      expect(data.interaction.date).toBe('2024-01-20');
-      expect(data.interaction.sellerId).toBe(ctx.sellerId);
+
+      const retrieved = await expectOk<{ interaction: { type: string; date: string; sellerId: number } }>(
+        await get(ctx.app, `/api/interactions/${data.interaction.id}`, ctx.sellerToken)
+      );
+      expect(retrieved.interaction.type).toBe('meeting');
+      expect(retrieved.interaction.date).toBe('2024-01-20');
+      expect(retrieved.interaction.sellerId).toBe(ctx.sellerId);
     });
 
     it('should create interaction with minimal data', async () => {
-      const data = await expectCreated<{ interaction: { type: string; time: string | null; notes: string | null } }>(
+      const data = await expectCreated<{ interaction: { type: string; time: string | null; notes: string | null; id: number } }>(
         await post(ctx.app, '/api/interactions', ctx.sellerToken, {
           contactId: ctx.contactId,
           type: 'email',
           date: '2024-01-21',
         })
       );
-      expect(data.interaction.type).toBe('email');
-      expect(data.interaction.time).toBeNull();
-      expect(data.interaction.notes).toBeNull();
+
+      const retrieved = await expectOk<{ interaction: { type: string; time: string | null; notes: string | null } }>(
+        await get(ctx.app, `/api/interactions/${data.interaction.id}`, ctx.sellerToken)
+      );
+      expect(retrieved.interaction.type).toBe('email');
+      expect(retrieved.interaction.time).toBeNull();
+      expect(retrieved.interaction.notes).toBeNull();
     });
 
     it('should reject interaction for other sellers contact', async () => {
@@ -152,8 +160,12 @@ describe('Interaction Routes', () => {
           notes: 'Changed to meeting',
         })
       );
-      expect(data.interaction.type).toBe('meeting');
-      expect(data.interaction.notes).toBe('Changed to meeting');
+
+      const retrieved = await expectOk<{ interaction: { type: string; notes: string } }>(
+        await get(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.sellerToken)
+      );
+      expect(retrieved.interaction.type).toBe('meeting');
+      expect(retrieved.interaction.notes).toBe('Changed to meeting');
     });
 
     it('should update any interaction as admin', async () => {
@@ -162,7 +174,11 @@ describe('Interaction Routes', () => {
           notes: 'Admin updated',
         })
       );
-      expect(data.interaction.notes).toBe('Admin updated');
+
+      const retrieved = await expectOk<{ interaction: { notes: string } }>(
+        await get(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.adminToken)
+      );
+      expect(retrieved.interaction.notes).toBe('Admin updated');
     });
 
     it('should deny update of other sellers interaction', async () => {
@@ -186,7 +202,6 @@ describe('Interaction Routes', () => {
     it('should delete own interaction', async () => {
       await expectOk(await del(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.sellerToken));
 
-      // Verify deleted
       await expectNotFound(await get(ctx.app, `/api/interactions/${ctx.interactionId}`, ctx.sellerToken));
     });
 

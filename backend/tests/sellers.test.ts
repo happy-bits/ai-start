@@ -61,16 +61,20 @@ describe('Seller Routes', () => {
 
   describe('POST /api/sellers', () => {
     it('should create new seller as admin', async () => {
-      const data = await expectCreated<{ seller: { email: string; name: string; role: string } }>(
+      const data = await expectCreated<{ seller: { email: string; name: string; role: string; id: number } }>(
         await post(ctx.app, '/api/sellers', ctx.adminToken, {
           email: 'newseller@test.com',
           password: 'newpassword123',
           name: 'New Seller',
         })
       );
-      expect(data.seller.email).toBe('newseller@test.com');
-      expect(data.seller.name).toBe('New Seller');
-      expect(data.seller.role).toBe('seller');
+
+      const retrieved = await expectOk<{ seller: { email: string; name: string; role: string } }>(
+        await get(ctx.app, `/api/sellers/${data.seller.id}`, ctx.adminToken)
+      );
+      expect(retrieved.seller.email).toBe('newseller@test.com');
+      expect(retrieved.seller.name).toBe('New Seller');
+      expect(retrieved.seller.role).toBe('seller');
     });
 
     it('should reject duplicate email', async () => {
@@ -112,7 +116,11 @@ describe('Seller Routes', () => {
           name: 'Updated Seller Name',
         })
       );
-      expect(data.seller.name).toBe('Updated Seller Name');
+
+      const retrieved = await expectOk<{ seller: { name: string } }>(
+        await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken)
+      );
+      expect(retrieved.seller.name).toBe('Updated Seller Name');
     });
 
     it('should update seller email', async () => {
@@ -121,7 +129,11 @@ describe('Seller Routes', () => {
           email: 'updated@test.com',
         })
       );
-      expect(data.seller.email).toBe('updated@test.com');
+
+      const retrieved = await expectOk<{ seller: { email: string } }>(
+        await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken)
+      );
+      expect(retrieved.seller.email).toBe('updated@test.com');
     });
 
     it('should reject duplicate email on update', async () => {
@@ -146,7 +158,6 @@ describe('Seller Routes', () => {
     it('should delete seller as admin', async () => {
       await expectOk(await del(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken));
 
-      // Verify deleted
       await expectNotFound(await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken));
     });
 

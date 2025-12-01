@@ -72,7 +72,7 @@ describe('Contact Routes', () => {
 
   describe('POST /api/contacts', () => {
     it('should create contact as seller', async () => {
-      const data = await expectCreated<{ contact: { name: string; sellerId: number } }>(
+      const data = await expectCreated<{ contact: { name: string; sellerId: number; id: number } }>(
         await post(ctx.app, '/api/contacts', ctx.sellerToken, {
           name: 'New Contact',
           email: 'new@contact.com',
@@ -80,18 +80,26 @@ describe('Contact Routes', () => {
           company: 'New Corp',
         })
       );
-      expect(data.contact.name).toBe('New Contact');
-      expect(data.contact.sellerId).toBe(ctx.sellerId);
+
+      const retrieved = await expectOk<{ contact: { name: string; sellerId: number } }>(
+        await get(ctx.app, `/api/contacts/${data.contact.id}`, ctx.sellerToken)
+      );
+      expect(retrieved.contact.name).toBe('New Contact');
+      expect(retrieved.contact.sellerId).toBe(ctx.sellerId);
     });
 
     it('should create contact with minimal data', async () => {
-      const data = await expectCreated<{ contact: { name: string; email: string | null } }>(
+      const data = await expectCreated<{ contact: { name: string; email: string | null; id: number } }>(
         await post(ctx.app, '/api/contacts', ctx.sellerToken, {
           name: 'Minimal Contact',
         })
       );
-      expect(data.contact.name).toBe('Minimal Contact');
-      expect(data.contact.email).toBeNull();
+
+      const retrieved = await expectOk<{ contact: { name: string; email: string | null } }>(
+        await get(ctx.app, `/api/contacts/${data.contact.id}`, ctx.sellerToken)
+      );
+      expect(retrieved.contact.name).toBe('Minimal Contact');
+      expect(retrieved.contact.email).toBeNull();
     });
 
     it('should reject missing name', async () => {
@@ -112,24 +120,32 @@ describe('Contact Routes', () => {
     });
 
     it('should create contact with followUpDate', async () => {
-      const data = await expectCreated<{ contact: { name: string; followUpDate: string | null } }>(
+      const data = await expectCreated<{ contact: { name: string; followUpDate: string | null; id: number } }>(
         await post(ctx.app, '/api/contacts', ctx.sellerToken, {
           name: 'Contact With Follow Up',
           followUpDate: '2024-12-31',
         })
       );
-      expect(data.contact.name).toBe('Contact With Follow Up');
-      expect(data.contact.followUpDate).toBe('2024-12-31');
+
+      const retrieved = await expectOk<{ contact: { name: string; followUpDate: string | null } }>(
+        await get(ctx.app, `/api/contacts/${data.contact.id}`, ctx.sellerToken)
+      );
+      expect(retrieved.contact.name).toBe('Contact With Follow Up');
+      expect(retrieved.contact.followUpDate).toBe('2024-12-31');
     });
 
     it('should create contact without followUpDate (should be null)', async () => {
-      const data = await expectCreated<{ contact: { name: string; followUpDate: string | null } }>(
+      const data = await expectCreated<{ contact: { name: string; followUpDate: string | null; id: number } }>(
         await post(ctx.app, '/api/contacts', ctx.sellerToken, {
           name: 'Contact Without Follow Up',
         })
       );
-      expect(data.contact.name).toBe('Contact Without Follow Up');
-      expect(data.contact.followUpDate).toBeNull();
+
+      const retrieved = await expectOk<{ contact: { name: string; followUpDate: string | null } }>(
+        await get(ctx.app, `/api/contacts/${data.contact.id}`, ctx.sellerToken)
+      );
+      expect(retrieved.contact.name).toBe('Contact Without Follow Up');
+      expect(retrieved.contact.followUpDate).toBeNull();
     });
 
     it('should reject invalid followUpDate format', async () => {
@@ -144,23 +160,27 @@ describe('Contact Routes', () => {
 
   describe('PUT /api/contacts/:id', () => {
     it('should update own contact', async () => {
-      const data = await expectOk<{ contact: { name: string; company: string } }>(
-        await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
-          name: 'Updated Contact',
-          company: 'Updated Company',
-        })
+      await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
+        name: 'Updated Contact',
+        company: 'Updated Company',
+      });
+
+      const retrieved = await expectOk<{ contact: { name: string; company: string } }>(
+        await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken)
       );
-      expect(data.contact.name).toBe('Updated Contact');
-      expect(data.contact.company).toBe('Updated Company');
+      expect(retrieved.contact.name).toBe('Updated Contact');
+      expect(retrieved.contact.company).toBe('Updated Company');
     });
 
     it('should update any contact as admin', async () => {
-      const data = await expectOk<{ contact: { company: string } }>(
-        await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.adminToken, {
-          company: 'Admin Updated Corp',
-        })
+      await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.adminToken, {
+        company: 'Admin Updated Corp',
+      });
+
+      const retrieved = await expectOk<{ contact: { company: string } }>(
+        await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.adminToken)
       );
-      expect(data.contact.company).toBe('Admin Updated Corp');
+      expect(retrieved.contact.company).toBe('Admin Updated Corp');
     });
 
     it('should deny update of other sellers contact', async () => {
@@ -180,21 +200,25 @@ describe('Contact Routes', () => {
     });
 
     it('should update followUpDate as seller (own contact)', async () => {
-      const data = await expectOk<{ contact: { followUpDate: string | null } }>(
-        await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
-          followUpDate: '2024-12-25',
-        })
+      await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
+        followUpDate: '2024-12-25',
+      });
+
+      const retrieved = await expectOk<{ contact: { followUpDate: string | null } }>(
+        await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken)
       );
-      expect(data.contact.followUpDate).toBe('2024-12-25');
+      expect(retrieved.contact.followUpDate).toBe('2024-12-25');
     });
 
     it('should update followUpDate as admin (any contact)', async () => {
-      const data = await expectOk<{ contact: { followUpDate: string | null } }>(
-        await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.adminToken, {
-          followUpDate: '2024-12-30',
-        })
+      await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.adminToken, {
+        followUpDate: '2024-12-30',
+      });
+
+      const retrieved = await expectOk<{ contact: { followUpDate: string | null } }>(
+        await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.adminToken)
       );
-      expect(data.contact.followUpDate).toBe('2024-12-30');
+      expect(retrieved.contact.followUpDate).toBe('2024-12-30');
     });
 
     it('should deny update of followUpDate for other sellers contact', async () => {
@@ -212,12 +236,14 @@ describe('Contact Routes', () => {
       });
 
       // Then set it to null
-      const data = await expectOk<{ contact: { followUpDate: string | null } }>(
-        await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
-          followUpDate: null,
-        })
+      await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
+        followUpDate: null,
+      });
+
+      const retrieved = await expectOk<{ contact: { followUpDate: string | null } }>(
+        await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken)
       );
-      expect(data.contact.followUpDate).toBeNull();
+      expect(retrieved.contact.followUpDate).toBeNull();
     });
 
     it('should reject invalid followUpDate format on update', async () => {
