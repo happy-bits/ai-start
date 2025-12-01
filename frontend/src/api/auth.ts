@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { apiClient } from './client';
 import type { LoginCredentials, LoginResponse, User } from './types';
 
@@ -21,13 +21,8 @@ export async function getCurrentUser(): Promise<User> {
 
 // React Query hooks
 export function useLogin() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: login,
-    onSuccess: (data) => {
-      queryClient.setQueryData(['currentUser'], data.user);
-    },
   });
 }
 

@@ -37,29 +37,8 @@ export const formLabel = 'block text-sm font-medium text-dark-300';
 /** Error message text styles */
 export const formErrorText = 'text-sm text-red-400';
 
-/** Error message text styles (smaller variant) */
-export const formErrorTextSmall = 'text-xs text-red-400';
-
 /** Error message container styles */
 export const errorMessageContainer = 'bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm';
-
-// ============================================================================
-// Button Styles
-// ============================================================================
-
-/** Delete button base styles */
-export const deleteButtonBase =
-  'text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors';
-
-/** Delete button sizes */
-export const deleteButtonSize = {
-  sm: 'p-1',
-  md: 'p-1.5',
-};
-
-/** Action button base styles (warm/primary actions) */
-export const actionButtonBase =
-  'text-warm-400 hover:text-warm-300 hover:bg-warm-500/10';
 
 // ============================================================================
 // Navigation Styles
@@ -82,30 +61,6 @@ export const navLinkBase =
 
 /** Card container with background and border */
 export const cardContainer = 'bg-dark-800/50 rounded-lg border border-dark-700';
-
-/** Card container variant (lighter background) */
-export const cardContainerLight = 'bg-dark-800/30 rounded-lg border border-dark-700';
-
-/** Dashed border card container */
-export const cardContainerDashed = 'bg-dark-800/30 rounded-lg border border-dashed border-dark-600 hover:border-warm-500/30 transition-colors';
-
-// ============================================================================
-// Icon Container Styles
-// ============================================================================
-
-/** Icon container */
-export const iconContainer =
-  'w-10 h-10 shrink-0 rounded-lg flex items-center justify-center bg-warm-500/10 text-warm-400';
-
-// ============================================================================
-// Empty State Styles
-// ============================================================================
-
-/** Empty state text color */
-export const emptyStateText = 'text-dark-500 italic';
-
-/** Normal text color */
-export const textNormal = 'text-dark-400';
 
 // ============================================================================
 // Utility Functions

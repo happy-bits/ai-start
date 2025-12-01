@@ -18,7 +18,7 @@ function sortContacts(contacts: Contact[]): Contact[] {
 }
 
 // Component to render contact table
-function ContactTable({ contacts, deleteContact, showHeader = true }: { contacts: Contact[]; deleteContact: ReturnType<typeof useDeleteContact>; showHeader?: boolean }) {
+function ContactTable({ contacts, deleteContact }: { contacts: Contact[]; deleteContact: ReturnType<typeof useDeleteContact> }) {
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
   };
@@ -26,21 +26,19 @@ function ContactTable({ contacts, deleteContact, showHeader = true }: { contacts
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
-        {showHeader && (
-          <thead>
-            <tr className="border-b border-dark-700">
-              <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
-                Contact
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
-                Contact Info
-              </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-        )}
+        <thead>
+          <tr className="border-b border-dark-700">
+            <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
+              Contact
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
+              Contact Info
+            </th>
+            <th className="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
         <tbody className="divide-y divide-dark-700">
           {contacts.map((contact, index) => {
             return (
