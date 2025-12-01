@@ -8,7 +8,6 @@ import { authMiddleware, type AuthVariables } from './middleware/auth.js';
 import { createAuthRoutes } from './routes/auth.js';
 import { createSellerRoutes } from './routes/sellers.js';
 import { createContactRoutes } from './routes/contacts.js';
-import { createInteractionRoutes } from './routes/interactions.js';
 import { seedDatabase } from './db/seed.js';
 import { resetDatabase } from './db/index.js';
 import { ERROR_MESSAGES, ROLES, SUCCESS_MESSAGES } from './constants.js';
@@ -38,7 +37,6 @@ export function createApp(db: BetterSQLite3Database<typeof schema>, options?: { 
   // Mount protected routes
   protectedApp.route('/sellers', createSellerRoutes(db));
   protectedApp.route('/contacts', createContactRoutes(db));
-  protectedApp.route('/interactions', createInteractionRoutes(db));
 
   // Get current user
   protectedApp.get('/me', (c) => {

@@ -17,7 +17,6 @@ export type TestContext = {
   seller2Id: number;
   contactId: number;
   contact2Id: number;
-  interactionId: number;
 };
 
 // Create a fresh test database
@@ -57,21 +56,7 @@ export function createTestDatabase() {
       updated_at TEXT NOT NULL
     );
 
-    CREATE TABLE interactions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
-      seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      type TEXT NOT NULL CHECK(type IN ('call', 'meeting', 'email')),
-      date TEXT NOT NULL,
-      time TEXT,
-      notes TEXT,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-
     CREATE INDEX idx_contacts_seller_id ON contacts(seller_id);
-    CREATE INDEX idx_interactions_contact_id ON interactions(contact_id);
-    CREATE INDEX idx_interactions_seller_id ON interactions(seller_id);
     CREATE INDEX idx_sessions_token ON sessions(token);
   `);
 
@@ -86,7 +71,6 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
   seller2Id: number;
   contactId: number;
   contact2Id: number;
-  interactionId: number;
   adminToken: string;
   sellerToken: string;
   seller2Token: string;
@@ -164,22 +148,6 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
     .returning()
     .get();
 
-  // Create interaction
-  const interaction = db
-    .insert(schema.interactions)
-    .values({
-      contactId: contact.id,
-      sellerId: seller.id,
-      type: 'call',
-      date: '2024-01-10',
-      time: '10:00',
-      notes: 'Test call',
-      createdAt: now,
-      updatedAt: now,
-    })
-    .returning()
-    .get();
-
   // Create sessions
   const adminToken = createSession(db, admin.id);
   const sellerToken = createSession(db, seller.id);
@@ -191,7 +159,6 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
     seller2Id: seller2.id,
     contactId: contact.id,
     contact2Id: contact2.id,
-    interactionId: interaction.id,
     adminToken,
     sellerToken,
     seller2Token,

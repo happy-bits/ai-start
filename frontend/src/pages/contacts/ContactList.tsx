@@ -2,13 +2,10 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
-import { useInteractions, useUpdateInteraction, useDeleteInteraction } from '../../api/interactions';
-import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
-import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions, InlineEditableSelect, InlineEditableTime, InlineEditableTextarea } from '../../components/ui';
-import NewInteractionRow from '../../components/NewInteractionRow';
-import { deleteButtonBase, deleteButtonSize, actionButtonBase, cn } from '../../utils/styles';
+import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions } from '../../components/ui';
+import { actionButtonBase } from '../../utils/styles';
 
-import type { Contact, Interaction, InteractionType } from '../../api/types';
+import type { Contact } from '../../api/types';
 
 // Helper function to check if a follow-up date is today or earlier
 function isFollowUpDue(followUpDate: string | null): boolean {
@@ -45,41 +42,15 @@ function sortContacts(contacts: Contact[]): Contact[] {
   });
 }
 
-// Helper function to get latest interactions for a contact
-function getLatestInteractions(interactions: Interaction[], contactId: number, limit: number = 3): Interaction[] {
-  return interactions
-    .filter((interaction) => interaction.contactId === contactId)
-    .sort((a, b) => {
-      const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
-      if (dateDiff !== 0) return dateDiff;
-      // If dates are equal, sort by time if available
-      const aTime = a.time || '00:00';
-      const bTime = b.time || '00:00';
-      const timeDiff = bTime.localeCompare(aTime);
-      if (timeDiff !== 0) return timeDiff;
-      // If date and time are equal, sort by createdAt (newest first)
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    })
-    .slice(0, limit);
-}
-
 // Component to render priority contacts as cards
-function PriorityContactCards({ contacts, updateContact, deleteContact, interactions = [] }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[] }) {
-  const updateInteraction = useUpdateInteraction();
-  const deleteInteraction = useDeleteInteraction();
-  
+function PriorityContactCards({ contacts, updateContact, deleteContact }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact> }) {
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
-  };
-
-  const handleDeleteInteraction = async (interactionId: number) => {
-    deleteInteraction.mutate(interactionId);
   };
 
   return (
     <div className="space-y-4">
       {contacts.map((contact) => {
-        const latestInteractions = getLatestInteractions(interactions, contact.id, 3);
         return (
           <Card key={contact.id} className="hover:border-warm-500/30 transition-colors">
             <div className="space-y-4">
@@ -146,15 +117,13 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Link to={`/contacts/${contact.id}`}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={actionButtonBase}
-                    >
-                      View
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={actionButtonBase}
+                  >
+                    View
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -182,80 +151,6 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                   emptyText="Add follow-up date"
                 />
               </div>
-
-              {/* Interactions */}
-              <div className="pt-4 space-y-3">
-                <NewInteractionRow contactId={contact.id} variant="card" />
-                {latestInteractions.length > 0 && (
-                  <>
-                    {latestInteractions.map((interaction) => (
-                      <div key={interaction.id} className="flex items-start gap-3">
-                        <div className="shrink-0 mt-0.5 w-24">
-                          <InlineEditableSelect
-                            value={interaction.type}
-                            onSave={async (value) => {
-                              await updateInteraction.mutateAsync({
-                                id: interaction.id,
-                                data: { type: value as InteractionType },
-                              });
-                            }}
-                            options={INTERACTION_TYPE_OPTIONS}
-                            badgeVariant="warm"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                            <InlineEditableDate
-                              value={interaction.date}
-                              onSave={async (value) => {
-                                await updateInteraction.mutateAsync({
-                                  id: interaction.id,
-                                  data: { date: value || interaction.date },
-                                });
-                              }}
-                              className="text-sm"
-                            />
-                            <InlineEditableTime
-                              value={interaction.time}
-                              onSave={async (value) => {
-                                await updateInteraction.mutateAsync({
-                                  id: interaction.id,
-                                  data: { time: value },
-                                });
-                              }}
-                              className="text-sm"
-                              emptyText="Add time"
-                            />
-                          </div>
-                          <div>
-                            <InlineEditableTextarea
-                              value={interaction.notes}
-                              onSave={async (value) => {
-                                await updateInteraction.mutateAsync({
-                                  id: interaction.id,
-                                  data: { notes: value },
-                                });
-                              }}
-                              emptyText="Click to add notes"
-                              rows={2}
-                              className="text-xs"
-                            />
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleDeleteInteraction(interaction.id)}
-                          className={`${deleteButtonBase} ${deleteButtonSize.sm} shrink-0 mt-0.5`}
-                          title="Delete interaction"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    ))}
-                  </>
-                )}
-              </div>
             </div>
           </Card>
         );
@@ -265,16 +160,9 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
 }
 
 // Component to render contact table
-function ContactTable({ contacts, updateContact, deleteContact, interactions = [], showInteractions = false, showHeader = true }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[]; showInteractions?: boolean; showHeader?: boolean }) {
-  const updateInteraction = useUpdateInteraction();
-  const deleteInteraction = useDeleteInteraction();
-  
+function ContactTable({ contacts, updateContact, deleteContact, showHeader = true }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; showHeader?: boolean }) {
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
-  };
-
-  const handleDeleteInteraction = async (interactionId: number) => {
-    deleteInteraction.mutate(interactionId);
   };
 
   return (
@@ -297,7 +185,6 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
         )}
         <tbody className="divide-y divide-dark-700">
           {contacts.map((contact, index) => {
-            const latestInteractions = showInteractions ? getLatestInteractions(interactions, contact.id, 3) : [];
             return (
               <>
                 {index > 0 && (
@@ -383,15 +270,13 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
-                      <Link to={`/contacts/${contact.id}`}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={actionButtonBase}
-                        >
-                          Interactions
-                        </Button>
-                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={actionButtonBase}
+                      >
+                        View
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -404,86 +289,6 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                     </div>
                   </td>
                 </tr>
-                {showInteractions && latestInteractions.length > 0 && (
-                  <>
-                    {latestInteractions.map((interaction) => (
-                      <tr key={`interaction-${interaction.id}`} className="bg-dark-800/30 hover:bg-dark-800/40 transition-colors">
-                        <td colSpan={3} className="px-6 py-3">
-                          <div className="flex items-start gap-3">
-                            <div className="shrink-0 mt-0.5 w-24">
-                              <InlineEditableSelect
-                                value={interaction.type}
-                                onSave={async (value) => {
-                                  await updateInteraction.mutateAsync({
-                                    id: interaction.id,
-                                    data: { type: value as InteractionType },
-                                  });
-                                }}
-                                options={INTERACTION_TYPE_OPTIONS}
-                                badgeVariant="warm"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                                <InlineEditableDate
-                                  value={interaction.date}
-                                  onSave={async (value) => {
-                                    await updateInteraction.mutateAsync({
-                                      id: interaction.id,
-                                      data: { date: value || interaction.date },
-                                    });
-                                  }}
-                                  className="text-sm"
-                                />
-                                <InlineEditableTime
-                                  value={interaction.time}
-                                  onSave={async (value) => {
-                                    await updateInteraction.mutateAsync({
-                                      id: interaction.id,
-                                      data: { time: value },
-                                    });
-                                  }}
-                                  className="text-sm"
-                                  emptyText="Add time"
-                                />
-                              </div>
-                              <div>
-                                <InlineEditableTextarea
-                                  value={interaction.notes}
-                                  onSave={async (value) => {
-                                    await updateInteraction.mutateAsync({
-                                      id: interaction.id,
-                                      data: { notes: value },
-                                    });
-                                  }}
-                                  emptyText="Click to add notes"
-                                  rows={2}
-                                  className="text-xs"
-                                />
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => handleDeleteInteraction(interaction.id)}
-                              className={cn(deleteButtonBase, deleteButtonSize.sm, 'shrink-0 mt-0.5')}
-                              title="Delete interaction"
-                            >
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </>
-                )}
-                {showInteractions && latestInteractions.length === 0 && (
-                  <tr className="bg-dark-800/30">
-                    <td colSpan={3} className="px-6 py-3">
-                      <span className="text-xs text-dark-500">No interactions</span>
-                    </td>
-                  </tr>
-                )}
               </>
             );
           })}
@@ -495,7 +300,6 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
 
 export default function ContactList() {
   const { data: contacts = [], isLoading } = useContacts();
-  const { data: interactions = [] } = useInteractions();
   const deleteContact = useDeleteContact();
   const updateContact = useUpdateContact();
   const [searchTerm, setSearchTerm] = useState('');
@@ -576,7 +380,7 @@ export default function ContactList() {
                 />
               </Card>
             ) : (
-              <PriorityContactCards contacts={priorityContacts} updateContact={updateContact} deleteContact={deleteContact} interactions={interactions} />
+              <PriorityContactCards contacts={priorityContacts} updateContact={updateContact} deleteContact={deleteContact} />
             )}
           </div>
 

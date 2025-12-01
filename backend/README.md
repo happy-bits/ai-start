@@ -80,16 +80,6 @@ npm run db:seed
 | PUT | `/api/customers/:id` | Update customer |
 | DELETE | `/api/customers/:id` | Delete customer |
 
-### Interactions
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/interactions` | List interactions (optional: `?customerId=X`) |
-| GET | `/api/interactions/:id` | Get interaction details |
-| POST | `/api/interactions` | Create new interaction |
-| PUT | `/api/interactions/:id` | Update interaction |
-| DELETE | `/api/interactions/:id` | Delete interaction |
-
 ### Development
 
 | Method | Endpoint | Description |
@@ -126,8 +116,7 @@ src/
 ├── routes/
 │   ├── auth.ts      # Authentication routes
 │   ├── sellers.ts   # Seller management routes
-│   ├── customers.ts # Customer management routes
-│   └── interactions.ts # Interaction management routes
+│   └── customers.ts # Customer management routes
 ├── app.ts           # Hono app setup
 └── index.ts         # Entry point
 
@@ -135,7 +124,6 @@ tests/
 ├── setup.ts         # Test utilities and helpers
 ├── auth.test.ts     # Authentication tests
 ├── sellers.test.ts  # Seller routes tests
-├── customers.test.ts # Customer routes tests
-└── interactions.test.ts # Interaction routes tests
+└── customers.test.ts # Customer routes tests
 ```
 

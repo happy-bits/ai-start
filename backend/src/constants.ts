@@ -6,21 +6,6 @@ export const ROLES = {
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
-// Interaction types
-export const INTERACTION_TYPES = {
-  CALL: 'call',
-  MEETING: 'meeting',
-  EMAIL: 'email',
-} as const;
-
-export type InteractionType = (typeof INTERACTION_TYPES)[keyof typeof INTERACTION_TYPES];
-
-export const INTERACTION_TYPE_VALUES = [
-  INTERACTION_TYPES.CALL,
-  INTERACTION_TYPES.MEETING,
-  INTERACTION_TYPES.EMAIL,
-] as const;
-
 // Session configuration
 export const SESSION_CONFIG = {
   DEFAULT_EXPIRY_HOURS: 24,

@@ -37,47 +37,6 @@ export interface UpdateContactData {
   followUpDate?: string | null;
 }
 
-// Interaction types
-export type InteractionType = 'call' | 'meeting' | 'email';
-
-export interface InteractionTypeOption {
-  value: InteractionType;
-  label: string;
-}
-
-export const INTERACTION_TYPE_OPTIONS: InteractionTypeOption[] = [
-  { value: 'call', label: 'Phone Call' },
-  { value: 'meeting', label: 'Meeting' },
-  { value: 'email', label: 'Email' },
-];
-
-export interface Interaction {
-  id: number;
-  contactId: number;
-  sellerId: number;
-  type: InteractionType;
-  date: string;
-  time: string | null;
-  notes: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateInteractionData {
-  contactId: number;
-  type: InteractionType;
-  date: string;
-  time?: string | null;
-  notes?: string | null;
-}
-
-export interface UpdateInteractionData {
-  type?: InteractionType;
-  date?: string;
-  time?: string | null;
-  notes?: string | null;
-}
-
 // Seller types (for admin)
 export interface Seller {
   id: number;

@@ -32,18 +32,6 @@ As an **admin**, I want to **see all customers** in the system to have a full ov
 
 As an **admin**, I want to **manage all customers** to be able to help sellers.
 
-## Interaction Management
-
-As a **seller**, I want to **see my interactions** for a customer so that I can track previous communications and maintain better customer relationships.
-
-As a **seller**, I want to **log a new interaction** (call, meeting, or email) with date, time, and notes
-
-As a **seller**, I want to **edit my interactions** to update interaction details.
-
-As a **seller**, I want to **delete my interactions** to remove incorrect entries.
-
-As an **admin**, I want to **see all interactions** for any customer to have full visibility.
-
 ## Development
 
 As a **developer**, I want to **reset the database and seed all tables** to set up a clean development environment with deterministic test data (not relying on random data or time).

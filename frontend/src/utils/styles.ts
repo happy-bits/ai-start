@@ -117,7 +117,7 @@ export const cardContainerDashed = 'bg-dark-800/30 rounded-lg border border-dash
 // Icon Container Styles
 // ============================================================================
 
-/** Icon container for interaction types */
+/** Icon container */
 export const iconContainer =
   'w-10 h-10 shrink-0 rounded-lg flex items-center justify-center bg-warm-500/10 text-warm-400';
 
