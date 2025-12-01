@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
-import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable } from '../../components/ui';
+import { Button, Card, LoadingSpinner, EmptyState, Avatar, InlineEditable } from '../../components/ui';
 import { actionButtonBase } from '../../utils/styles';
 
 import type { Contact } from '../../api/types';
@@ -149,18 +149,11 @@ export default function ContactList() {
   const { data: contacts = [], isLoading } = useContacts();
   const deleteContact = useDeleteContact();
   const updateContact = useUpdateContact();
-  const [searchTerm, setSearchTerm] = useState('');
 
-  // Filter and sort contacts alphabetically
+  // Sort contacts alphabetically
   const sortedContacts = useMemo(() => {
-    const filtered = contacts.filter(
-      (contact) =>
-        contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    return sortContacts(filtered);
-  }, [contacts, searchTerm]);
+    return sortContacts(contacts);
+  }, [contacts]);
 
   return (
     <div className="space-y-6">
@@ -180,13 +173,6 @@ export default function ContactList() {
         </Link>
       </div>
 
-      {/* Search */}
-      <SearchInput
-        placeholder="Search contacts..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
       {isLoading ? (
         <Card padding="none">
           <div className="p-8 flex justify-center">
@@ -202,12 +188,12 @@ export default function ContactList() {
               </svg>
             }
             title="No contacts found"
-            message={searchTerm ? 'Try a different search term' : 'Get started by adding your first contact'}
-            action={!searchTerm ? (
+            message="Get started by adding your first contact"
+            action={
               <Link to="/contacts/new">
                 <Button size="sm">Add Contact</Button>
               </Link>
-            ) : undefined}
+            }
           />
         </Card>
       ) : (

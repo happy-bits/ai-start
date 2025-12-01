@@ -1,20 +1,12 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useSellers, useDeleteSeller } from '../../api/sellers';
-import { Button, Card, Badge, LoadingSpinner, EmptyState, Avatar, SearchInput } from '../../components/ui';
+import { Button, Card, Badge, LoadingSpinner, EmptyState, Avatar } from '../../components/ui';
 import { formatDate } from '../../utils';
 
 export default function SellerList() {
   const { data: sellers = [], isLoading } = useSellers();
   const deleteSeller = useDeleteSeller();
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const filteredSellers = sellers.filter(
-    (seller) =>
-      seller.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      seller.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleDelete = async (id: number) => {
     deleteSeller.mutate(id);
@@ -38,20 +30,13 @@ export default function SellerList() {
         </Link>
       </div>
 
-      {/* Search */}
-      <SearchInput
-        placeholder="Search sellers..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
       {/* Seller list */}
       <Card padding="none">
         {isLoading ? (
           <div className="p-8 flex justify-center">
             <LoadingSpinner size="md" />
           </div>
-        ) : filteredSellers.length === 0 ? (
+        ) : sellers.length === 0 ? (
           <EmptyState
             icon={
               <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -59,12 +44,12 @@ export default function SellerList() {
               </svg>
             }
             title="No sellers found"
-            message={searchTerm ? 'Try a different search term' : 'Get started by adding your first seller'}
-            action={!searchTerm ? (
+            message="Get started by adding your first seller"
+            action={
               <Link to="/sellers/new">
                 <Button size="sm">Add Seller</Button>
               </Link>
-            ) : undefined}
+            }
           />
         ) : (
           <div className="overflow-x-auto">
@@ -89,7 +74,7 @@ export default function SellerList() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-dark-700">
-                {filteredSellers.map((seller) => (
+                {sellers.map((seller) => (
                   <tr key={seller.id} className="hover:bg-dark-800/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
