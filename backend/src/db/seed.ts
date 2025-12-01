@@ -59,17 +59,6 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
 
   console.log('Created users:', { adminUser, seller1, seller2 });
 
-  // Helper function to generate follow-up date between 2025-11-20 and 2026-01-18
-  function getFollowUpDate(index: number): string {
-    const startDate = new Date('2025-11-20');
-    const endDate = new Date('2026-01-18');
-    const daysDiff = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const daysToAdd = (index * 7) % (daysDiff + 1); // Distribute evenly across range
-    const date = new Date(startDate);
-    date.setDate(date.getDate() + daysToAdd);
-    return date.toISOString().split('T')[0];
-  }
-
   // Swedish names and companies for seed data
   const swedishNames = [
     'Erik Andersson', 'Anna Larsson', 'Johan Nilsson', 'Maria Johansson', 'Lars Eriksson',
@@ -100,7 +89,6 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
         email: `${swedishNames[i].toLowerCase().replace(' ', '.')}@${companies[i].toLowerCase().replace(/\s+/g, '')}.se`,
         phone: `+46 70 ${String(123 + i).padStart(3, '0')} ${String(45 + i).padStart(2, '0')} ${String(67 + i).padStart(2, '0')}`,
         company: companies[i],
-        followUpDate: getFollowUpDate(i),
         createdAt: SEED_DATE,
         updatedAt: SEED_DATE,
       })
@@ -120,7 +108,6 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
       email: 'johan.nilsson@ikea.se',
       phone: '+46 73 345 67 89',
       company: 'IKEA Sverige',
-      followUpDate: '2026-01-03',
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })
@@ -136,7 +123,6 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
       email: 'kristina.wallin@astrazeneca.com',
       phone: '+46 73 456 78 90',
       company: 'AstraZeneca Sverige',
-      followUpDate: '2026-01-10',
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })
@@ -152,7 +138,6 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
       email: 'robert.lindgren@teliacompany.se',
       phone: '+46 73 567 89 01',
       company: 'Telia Company',
-      followUpDate: '2025-12-15',
       createdAt: SEED_DATE,
       updatedAt: SEED_DATE,
     })

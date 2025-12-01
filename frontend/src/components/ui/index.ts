@@ -12,8 +12,6 @@ export { default as Avatar } from './Avatar';
 export { default as SearchInput } from './SearchInput';
 export { default as InlineEditable } from './InlineEditable';
 export { default as InlineEditableSelect } from './InlineEditableSelect';
-export { default as InlineEditableDate } from './InlineEditableDate';
-export { default as InlineEditableDateWithQuickActions } from './InlineEditableDateWithQuickActions';
 export { default as InlineEditableTime } from './InlineEditableTime';
 export { default as InlineEditableTextarea } from './InlineEditableTextarea';
 

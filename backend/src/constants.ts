@@ -19,10 +19,6 @@ export const ARGON_OPTIONS = {
   parallelism: 1,
 } as const;
 
-// Date format
-export const DATE_FORMAT_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-export const DATE_FORMAT_MESSAGE = 'Date must be YYYY-MM-DD format';
-
 // Auth
 export const AUTH_HEADER_PREFIX = 'Bearer';
 

@@ -2,161 +2,20 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
-import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions } from '../../components/ui';
+import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable } from '../../components/ui';
 import { actionButtonBase } from '../../utils/styles';
 
 import type { Contact } from '../../api/types';
 
-// Helper function to check if a follow-up date is today or earlier
-function isFollowUpDue(followUpDate: string | null): boolean {
-  if (!followUpDate) return false;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const followUp = new Date(followUpDate);
-  followUp.setHours(0, 0, 0, 0);
-  return followUp <= today;
-}
-
-// Helper function to sort contacts
+// Helper function to sort contacts alphabetically by name
 function sortContacts(contacts: Contact[]): Contact[] {
   return [...contacts].sort((a, b) => {
-    // If both have followup dates, sort by date (earliest first), then by ID if dates are equal
-    if (a.followUpDate && b.followUpDate) {
-      const dateDiff = new Date(a.followUpDate).getTime() - new Date(b.followUpDate).getTime();
-      if (dateDiff !== 0) {
-        return dateDiff;
-      }
-      // If dates are equal, sort by ID
-      return a.id - b.id;
-    }
-    // If only a has a followup date, it comes first
-    if (a.followUpDate && !b.followUpDate) {
-      return -1;
-    }
-    // If only b has a followup date, it comes first
-    if (!a.followUpDate && b.followUpDate) {
-      return 1;
-    }
-    // If neither has a followup date, sort by ID
-    return a.id - b.id;
+    const nameA = (a.name || '').toLowerCase();
+    const nameB = (b.name || '').toLowerCase();
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0;
   });
-}
-
-// Component to render priority contacts as cards
-function PriorityContactCards({ contacts, updateContact, deleteContact }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact> }) {
-  const handleDelete = async (id: number) => {
-    deleteContact.mutate(id);
-  };
-
-  return (
-    <div className="space-y-4">
-      {contacts.map((contact) => {
-        return (
-          <Card key={contact.id} className="hover:border-warm-500/30 transition-colors">
-            <div className="space-y-4">
-              {/* Contact Header */}
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <Avatar name={contact.name} size="md" />
-                  <div className="flex-1 min-w-0">
-                    <InlineEditable
-                      value={contact.name}
-                      onSave={async (value) => {
-                        await updateContact.mutateAsync({
-                          id: contact.id,
-                          data: { name: value || '' },
-                        });
-                      }}
-                      type="text"
-                      placeholder="Contact name"
-                      className="text-white font-medium hover:text-white truncate"
-                      emptyText="Add name"
-                    />
-                    <div className="mt-1">
-                      <InlineEditable
-                        value={contact.company}
-                        onSave={async (value) => {
-                          await updateContact.mutateAsync({
-                            id: contact.id,
-                            data: { company: value },
-                          });
-                        }}
-                        type="text"
-                        placeholder="Company name"
-                        className="text-dark-400 hover:text-white truncate"
-                        emptyText="Add company"
-                      />
-                    </div>
-                    {/* Contact Info */}
-                    <div className="space-y-1 mt-2">
-                      <InlineEditable
-                        value={contact.email}
-                        onSave={async (value) => {
-                          await updateContact.mutateAsync({
-                            id: contact.id,
-                            data: { email: value },
-                          });
-                        }}
-                        type="email"
-                        placeholder="email@example.com"
-                        emptyText="Add email"
-                      />
-                      <InlineEditable
-                        value={contact.phone}
-                        onSave={async (value) => {
-                          await updateContact.mutateAsync({
-                            id: contact.id,
-                            data: { phone: value },
-                          });
-                        }}
-                        type="tel"
-                        placeholder="+46 73 345 67 89"
-                        emptyText="Add phone"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={actionButtonBase}
-                  >
-                    View
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(contact.id)}
-                    disabled={deleteContact.isPending}
-                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Follow-up Date */}
-              <div>
-                <InlineEditableDateWithQuickActions
-                  value={contact.followUpDate}
-                  onSave={async (value) => {
-                    await updateContact.mutateAsync({
-                      id: contact.id,
-                      data: { followUpDate: value },
-                    });
-                  }}
-                  emptyText="Add follow-up date"
-                />
-              </div>
-            </div>
-          </Card>
-        );
-      })}
-    </div>
-  );
 }
 
 // Component to render contact table
@@ -223,18 +82,6 @@ function ContactTable({ contacts, updateContact, deleteContact, showHeader = tru
                             placeholder="Company name"
                             className="text-dark-400 hover:text-white"
                             emptyText="Add company"
-                          />
-                        </div>
-                        <div className="mt-2">
-                          <InlineEditableDate
-                            value={contact.followUpDate}
-                            onSave={async (value) => {
-                              await updateContact.mutateAsync({
-                                id: contact.id,
-                                data: { followUpDate: value },
-                              });
-                            }}
-                            emptyText="Add follow-up date"
                           />
                         </div>
                       </div>
@@ -304,25 +151,16 @@ export default function ContactList() {
   const updateContact = useUpdateContact();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Filter contacts globally first
-  const filteredContacts = useMemo(() => {
-    return contacts.filter(
+  // Filter and sort contacts alphabetically
+  const sortedContacts = useMemo(() => {
+    const filtered = contacts.filter(
       (contact) =>
         contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    return sortContacts(filtered);
   }, [contacts, searchTerm]);
-
-  // Split into priority (due today or earlier) and other contacts
-  const { priorityContacts, otherContacts } = useMemo(() => {
-    const priority = filteredContacts.filter((contact) => isFollowUpDue(contact.followUpDate));
-    const other = filteredContacts.filter((contact) => !isFollowUpDue(contact.followUpDate));
-    return {
-      priorityContacts: sortContacts(priority),
-      otherContacts: sortContacts(other),
-    };
-  }, [filteredContacts]);
 
   return (
     <div className="space-y-6">
@@ -355,70 +193,27 @@ export default function ContactList() {
             <LoadingSpinner size="md" />
           </div>
         </Card>
+      ) : sortedContacts.length === 0 ? (
+        <Card padding="none">
+          <EmptyState
+            icon={
+              <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            }
+            title="No contacts found"
+            message={searchTerm ? 'Try a different search term' : 'Get started by adding your first contact'}
+            action={!searchTerm ? (
+              <Link to="/contacts/new">
+                <Button size="sm">Add Contact</Button>
+              </Link>
+            ) : undefined}
+          />
+        </Card>
       ) : (
-        <>
-          {/* Priority/Todo Section */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-white">Today's Follow-ups</h2>
-              {priorityContacts.length > 0 && (
-                <span className="px-2 py-1 text-xs font-medium bg-warm-500/20 text-warm-300 rounded-full">
-                  {priorityContacts.length}
-                </span>
-              )}
-            </div>
-            {priorityContacts.length === 0 ? (
-              <Card>
-                <EmptyState
-                  icon={
-                    <svg className="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  }
-                  title="All caught up!"
-                  message="No follow-ups due today. Great work!"
-                />
-              </Card>
-            ) : (
-              <PriorityContactCards contacts={priorityContacts} updateContact={updateContact} deleteContact={deleteContact} />
-            )}
-          </div>
-
-          {/* Other Contacts Section */}
-          {otherContacts.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold text-white">Other Contacts</h2>
-                <span className="px-2 py-1 text-xs font-medium bg-dark-700 text-dark-300 rounded-full">
-                  {otherContacts.length}
-                </span>
-              </div>
-              <Card padding="none">
-                <ContactTable contacts={otherContacts} updateContact={updateContact} deleteContact={deleteContact} />
-              </Card>
-            </div>
-          )}
-
-          {/* Empty state when no contacts match search */}
-          {filteredContacts.length === 0 && (
-            <Card padding="none">
-              <EmptyState
-                icon={
-                  <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                }
-                title="No contacts found"
-                message={searchTerm ? 'Try a different search term' : 'Get started by adding your first contact'}
-                action={!searchTerm ? (
-                  <Link to="/contacts/new">
-                    <Button size="sm">Add Contact</Button>
-                  </Link>
-                ) : undefined}
-              />
-            </Card>
-          )}
-        </>
+        <Card padding="none">
+          <ContactTable contacts={sortedContacts} updateContact={updateContact} deleteContact={deleteContact} />
+        </Card>
       )}
     </div>
   );

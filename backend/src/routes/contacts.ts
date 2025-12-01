@@ -6,14 +6,13 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { type AuthVariables } from '../middleware/auth.js';
 import { withEntityAccess, buildUpdateValues } from './helpers.js';
-import { ERROR_MESSAGES, ROLES, DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE } from '../constants.js';
+import { ERROR_MESSAGES, ROLES } from '../constants.js';
 
 const createContactSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
-  followUpDate: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE).optional().nullable(),
 });
 
 const updateContactSchema = z.object({
@@ -21,7 +20,6 @@ const updateContactSchema = z.object({
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
-  followUpDate: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE).optional().nullable(),
 });
 
 export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
@@ -65,7 +63,6 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
         email: data.email ?? null,
         phone: data.phone ?? null,
         company: data.company ?? null,
-        followUpDate: data.followUpDate ?? null,
         createdAt: now,
         updatedAt: now,
       })
@@ -81,7 +78,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
     if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
-    const updateValues = buildUpdateValues(updates, ['name', 'email', 'phone', 'company', 'followUpDate']);
+    const updateValues = buildUpdateValues(updates, ['name', 'email', 'phone', 'company']);
 
     const contact = db
       .update(schema.contacts)
