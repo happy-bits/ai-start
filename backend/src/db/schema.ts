@@ -26,7 +26,6 @@ export const contacts = sqliteTable('contacts', {
   sellerId: integer('seller_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   email: text('email'),
-  phone: text('phone'),
   company: text('company'),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
   updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),

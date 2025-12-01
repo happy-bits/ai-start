@@ -11,14 +11,12 @@ import { ERROR_MESSAGES, ROLES } from '../constants.js';
 const createContactSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().optional().nullable(),
-  phone: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
 });
 
 const updateContactSchema = z.object({
   name: z.string().min(1).optional(),
   email: z.string().email().optional().nullable(),
-  phone: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
 });
 
@@ -61,7 +59,6 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
         sellerId: user.id,
         name: data.name,
         email: data.email ?? null,
-        phone: data.phone ?? null,
         company: data.company ?? null,
         createdAt: now,
         updatedAt: now,
@@ -78,7 +75,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
     if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
-    const updateValues = buildUpdateValues(updates, ['name', 'email', 'phone', 'company']);
+    const updateValues = buildUpdateValues(updates, ['name', 'email', 'company']);
 
     const contact = db
       .update(schema.contacts)

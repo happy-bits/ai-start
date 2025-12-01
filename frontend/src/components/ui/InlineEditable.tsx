@@ -13,7 +13,7 @@ import {
 interface InlineEditableProps {
   value: string | null;
   onSave: (value: string | null) => Promise<void>;
-  type?: 'email' | 'tel' | 'text';
+  type?: 'email' | 'text';
   placeholder?: string;
   className?: string;
   emptyText?: string;
@@ -38,14 +38,6 @@ export default function InlineEditable({
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(trimmed)) {
         return 'Invalid email format';
-      }
-    }
-
-    if (type === 'tel') {
-      // Basic phone validation - allow international format
-      const phoneRegex = /^[\d\s\+\-\(\)]+$/;
-      if (!phoneRegex.test(trimmed) || trimmed.length < 3) {
-        return 'Invalid phone format';
       }
     }
 

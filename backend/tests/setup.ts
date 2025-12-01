@@ -49,7 +49,6 @@ export function createTestDatabase() {
       seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       name TEXT NOT NULL,
       email TEXT,
-      phone TEXT,
       company TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
@@ -125,7 +124,6 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
       sellerId: seller.id,
       name: 'Test Contact',
       email: 'contact@test.com',
-      phone: '+1-555-0100',
       company: 'Test Corp',
       createdAt: now,
       updatedAt: now,
@@ -139,7 +137,6 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
       sellerId: seller2.id,
       name: 'Other Contact',
       email: 'other@test.com',
-      phone: '+1-555-0200',
       company: 'Other Corp',
       createdAt: now,
       updatedAt: now,
@@ -275,7 +272,6 @@ export function createTestContact(
   overrides?: Partial<{
     name: string;
     email: string;
-    phone: string;
     company: string;
   }>
 ) {
@@ -286,7 +282,6 @@ export function createTestContact(
       sellerId,
       name: overrides?.name ?? 'Test Contact',
       email: overrides?.email ?? 'contact@test.com',
-      phone: overrides?.phone ?? '+1-555-0100',
       company: overrides?.company ?? 'Test Corp',
       createdAt: now,
       updatedAt: now,

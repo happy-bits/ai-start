@@ -41,7 +41,6 @@ export function initializeDatabase() {
       seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       name TEXT NOT NULL,
       email TEXT,
-      phone TEXT,
       company TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL

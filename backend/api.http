@@ -126,9 +126,7 @@ Content-Type: application/json
 {
   "name": "New Contact Inc",
   "email": "contact@newcontact.com",
-  "phone": "+1-555-9999",
-  "company": "New Contact Inc",
-  "notes": "Potential enterprise client"
+  "company": "New Contact Inc"
 }
 
 ### Update Contact

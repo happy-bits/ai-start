@@ -76,7 +76,6 @@ describe('Contact Routes', () => {
         await post(ctx.app, '/api/contacts', ctx.sellerToken, {
           name: 'New Contact',
           email: 'new@contact.com',
-          phone: '+1-555-1234',
           company: 'New Corp',
         })
       );

@@ -14,7 +14,6 @@ export interface Contact {
   sellerId: number;
   name: string;
   email: string | null;
-  phone: string | null;
   company: string | null;
   createdAt: string;
   updatedAt: string;
@@ -23,14 +22,12 @@ export interface Contact {
 export interface CreateContactData {
   name: string;
   email?: string | null;
-  phone?: string | null;
   company?: string | null;
 }
 
 export interface UpdateContactData {
   name?: string;
   email?: string | null;
-  phone?: string | null;
   company?: string | null;
 }
 

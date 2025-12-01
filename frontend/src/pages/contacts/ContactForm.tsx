@@ -20,7 +20,6 @@ export default function ContactForm() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
     company: '',
   });
 
@@ -29,7 +28,6 @@ export default function ContactForm() {
       setFormData({
         name: existingContact.name,
         email: existingContact.email || '',
-        phone: existingContact.phone || '',
         company: existingContact.company || '',
       });
     }
@@ -61,7 +59,6 @@ export default function ContactForm() {
     const data = {
       name: formData.name.trim(),
       email: formData.email.trim() || null,
-      phone: formData.phone.trim() || null,
       company: formData.company.trim() || null,
     };
     handleSubmit(e, data);
@@ -71,7 +68,6 @@ export default function ContactForm() {
     setFormData({
       name: 'Mikael Pettersson',
       email: 'mikael.petterson@volvo.com',
-      phone: '+46 70 123 45 67',
       company: 'Volvo AB',
     });
   };
@@ -124,23 +120,13 @@ export default function ContactForm() {
             required
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <Input
-              label="Email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="john@company.com"
-            />
-
-            <Input
-              label="Phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="+1 (555) 123-4567"
-            />
-          </div>
+          <Input
+            label="Email"
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            placeholder="john@company.com"
+          />
 
           <Input
             label="Company"
