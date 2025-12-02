@@ -3,7 +3,6 @@ import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import ContactList from './pages/contacts/ContactList';
-import ContactDetail from './pages/contacts/ContactDetail';
 import ContactForm from './pages/contacts/ContactForm';
 import SellerList from './pages/sellers/SellerList';
 import SellerForm from './pages/sellers/SellerForm';
@@ -52,7 +51,6 @@ export default function App() {
         <Route index element={<Navigate to="/contacts" replace />} />
         <Route path="contacts" element={<ContactList />} />
         <Route path="contacts/new" element={<ContactForm />} />
-        <Route path="contacts/:id" element={<ContactDetail />} />
         <Route
           path="sellers"
           element={

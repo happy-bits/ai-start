@@ -8,11 +8,6 @@ export async function getContacts(): Promise<Contact[]> {
   return response.contacts;
 }
 
-export async function getContact(id: number): Promise<Contact> {
-  const response = await apiClient.get<{ contact: Contact }>(`/api/contacts/${id}`);
-  return response.contact;
-}
-
 export async function createContact(data: CreateContactData): Promise<Contact> {
   const response = await apiClient.post<{ contact: Contact }>('/api/contacts', data);
   return response.contact;
@@ -27,14 +22,6 @@ export function useContacts() {
   return useQuery({
     queryKey: ['contacts'],
     queryFn: getContacts,
-  });
-}
-
-export function useContact(id: number) {
-  return useQuery({
-    queryKey: ['contacts', id],
-    queryFn: () => getContact(id),
-    enabled: !!id,
   });
 }
 
