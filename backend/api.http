@@ -5,8 +5,8 @@
 #
 # Test Credentials:
 # - Admin: admin@keepwarm.com / admin123
-# - Seller: alice@keepwarm.com / seller123
-# - Seller: bob@keepwarm.com / seller123
+# - Seller: maria@sellmore.se / seller123
+# - Seller: lars@hotmail.com / seller123
 #
 # Start server: SEED_DB=true npm run dev
 
@@ -34,23 +34,23 @@ Content-Type: application/json
   "password": "admin123"
 }
 
-### Login as Seller (Alice)
+### Login as Seller (Maria)
 # @name login
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "alice@keepwarm.com",
+  "email": "maria@sellmore.se",
   "password": "seller123"
 }
 
-### Login as Seller (Bob)
+### Login as Seller (Lars)
 # @name login
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "bob@keepwarm.com",
+  "email": "lars@hotmail.com",
   "password": "seller123"
 }
 
