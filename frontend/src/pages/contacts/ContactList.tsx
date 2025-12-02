@@ -56,11 +56,6 @@ function ContactTable({ contacts, deleteContact }: { contacts: Contact[]; delete
                         <p className="text-white font-medium">
                           {contact.name || 'No name'}
                         </p>
-                        {contact.company && (
-                          <p className="text-sm text-dark-400 mt-1">
-                            {contact.company}
-                          </p>
-                        )}
                       </div>
                     </div>
                   </td>
