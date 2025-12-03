@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { hash, verify } from '@node-rs/argon2';
+import { verify } from '@node-rs/argon2';
 import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
@@ -56,15 +56,6 @@ export function createAuthRoutes(db: BetterSQLite3Database<typeof schema>) {
       deleteSession(db, token);
     }
     return c.json({ message: SUCCESS_MESSAGES.LOGGED_OUT });
-  });
-
-  // GET /auth/me - Get current user info (requires auth)
-  app.get('/me', (c) => {
-    const user = c.get('user');
-    if (!user) {
-      return c.json({ error: ERROR_MESSAGES.NOT_AUTHENTICATED }, 401);
-    }
-    return c.json({ user });
   });
 
   return app;

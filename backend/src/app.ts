@@ -3,7 +3,7 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { HTTPException } from 'hono/http-exception';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import * as schema from './db/schema.js';
+import type * as schema from './db/schema.js';
 import { authMiddleware, type AuthVariables } from './middleware/auth.js';
 import { createAuthRoutes } from './routes/auth.js';
 import { createSellerRoutes } from './routes/sellers.js';

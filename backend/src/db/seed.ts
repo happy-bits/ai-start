@@ -1,5 +1,4 @@
 import { hash } from '@node-rs/argon2';
-import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from './schema.js';
 import { ARGON_OPTIONS, ROLES } from '../constants.js';
@@ -306,8 +305,11 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
 }
 
 // Run seed if called directly
-const isMainModule = import.meta.url === `file://${process.argv[1]}`;
-if (isMainModule) {
+// Check if this module is being run directly (not imported) by comparing file paths
+import { fileURLToPath } from 'url';
+const currentFile = fileURLToPath(import.meta.url);
+const entryFile = process.argv[1];
+if (currentFile === entryFile || entryFile?.endsWith('seed.ts')) {
   const { db, rawDb } = await import('./index.js');
   const { initializeDatabase } = await import('./index.js');
   initializeDatabase();

@@ -7,7 +7,6 @@ import { createSession, hashPassword } from '../src/middleware/auth.js';
 
 export type TestContext = {
   db: ReturnType<typeof drizzle<typeof schema>>;
-  rawDb: Database.Database;
   app: ReturnType<typeof createApp>;
   adminToken: string;
   sellerToken: string;
@@ -76,7 +75,7 @@ export function createTestDatabase() {
   `);
 
   const db = drizzle(sqlite, { schema });
-  return { db, rawDb: sqlite };
+  return { db };
 }
 
 // Seed test data with deterministic values
@@ -200,13 +199,12 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
 
 // Setup helper for tests
 export async function setupTest(): Promise<TestContext> {
-  const { db, rawDb } = createTestDatabase();
+  const { db } = createTestDatabase();
   const seedData = await seedTestData(db);
   const app = createApp(db, { enableLogging: false });
 
   return {
     db,
-    rawDb,
     app,
     ...seedData,
   };
@@ -243,11 +241,6 @@ export function del(app: TestContext['app'], url: string, token: string) {
 }
 
 // Test assertion helpers for cleaner tests
-export async function expectStatus(res: Response, status: number) {
-  expect(res.status).toBe(status);
-  return res;
-}
-
 export async function expectJson<T = unknown>(res: Response, status: number): Promise<T> {
   expect(res.status).toBe(status);
   return res.json() as Promise<T>;
@@ -275,57 +268,5 @@ export async function expectCreated<T = unknown>(res: Response): Promise<T> {
 
 export async function expectOk<T = unknown>(res: Response): Promise<T> {
   return expectJson<T>(res, 200);
-}
-
-// Helper to create test user with defaults
-export function createTestUser(
-  db: ReturnType<typeof drizzle<typeof schema>>,
-  overrides: Partial<{
-    email: string;
-    name: string;
-    role: 'admin' | 'seller';
-    passwordHash: string;
-  }> & { passwordHash: string }
-) {
-  const now = '2024-01-15T10:00:00.000Z';
-  return db
-    .insert(schema.users)
-    .values({
-      email: overrides.email ?? `user-${Date.now()}@test.com`,
-      passwordHash: overrides.passwordHash,
-      name: overrides.name ?? 'Test User',
-      role: overrides.role ?? 'seller',
-      createdAt: now,
-      updatedAt: now,
-    })
-    .returning()
-    .get();
-}
-
-// Helper to create test contact with defaults
-export function createTestContact(
-  db: ReturnType<typeof drizzle<typeof schema>>,
-  sellerId: number,
-  overrides?: Partial<{
-    name: string;
-    email: string;
-    phone: string;
-    company: string;
-  }>
-) {
-  const now = '2024-01-15T10:00:00.000Z';
-  return db
-    .insert(schema.contacts)
-    .values({
-      sellerId,
-      name: overrides?.name ?? 'Test Contact',
-      email: overrides?.email ?? 'contact@test.com',
-      phone: overrides?.phone ?? '+1-555-0100',
-      company: overrides?.company ?? 'Test Corp',
-      createdAt: now,
-      updatedAt: now,
-    })
-    .returning()
-    .get();
 }
 

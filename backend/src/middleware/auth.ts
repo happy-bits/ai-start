@@ -1,7 +1,7 @@
 import { Context, Next } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { hash } from '@node-rs/argon2';
-import { eq, and, gt, lt } from 'drizzle-orm';
+import { eq, and, gt } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import {
@@ -26,7 +26,6 @@ export type AuthUser = {
 
 export type AuthVariables = {
   user: AuthUser;
-  db: BetterSQLite3Database<typeof schema>;
 };
 
 // Extract bearer token from Authorization header
@@ -72,7 +71,6 @@ export function authMiddleware(db: BetterSQLite3Database<typeof schema>) {
       name: session.name,
       role: session.role as 'admin' | 'seller',
     });
-    c.set('db', db);
 
     await next();
   };
@@ -92,7 +90,7 @@ export function adminOnly() {
 }
 
 // Generate a secure random token
-export function generateToken(): string {
+function generateToken(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let token = '';
   const randomBytes = new Uint8Array(SESSION_CONFIG.TOKEN_LENGTH);
@@ -128,13 +126,6 @@ export function createSession(
 export function deleteSession(db: BetterSQLite3Database<typeof schema>, token: string): boolean {
   const result = db.delete(schema.sessions).where(eq(schema.sessions.token, token)).run();
   return result.changes > 0;
-}
-
-// Clean up expired sessions
-export function cleanupExpiredSessions(db: BetterSQLite3Database<typeof schema>): number {
-  const now = new Date().toISOString();
-  const result = db.delete(schema.sessions).where(lt(schema.sessions.expiresAt, now)).run();
-  return result.changes;
 }
 
 

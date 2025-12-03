@@ -6,7 +6,7 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../db/schema.js';
 import { type AuthVariables, adminOnly, hashPassword } from '../middleware/auth.js';
 import { parseIdParam, buildUpdateValues } from './helpers.js';
-import { ERROR_MESSAGES, ROLES, SUCCESS_MESSAGES } from '../constants.js';
+import { ERROR_MESSAGES, ROLES } from '../constants.js';
 
 const createSellerSchema = z.object({
   email: z.string().email(),

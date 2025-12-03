@@ -4,22 +4,8 @@ export const ROLES = {
   SELLER: 'seller',
 } as const;
 
-export type Role = (typeof ROLES)[keyof typeof ROLES];
-
 // Interaction types
-export const INTERACTION_TYPES = {
-  CALL: 'call',
-  MEETING: 'meeting',
-  EMAIL: 'email',
-} as const;
-
-export type InteractionType = (typeof INTERACTION_TYPES)[keyof typeof INTERACTION_TYPES];
-
-export const INTERACTION_TYPE_VALUES = [
-  INTERACTION_TYPES.CALL,
-  INTERACTION_TYPES.MEETING,
-  INTERACTION_TYPES.EMAIL,
-] as const;
+export const INTERACTION_TYPE_VALUES = ['call', 'meeting', 'email'] as const;
 
 // Session configuration
 export const SESSION_CONFIG = {
@@ -47,7 +33,6 @@ export const ERROR_MESSAGES = {
   AUTHENTICATION_REQUIRED: 'Authentication required',
   INVALID_OR_EXPIRED_SESSION: 'Invalid or expired session',
   INVALID_CREDENTIALS: 'Invalid email or password',
-  NOT_AUTHENTICATED: 'Not authenticated',
   ADMIN_ACCESS_REQUIRED: 'Admin access required',
   ACCESS_DENIED: 'Access denied',
 

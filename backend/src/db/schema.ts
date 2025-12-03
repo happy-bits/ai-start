@@ -46,15 +46,5 @@ export const interactions = sqliteTable('interactions', {
   updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),
 });
 
-// Type exports
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
-export type Session = typeof sessions.$inferSelect;
-export type NewSession = typeof sessions.$inferInsert;
-export type Contact = typeof contacts.$inferSelect;
-export type NewContact = typeof contacts.$inferInsert;
-export type Interaction = typeof interactions.$inferSelect;
-export type NewInteraction = typeof interactions.$inferInsert;
-
 
 

@@ -12,7 +12,7 @@ sqlite.pragma('foreign_keys = ON');
 // Create Drizzle ORM instance
 export const db = drizzle(sqlite, { schema });
 
-// Export the raw sqlite connection for direct operations
+// Export the raw sqlite connection for direct operations (used in seed.ts and tests)
 export const rawDb = sqlite;
 
 // Initialize database tables
@@ -76,22 +76,6 @@ export function resetDatabase() {
     DROP TABLE IF EXISTS users;
   `);
   initializeDatabase();
-}
-
-// Close database connection
-export function closeDatabase() {
-  sqlite.close();
-}
-
-// Create a new database instance (useful for testing)
-export function createDatabase(dbPath: string = ':memory:') {
-  const testSqlite = new Database(dbPath);
-  testSqlite.pragma('journal_mode = WAL');
-  testSqlite.pragma('foreign_keys = ON');
-  return {
-    db: drizzle(testSqlite, { schema }),
-    rawDb: testSqlite,
-  };
 }
 
 
