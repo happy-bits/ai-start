@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { ROLES } from '../constants.js';
 
 // Users table (sellers and admins)
 export const users = sqliteTable('users', {
@@ -6,7 +7,7 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   name: text('name').notNull(),
-  role: text('role', { enum: ['admin', 'seller'] }).notNull().default('seller'),
+  role: text('role', { enum: [ROLES.ADMIN, ROLES.SELLER] }).notNull().default(ROLES.SELLER),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
   updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),
 });

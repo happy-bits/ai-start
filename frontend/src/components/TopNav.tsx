@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { navItems, adminItems } from '../config/navigation';
 import { navLinkBase, navLinkActive, navLinkInactive, cn } from '../utils/styles';
+import { ROLES } from '../constants';
 
 export default function TopNav() {
   const { user, logout } = useAuth();
@@ -35,7 +36,7 @@ export default function TopNav() {
               </NavLink>
             ))}
 
-            {user?.role === 'admin' && (
+            {user?.role === ROLES.ADMIN && (
               <>
                 <div className="h-6 w-px bg-dark-700 mx-2" />
                 {adminItems.map((item) => (
@@ -59,7 +60,7 @@ export default function TopNav() {
             {user && (
               <div className="text-right">
                 <p className="text-sm font-medium text-white">{user.name}</p>
-                <p className="text-xs text-dark-400">{user.role === 'admin' ? 'Admin' : 'Seller'}</p>
+                <p className="text-xs text-dark-400">{user.role === ROLES.ADMIN ? 'Admin' : 'Seller'}</p>
               </div>
             )}
             <button

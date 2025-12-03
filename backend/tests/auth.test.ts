@@ -9,6 +9,7 @@ import {
   expectJson,
   type TestContext,
 } from './setup.js';
+import { ROLES } from '../src/constants.js';
 
 describe('Auth Routes', () => {
   let ctx: TestContext;
@@ -27,7 +28,7 @@ describe('Auth Routes', () => {
       );
       expect(data.token).toBeDefined();
       expect(data.user.email).toBe('admin@test.com');
-      expect(data.user.role).toBe('admin');
+      expect(data.user.role).toBe(ROLES.ADMIN);
     });
 
     it('should reject invalid password', async () => {
@@ -83,7 +84,7 @@ describe('Auth Routes', () => {
         await get(ctx.app, '/api/me', ctx.sellerToken)
       );
       expect(data.user.email).toBe('seller@test.com');
-      expect(data.user.role).toBe('seller');
+      expect(data.user.role).toBe(ROLES.SELLER);
     });
 
     it('should reject unauthenticated request', async () => {

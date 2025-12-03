@@ -14,6 +14,7 @@ import {
   expectJson,
   type TestContext,
 } from './setup.js';
+import { ROLES } from '../src/constants.js';
 
 describe('Seller Routes', () => {
   let ctx: TestContext;
@@ -74,7 +75,7 @@ describe('Seller Routes', () => {
       );
       expect(retrieved.seller.email).toBe('newseller@test.com');
       expect(retrieved.seller.name).toBe('New Seller');
-      expect(retrieved.seller.role).toBe('seller');
+      expect(retrieved.seller.role).toBe(ROLES.SELLER);
     });
 
     it('should reject duplicate email', async () => {

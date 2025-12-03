@@ -1,9 +1,11 @@
+import { ROLES } from '../constants';
+
 // User types
 export interface User {
   id: number;
   email: string;
   name: string;
-  role: 'admin' | 'seller';
+  role: typeof ROLES.ADMIN | typeof ROLES.SELLER;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -83,7 +85,7 @@ export interface Seller {
   id: number;
   email: string;
   name: string;
-  role: 'seller';
+  role: typeof ROLES.SELLER;
   createdAt: string;
   updatedAt: string;
 }

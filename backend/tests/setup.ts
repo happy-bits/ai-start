@@ -4,6 +4,7 @@ import { expect } from 'vitest';
 import * as schema from '../src/db/schema.js';
 import { createApp } from '../src/app.js';
 import { createSession, hashPassword } from '../src/middleware/auth.js';
+import { ROLES } from '../src/constants.js';
 
 export type TestContext = {
   db: ReturnType<typeof drizzle<typeof schema>>;
@@ -31,7 +32,7 @@ export function createTestDatabase() {
       email TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
       name TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'seller' CHECK(role IN ('admin', 'seller')),
+      role TEXT NOT NULL DEFAULT '${ROLES.SELLER}' CHECK(role IN ('${ROLES.ADMIN}', '${ROLES.SELLER}')),
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -100,7 +101,7 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
       email: 'admin@test.com',
       passwordHash,
       name: 'Test Admin',
-      role: 'admin',
+      role: ROLES.ADMIN,
       createdAt: now,
       updatedAt: now,
     })
@@ -114,7 +115,7 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
       email: 'seller@test.com',
       passwordHash,
       name: 'Test Seller',
-      role: 'seller',
+      role: ROLES.SELLER,
       createdAt: now,
       updatedAt: now,
     })
@@ -127,7 +128,7 @@ export async function seedTestData(db: ReturnType<typeof drizzle<typeof schema>>
       email: 'seller2@test.com',
       passwordHash,
       name: 'Test Seller 2',
-      role: 'seller',
+      role: ROLES.SELLER,
       createdAt: now,
       updatedAt: now,
     })

@@ -21,7 +21,7 @@ export type AuthUser = {
   id: number;
   email: string;
   name: string;
-  role: 'admin' | 'seller';
+  role: typeof ROLES.ADMIN | typeof ROLES.SELLER;
 };
 
 export type AuthVariables = {
@@ -69,7 +69,7 @@ export function authMiddleware(db: BetterSQLite3Database<typeof schema>) {
       id: session.userId,
       email: session.email,
       name: session.name,
-      role: session.role as 'admin' | 'seller',
+      role: session.role as typeof ROLES.ADMIN | typeof ROLES.SELLER,
     });
 
     await next();

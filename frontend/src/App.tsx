@@ -8,6 +8,7 @@ import ContactForm from './pages/contacts/ContactForm';
 import SellerList from './pages/sellers/SellerList';
 import SellerForm from './pages/sellers/SellerForm';
 import { LoadingSpinner } from './components/ui';
+import { ROLES } from './constants';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -30,7 +31,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
 
-  if (user?.role !== 'admin') {
+  if (user?.role !== ROLES.ADMIN) {
     return <Navigate to="/" replace />;
   }
 

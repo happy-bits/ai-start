@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import * as schema from './schema.js';
+import { ROLES } from '../constants.js';
 
 const DB_PATH = process.env.DB_PATH || 'keepwarm.db';
 
@@ -23,7 +24,7 @@ export function initializeDatabase() {
       email TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
       name TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'seller' CHECK(role IN ('admin', 'seller')),
+      role TEXT NOT NULL DEFAULT '${ROLES.SELLER}' CHECK(role IN ('${ROLES.ADMIN}', '${ROLES.SELLER}')),
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
