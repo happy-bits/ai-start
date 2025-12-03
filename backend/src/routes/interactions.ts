@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { eq, and } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import type { InferSelectModel } from 'drizzle-orm';
 import * as schema from '../db/schema.js';
 import { type AuthVariables } from '../middleware/auth.js';
 import { withEntityAccess, buildUpdateValues, checkSellerAccess } from './helpers.js';
@@ -64,7 +65,7 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
   // GET /interactions/:id - Get interaction details
   app.get('/:id', (c) => {
-    const result = withEntityAccess<schema.Interaction>(c, db, schema.interactions, 'Interaction');
+    const result = withEntityAccess<InferSelectModel<typeof schema.interactions>>(c, db, schema.interactions, 'Interaction');
     if (!result.success) return result.response;
 
     return c.json({ interaction: result.entity });
@@ -113,7 +114,7 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
   // PUT /interactions/:id - Update interaction
   app.put('/:id', zValidator('json', updateInteractionSchema), (c) => {
-    const result = withEntityAccess<schema.Interaction>(c, db, schema.interactions, 'Interaction');
+    const result = withEntityAccess<InferSelectModel<typeof schema.interactions>>(c, db, schema.interactions, 'Interaction');
     if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
@@ -131,7 +132,7 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
   // DELETE /interactions/:id - Delete interaction
   app.delete('/:id', (c) => {
-    const result = withEntityAccess<schema.Interaction>(c, db, schema.interactions, 'Interaction');
+    const result = withEntityAccess<InferSelectModel<typeof schema.interactions>>(c, db, schema.interactions, 'Interaction');
     if (!result.success) return result.response;
 
     db.delete(schema.interactions).where(eq(schema.interactions.id, result.entity.id)).run();

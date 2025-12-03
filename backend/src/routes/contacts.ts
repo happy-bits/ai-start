@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import type { InferSelectModel } from 'drizzle-orm';
 import * as schema from '../db/schema.js';
 import { type AuthVariables } from '../middleware/auth.js';
 import { withEntityAccess, buildUpdateValues } from './helpers.js';
@@ -44,7 +45,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   // GET /contacts/:id - Get contact details
   app.get('/:id', (c) => {
-    const result = withEntityAccess<schema.Contact>(c, db, schema.contacts, 'Contact');
+    const result = withEntityAccess<InferSelectModel<typeof schema.contacts>>(c, db, schema.contacts, 'Contact');
     if (!result.success) return result.response;
 
     return c.json({ contact: result.entity });
@@ -77,7 +78,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   // PUT /contacts/:id - Update contact
   app.put('/:id', zValidator('json', updateContactSchema), (c) => {
-    const result = withEntityAccess<schema.Contact>(c, db, schema.contacts, 'Contact');
+    const result = withEntityAccess<InferSelectModel<typeof schema.contacts>>(c, db, schema.contacts, 'Contact');
     if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
@@ -95,7 +96,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   // DELETE /contacts/:id - Delete contact
   app.delete('/:id', (c) => {
-    const result = withEntityAccess<schema.Contact>(c, db, schema.contacts, 'Contact');
+    const result = withEntityAccess<InferSelectModel<typeof schema.contacts>>(c, db, schema.contacts, 'Contact');
     if (!result.success) return result.response;
 
     db.delete(schema.contacts).where(eq(schema.contacts.id, result.entity.id)).run();
