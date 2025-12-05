@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 
 import { useLogin, login as loginApi } from '../api/auth';
 import { apiClient } from '../api/client';
@@ -8,6 +9,17 @@ import { useAuth } from '../context/AuthContext';
 import { config } from '../config';
 import { getErrorMessage } from '../utils';
 import { formInputBase, formInputBorderNormal, formLabel, cn } from '../utils/styles';
+
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
+// Health check function
+async function checkHealth(): Promise<{ status: string }> {
+  const response = await fetch(`${API_BASE}/health`);
+  if (!response.ok) {
+    throw new Error('Backend is not responding');
+  }
+  return response.json();
+}
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,6 +30,15 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isResetting, setIsResetting] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
+
+  // Check backend health status
+  const { data: healthData, isError: isHealthError } = useQuery({
+    queryKey: ['health'],
+    queryFn: checkHealth,
+    refetchInterval: 500, // Check every 0.5 seconds
+    retry: 1,
+    enabled: config.developerTools, // Only check if developer tools are enabled
+  });
 
   const handleResetDatabase = async () => {
     setIsResetting(true);
@@ -142,9 +163,22 @@ export default function Login() {
           {/* Developer Tools: Quick Login */}
           {config.developerTools && (
             <div className="mt-6 pt-6 border-t border-dark-700">
-              <p className="text-xs text-dark-500 text-center mb-3">
-                Developer tools
-              </p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-dark-500">
+                  Developer tools
+                </p>
+                {/* Backend status indicator */}
+                <div className="flex items-center gap-1.5">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      isHealthError ? 'bg-red-500' : healthData?.status === 'ok' ? 'bg-green-500' : 'bg-yellow-500'
+                    }`}
+                  />
+                  <span className="text-xs text-dark-400">
+                    {isHealthError ? 'Backend offline' : healthData?.status === 'ok' ? 'Backend online' : 'Checking...'}
+                  </span>
+                </div>
+              </div>
               
               {/* Credentials Display */}
               <div className="mb-4 space-y-1.5">
