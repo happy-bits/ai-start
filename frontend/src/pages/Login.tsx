@@ -32,7 +32,7 @@ export default function Login() {
   const [resetSuccess, setResetSuccess] = useState(false);
 
   // Check backend health status
-  const { data: healthData, isError: isHealthError } = useQuery({
+  const { data: healthData } = useQuery({
     queryKey: ['health'],
     queryFn: checkHealth,
     refetchInterval: 500, // Check every 0.5 seconds
@@ -171,11 +171,11 @@ export default function Login() {
                 <div className="flex items-center gap-1.5">
                   <div
                     className={`w-2 h-2 rounded-full ${
-                      isHealthError ? 'bg-red-500' : healthData?.status === 'ok' ? 'bg-green-500' : 'bg-yellow-500'
+                      healthData?.status === 'ok' ? 'bg-green-500' : 'bg-red-500'
                     }`}
                   />
                   <span className="text-xs text-dark-400">
-                    {isHealthError ? 'Backend offline' : healthData?.status === 'ok' ? 'Backend online' : 'Checking...'}
+                    {healthData?.status === 'ok' ? 'Backend online' : 'Backend offline'}
                   </span>
                 </div>
               </div>
