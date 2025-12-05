@@ -14,11 +14,16 @@ const API_BASE = import.meta.env.VITE_API_URL || '';
 
 // Health check function
 async function checkHealth(): Promise<{ status: string }> {
-  const response = await fetch(`${API_BASE}/health`);
-  if (!response.ok) {
+  try {
+    const response = await fetch(`${API_BASE}/health`);
+    if (!response.ok) {
+      throw new Error('Backend is not responding');
+    }
+    return response.json();
+  } catch (error) {
+    // Handle network errors (backend offline, CORS, etc.)
     throw new Error('Backend is not responding');
   }
-  return response.json();
 }
 
 export default function Login() {
@@ -32,12 +37,14 @@ export default function Login() {
   const [resetSuccess, setResetSuccess] = useState(false);
 
   // Check backend health status
-  const { data: healthData } = useQuery({
+  const { data: healthData, isError, isSuccess } = useQuery({
     queryKey: ['health'],
     queryFn: checkHealth,
     refetchInterval: 500, // Check every 0.5 seconds
     retry: 1,
     enabled: config.developerTools, // Only check if developer tools are enabled
+    // Don't keep previous data when query fails
+    keepPreviousData: false,
   });
 
   const handleResetDatabase = async () => {
@@ -171,11 +178,11 @@ export default function Login() {
                 <div className="flex items-center gap-1.5">
                   <div
                     className={`w-2 h-2 rounded-full ${
-                      healthData?.status === 'ok' ? 'bg-green-500' : 'bg-red-500'
+                      isSuccess && healthData?.status === 'ok' ? 'bg-green-500' : 'bg-red-500'
                     }`}
                   />
                   <span className="text-xs text-dark-400">
-                    {healthData?.status === 'ok' ? 'Backend online' : 'Backend offline'}
+                    {isSuccess && healthData?.status === 'ok' ? 'Backend online' : 'Backend offline'}
                   </span>
                 </div>
               </div>
