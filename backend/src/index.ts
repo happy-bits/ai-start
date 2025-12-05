@@ -1,5 +1,5 @@
 import { serve } from '@hono/node-server';
-import { db, initializeDatabase } from './db/index.js';
+import { db, initializeDatabase, resetDatabase } from './db/index.js';
 import { createApp } from './app.js';
 import { seedDatabase } from './db/seed.js';
 
@@ -10,6 +10,9 @@ initializeDatabase();
 
 // Seed database if SEED_DB environment variable is set
 if (process.env.SEED_DB === 'true') {
+  console.log('Resetting database...');
+  resetDatabase();
+  
   console.log('Seeding database...');
   await seedDatabase(db);
 }
