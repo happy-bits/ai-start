@@ -37,14 +37,12 @@ export default function Login() {
   const [resetSuccess, setResetSuccess] = useState(false);
 
   // Check backend health status
-  const { data: healthData, isError, isSuccess } = useQuery({
+  const { data: healthData, isSuccess } = useQuery<{ status: string }>({
     queryKey: ['health'],
     queryFn: checkHealth,
     refetchInterval: 500, // Check every 0.5 seconds
     retry: 1,
     enabled: config.developerTools, // Only check if developer tools are enabled
-    // Don't keep previous data when query fails
-    keepPreviousData: false,
   });
 
   const handleResetDatabase = async () => {
