@@ -1,6 +1,6 @@
 import React from 'react';
 
-export interface NavItem {
+interface NavItem {
   to: string;
   label: string;
   icon: React.ReactNode;

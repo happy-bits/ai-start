@@ -107,9 +107,6 @@ export const navLinkBase =
 /** Card container with background and border */
 export const cardContainer = 'bg-dark-800/50 rounded-lg border border-dark-700';
 
-/** Card container variant (lighter background) */
-export const cardContainerLight = 'bg-dark-800/30 rounded-lg border border-dark-700';
-
 /** Dashed border card container */
 export const cardContainerDashed = 'bg-dark-800/30 rounded-lg border border-dashed border-dark-600 hover:border-warm-500/30 transition-colors';
 
@@ -120,16 +117,6 @@ export const cardContainerDashed = 'bg-dark-800/30 rounded-lg border border-dash
 /** Icon container for interaction types */
 export const iconContainer =
   'w-10 h-10 shrink-0 rounded-lg flex items-center justify-center bg-warm-500/10 text-warm-400';
-
-// ============================================================================
-// Empty State Styles
-// ============================================================================
-
-/** Empty state text color */
-export const emptyStateText = 'text-dark-500 italic';
-
-/** Normal text color */
-export const textNormal = 'text-dark-400';
 
 // ============================================================================
 // Utility Functions
