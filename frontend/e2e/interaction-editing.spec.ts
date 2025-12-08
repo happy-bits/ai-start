@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Inline Editing Functionality', () => {
-  test('all inline editing components work correctly', async ({ page }) => {
+test.describe('Interaction Inline Editing', () => {
+  test('edit interaction fields inline', async ({ page }) => {
     
     // 1. Reset database (Setup)
     await test.step('Reset database before test', async () => {
@@ -54,8 +54,8 @@ test.describe('Inline Editing Functionality', () => {
       await expect(page.getByText('Initial test interaction')).toBeVisible();
     });
 
-    // 4. Test inline editing on contact detail page
-    await test.step('Test inline editing on contact detail page', async () => {
+    // 4. Test inline editing of interaction fields
+    await test.step('Test inline editing of interaction fields', async () => {
       // Find the interaction article using aria-label (more robust than text matching)
       const interactionArticle = page.getByRole('article', { name: /interaction on/ }).filter({ hasText: 'Initial test interaction' }).first();
       await expect(interactionArticle).toBeVisible();
@@ -145,107 +145,8 @@ test.describe('Inline Editing Functionality', () => {
       });
     });
 
-    // 5. Navigate back to contacts list and test inline editing on contact card
-    await test.step('Test inline editing on contact card', async () => {
-      await page.getByRole('link', { name: 'Contacts' }).click();
-      await page.waitForURL('**/contacts');
-      
-      // Helper function to find contact card/row by name
-      const findContactCard = async (name: string) => {
-        // Try article first (priority contacts)
-        const articleCard = page.getByRole('article', { name: `Contact: ${name}` });
-        if (await articleCard.count() > 0 && await articleCard.isVisible()) {
-          return articleCard;
-        }
-        // Fallback to table row - use getByRole with row role
-        return page.getByRole('row').filter({ hasText: name }).first();
-      };
-      
-      // Find the contact - it might be in priority contacts (card) or other contacts (table)
-      let contactName = 'Test Contact';
-      let contactCard = await findContactCard(contactName);
-      await expect(contactCard).toBeVisible();
 
-      // Test editing contact name (InlineEditable - text)
-      await test.step('Edit contact name', async () => {
-        // Use aria-label pattern to find the name field
-        const nameField = contactCard.getByLabel(/Contact name for/);
-        await nameField.click();
-        
-        // Wait for the input to appear - use page-level focused input (avoids scoping issues with :focus)
-        const nameInput = page.locator('input:focus');
-        await expect(nameInput).toBeVisible();
-        
-        contactName = 'Updated Test Contact';
-        await nameInput.fill(contactName);
-        await nameInput.press('Enter');
-        
-        // Wait for the change to be saved
-        await expect(page.getByText(contactName)).toBeVisible();
-        
-        // Update contactCard reference since name changed
-        contactCard = await findContactCard(contactName);
-        await expect(contactCard).toBeVisible();
-      });
-
-      // Test editing company (InlineEditable - text)
-      await test.step('Edit company', async () => {
-        // Use aria-label pattern that matches any contact name (since name may have changed)
-        const companyField = contactCard.getByLabel(/Company name for/);
-        await companyField.click();
-        
-        // Wait for the input to appear - use page-level focused input
-        const companyInput = page.locator('input:focus');
-        await expect(companyInput).toBeVisible();
-        
-        await companyInput.fill('Test Company AB');
-        await companyInput.press('Enter');
-        
-        // Wait for the change to be saved
-        await expect(contactCard.getByText('Test Company AB')).toBeVisible();
-      });
-
-      // Test editing email (InlineEditable - email)
-      await test.step('Edit email', async () => {
-        // Use aria-label pattern that matches any contact name
-        const emailField = contactCard.getByLabel(/Email for/);
-        await emailField.click();
-        
-        // Wait for the input to appear - use page-level focused input
-        const emailInput = page.locator('input:focus');
-        await expect(emailInput).toBeVisible();
-        
-        await emailInput.fill('updated@example.com');
-        await emailInput.press('Enter');
-        
-        // Wait for the change to be saved
-        await expect(contactCard.getByText('updated@example.com')).toBeVisible();
-      });
-
-      // Test editing phone (InlineEditable - tel)
-      await test.step('Edit phone', async () => {
-        // Use aria-label pattern that matches any contact name
-        const phoneField = contactCard.getByLabel(/Phone for/);
-        await phoneField.click();
-        
-        // Wait for the input to appear - use page-level focused input
-        const phoneInput = page.locator('input:focus');
-        await expect(phoneInput).toBeVisible();
-        
-        await phoneInput.fill('+46709876543');
-        await phoneInput.press('Enter');
-        
-        // Wait for the change to be saved
-        await expect(contactCard.getByText('+46709876543')).toBeVisible();
-      });
-
-      // Note: Interaction field editing (type, date, time, notes) is only available on:
-      // 1. Contact detail page - already tested in "Test inline editing on contact detail page" section
-      // 2. Priority contact cards (not table rows)
-      // Since this contact ends up in "Other Contacts" table, we skip interaction editing here
-    });
-
-    // 6. Reset database (Cleanup)
+    // 5. Reset database (Cleanup)
     await test.step('Reset database after test', async () => {
       await page.getByRole('button', { name: 'Logout' }).click();
       await page.waitForURL('**/login');

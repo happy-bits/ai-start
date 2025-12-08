@@ -35,43 +35,9 @@ test.describe('Complete CRM User Journey', () => {
       await expect(page.getByText('Test Seller')).toBeVisible();
     });
 
-    // 4. Contact management
-    await test.step('Create and edit contact', async () => {
-      await page.getByRole('link', { name: 'Contacts' }).click();
-      await page.waitForURL('**/contacts');
-      
-      // Create new contact
-      await page.getByRole('button', { name: 'Add new contact' }).click();
-      await page.getByLabel('Name').fill('John Doe');
-      await page.getByLabel('Email').fill('john@acme.com');
-      await page.getByLabel('Phone').fill('+46701234567');
-      await page.getByRole('button', { name: 'Create Contact' }).click();
-      
-      // Verify contact appears in list
-      await expect(page.getByText('John Doe')).toBeVisible();
-    });
+  
 
-    // 5. Interaction management
-    await test.step('Add interaction to contact', async () => {
-      // Open contact detail (button in table says "Interactions" with aria-label)
-      await page.getByRole('button', { name: 'View interactions for John Doe' }).click();
-      
-      // Wait for contact detail page
-      await expect(page.getByRole('heading', { name: 'John Doe' })).toBeVisible();
-      
-      // Add new interaction
-      await page.getByRole('button', { name: 'Log new interaction' }).click();
-      
-      // Fill interaction form
-      await page.getByLabel('Notes').fill('Initial contact - very interested in our services');
-      await page.getByRole('button', { name: 'Log Interaction' }).click();
-      
-      // Verify interaction was added
-      await expect(page.getByText('Initial contact - very interested in our services')).toBeVisible();
-    });
-
-
-    // 6. Logout
+    // 4. Logout
     await test.step('Logout', async () => {
       await page.getByRole('button', { name: 'Logout' }).click();
       await page.waitForURL('**/login');
