@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: false, // Seriellt för långt test
   retries: 0,
+  timeout: 5000, // 5 seconds per test
   reporter: 'html',
   webServer: {
     command: 'npm run dev',
