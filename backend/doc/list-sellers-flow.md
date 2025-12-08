@@ -63,3 +63,4 @@ sequenceDiagram
 7. **Response** → Returnerar `{ sellers: [...] }` (utan passwordHash!)
 8. **Caching** → React Query cachar med key `['sellers']`
 9. **Rendering** → Listan visas med filtrering på klientsidan
+
