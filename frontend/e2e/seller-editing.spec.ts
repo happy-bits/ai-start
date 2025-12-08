@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Complete CRM User Journey', () => {
-  test('admin manages full workflow', async ({ page }) => {
+test.describe('Seller Editing', () => {
+  test('create and edit seller', async ({ page }) => {
     
     // 1. Reset database (Setup)
     await test.step('Reset database before test', async () => {
@@ -35,16 +35,56 @@ test.describe('Complete CRM User Journey', () => {
       await expect(page.getByText('Test Seller')).toBeVisible();
     });
 
-  
+    // 4. Edit seller
+    await test.step('Edit seller', async () => {
+      // Find the seller row and click Edit button
+      const sellerRow = page.getByRole('row').filter({ hasText: 'Test Seller' }).first();
+      await expect(sellerRow).toBeVisible();
+      
+      await sellerRow.getByRole('button', { name: 'Edit Test Seller' }).click();
+      
+      // Wait for edit form to load
+      await page.waitForURL('**/sellers/**/edit');
+      await expect(page.getByRole('heading', { name: 'Edit Seller' })).toBeVisible();
+      
+      // Edit name
+      await test.step('Edit seller name', async () => {
+        const nameInput = page.getByLabel('Name');
+        await expect(nameInput).toHaveValue('Test Seller');
+        await nameInput.clear();
+        await nameInput.fill('Updated Seller Name');
+      });
 
-    // 4. Logout
+      // Edit email
+      await test.step('Edit seller email', async () => {
+        const emailInput = page.getByLabel('Email');
+        await expect(emailInput).toHaveValue('testseller@example.com');
+        await emailInput.clear();
+        await emailInput.fill('updated@example.com');
+      });
+
+      // Save changes
+      await test.step('Save seller changes', async () => {
+        await page.getByRole('button', { name: 'Save Changes' }).click();
+        
+        // Wait for redirect back to sellers list
+        await page.waitForURL('**/sellers');
+        await expect(page.getByRole('heading', { name: 'Sellers', exact: true })).toBeVisible();
+        
+        // Verify updated seller appears in list
+        await expect(page.getByText('Updated Seller Name')).toBeVisible();
+        await expect(page.getByText('updated@example.com')).toBeVisible();
+      });
+    });
+
+    // 5. Logout
     await test.step('Logout', async () => {
       await page.getByRole('button', { name: 'Logout' }).click();
       await page.waitForURL('**/login');
       await expect(page.getByRole('button', { name: 'Quick login as Admin' })).toBeVisible();
     });
 
-    // 7. Reset database (Cleanup)
+    // 6. Reset database (Cleanup)
     await test.step('Reset database after test', async () => {
       await page.getByRole('button', { name: 'Reset database' }).click();
       await expect(page.getByText('Database has been reset!')).toBeVisible();

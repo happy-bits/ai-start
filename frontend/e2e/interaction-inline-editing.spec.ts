@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Interaction Inline Editing', () => {
+test.describe('Interaction Editing', () => {
   test('edit interaction fields inline', async ({ page }) => {
     
     // 1. Reset database (Setup)
