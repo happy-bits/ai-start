@@ -27,8 +27,10 @@ Starta
     npm run dev
 
 
-Test
+Testa på fem olika sätt:
 
-    npm run test:e2e	        Headless	Snabb körning utan browser
-    npm run test:e2e:ui	        UI-läge	    Visuell debugger
-    npm run test:e2e:headed	    Headed	    Ser browsern köra
+    npm run test:e2e	        Snabbast stättet att köra (ingen browser eller ui)
+    npm run test:e2e:ui	        Visuell interaktiv debugger
+    npm run test:e2e:headed	    Öppnar en webläsare och kör testet
+    npm run test:e2e:trace	    Skapa en interaktiv rapport med skärmdumpar o nätverkslogg
+    npm run test:e2e:debug	    Kan stega, interaktivt
