@@ -1,4 +1,18 @@
 /**
+ * Get today's date as an ISO string (YYYY-MM-DD)
+ */
+export function getTodayISO(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+/**
+ * Get the current time in HH:MM format
+ */
+export function getCurrentTimeHHMM(): string {
+  return new Date().toTimeString().slice(0, 5);
+}
+
+/**
  * Format a date string to a localized date string
  * @param dateString - ISO date string or Date object
  * @param options - Intl.DateTimeFormatOptions

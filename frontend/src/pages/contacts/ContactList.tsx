@@ -7,6 +7,7 @@ import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions, InlineEditableSelect, InlineEditableTime, InlineEditableTextarea } from '../../components/ui';
 import NewInteractionRow from '../../components/NewInteractionRow';
 import { deleteButtonBase, deleteButtonSize, actionButtonBase, cn } from '../../utils/styles';
+import { getLatestInteractionsForContact } from '../../utils';
 
 import type { Contact, Interaction, InteractionType } from '../../api/types';
 
@@ -45,24 +46,6 @@ function sortContacts(contacts: Contact[]): Contact[] {
   });
 }
 
-// Helper function to get latest interactions for a contact
-function getLatestInteractions(interactions: Interaction[], contactId: number, limit: number = 3): Interaction[] {
-  return interactions
-    .filter((interaction) => interaction.contactId === contactId)
-    .sort((a, b) => {
-      const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
-      if (dateDiff !== 0) return dateDiff;
-      // If dates are equal, sort by time if available
-      const aTime = a.time || '00:00';
-      const bTime = b.time || '00:00';
-      const timeDiff = bTime.localeCompare(aTime);
-      if (timeDiff !== 0) return timeDiff;
-      // If date and time are equal, sort by createdAt (newest first)
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    })
-    .slice(0, limit);
-}
-
 // Component to render priority contacts as cards
 function PriorityContactCards({ contacts, updateContact, deleteContact, interactions = [] }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[] }) {
   const updateInteraction = useUpdateInteraction();
@@ -79,7 +62,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
   return (
     <div className="space-y-4" role="list" aria-label="Priority contacts">
       {contacts.map((contact) => {
-        const latestInteractions = getLatestInteractions(interactions, contact.id, 3);
+        const latestInteractions = getLatestInteractionsForContact(interactions, contact.id, 3);
         return (
           <Card key={contact.id} as="article" aria-label={`Contact: ${contact.name}`} className="hover:border-warm-500/30 transition-colors">
             <div className="space-y-4" role="listitem">
@@ -299,7 +282,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
         )}
         <tbody className="divide-y divide-dark-700">
           {contacts.map((contact, index) => {
-            const latestInteractions = showInteractions ? getLatestInteractions(interactions, contact.id, 3) : [];
+            const latestInteractions = showInteractions ? getLatestInteractionsForContact(interactions, contact.id, 3) : [];
             return (
               <>
                 {index > 0 && (

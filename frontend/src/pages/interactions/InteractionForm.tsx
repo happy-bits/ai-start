@@ -4,6 +4,7 @@ import { useInteraction, useCreateInteraction, useUpdateInteraction } from '../.
 import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 import { Button, Input, Select, Textarea, LoadingSpinner, ErrorMessage } from '../../components/ui';
 import { useFormSubmission } from '../../hooks/useFormSubmission';
+import { getTodayISO, getCurrentTimeHHMM } from '../../utils';
 
 import type { InteractionType, Interaction, CreateInteractionData, UpdateInteractionData } from '../../api/types';
 
@@ -25,13 +26,10 @@ export default function InteractionForm({
   const createInteraction = useCreateInteraction();
   const updateInteraction = useUpdateInteraction();
 
-  const today = new Date().toISOString().split('T')[0];
-  const now = new Date().toTimeString().slice(0, 5);
-
   const [formData, setFormData] = useState({
     type: 'call' as InteractionType,
-    date: today,
-    time: now,
+    date: getTodayISO(),
+    time: getCurrentTimeHHMM(),
     notes: '',
   });
 
