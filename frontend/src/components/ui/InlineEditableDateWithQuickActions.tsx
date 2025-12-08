@@ -1,5 +1,6 @@
 import InlineEditableDate from './InlineEditableDate';
 import { addWorkDaysFromToday, addDaysFromToday, addMonthsFromToday } from '../../utils/dates';
+import { cn } from '../../utils/styles';
 
 interface InlineEditableDateWithQuickActionsProps {
   value: string | null;
@@ -29,7 +30,7 @@ export default function InlineEditableDateWithQuickActions({
   ];
 
   return (
-    <div className={`bg-dark-800/50 border border-dark-700 rounded-lg p-3 ${className}`}>
+    <div className={cn('bg-dark-800/50 border border-dark-700 rounded-lg p-3', className)}>
       {/* Header with title */}
       <div className="mb-3">
         <h3 className="text-sm font-medium text-dark-300">Follow-up Date</h3>

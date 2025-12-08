@@ -1,3 +1,5 @@
+import { cn } from '../../utils/styles';
+
 interface AvatarProps {
   name: string;
   size?: 'sm' | 'md' | 'lg';
@@ -20,7 +22,7 @@ export default function Avatar({ name, size = 'md', className = '', gradient = '
 
   return (
     <div
-      className={`${sizeClasses[size]} ${gradientClasses[gradient]} rounded-full flex items-center justify-center text-white font-medium shrink-0 ${className}`}
+      className={cn(sizeClasses[size], gradientClasses[gradient], 'rounded-full flex items-center justify-center text-white font-medium shrink-0', className)}
     >
       {initial}
     </div>

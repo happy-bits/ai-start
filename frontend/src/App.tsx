@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+
 import { useAuth } from './context/AuthContext';
+
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import ContactList from './pages/contacts/ContactList';
@@ -7,7 +9,9 @@ import ContactDetail from './pages/contacts/ContactDetail';
 import ContactForm from './pages/contacts/ContactForm';
 import SellerList from './pages/sellers/SellerList';
 import SellerForm from './pages/sellers/SellerForm';
+
 import { LoadingSpinner } from './components/ui';
+
 import { ROLES } from './constants';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {

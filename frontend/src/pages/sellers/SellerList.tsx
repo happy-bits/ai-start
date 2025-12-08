@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useSellers, useDeleteSeller } from '../../api/sellers';
+
 import { Button, Card, Badge, LoadingSpinner, EmptyState, Avatar, SearchInput } from '../../components/ui';
+
 import { formatDate } from '../../utils';
 
 export default function SellerList() {

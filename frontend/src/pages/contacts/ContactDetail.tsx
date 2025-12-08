@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useContact } from '../../api/contacts';
 import { useInteractions, useDeleteInteraction, useUpdateInteraction } from '../../api/interactions';
 import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
+
 import { 
   Button, 
   Card, 
@@ -18,6 +19,7 @@ import {
 } from '../../components/ui';
 import InteractionForm from '../interactions/InteractionForm';
 import NewInteractionRow from '../../components/NewInteractionRow';
+
 import { interactionTypeConfig } from '../../config/interactions';
 import { deleteButtonBase, deleteButtonSize, iconContainer, cardContainer, cn } from '../../utils/styles';
 import { sortInteractionsByRecency } from '../../utils';

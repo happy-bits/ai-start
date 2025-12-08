@@ -1,7 +1,9 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+
 import { apiClient } from '../api/client';
 import { getCurrentUser, logout as logoutApi } from '../api/auth';
+
 import type { User } from '../api/types';
 
 interface AuthContextType {

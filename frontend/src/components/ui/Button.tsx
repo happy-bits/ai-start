@@ -1,4 +1,5 @@
 import { type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { cn } from '../../utils/styles';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -38,7 +39,7 @@ export default function Button({
 
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
+      className={cn(baseStyles, variants[variant], sizes[size], className)}
       disabled={disabled}
       aria-label={ariaLabel}
       {...props}

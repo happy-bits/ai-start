@@ -4,47 +4,14 @@ import { Link } from 'react-router-dom';
 import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
 import { useInteractions, useUpdateInteraction, useDeleteInteraction } from '../../api/interactions';
 import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
+
 import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions, InlineEditableSelect, InlineEditableTime, InlineEditableTextarea } from '../../components/ui';
 import NewInteractionRow from '../../components/NewInteractionRow';
+
 import { deleteButtonBase, deleteButtonSize, actionButtonBase, cn } from '../../utils/styles';
-import { getLatestInteractionsForContact } from '../../utils';
+import { getLatestInteractionsForContact, isFollowUpDue, sortContacts } from '../../utils';
 
 import type { Contact, Interaction, InteractionType } from '../../api/types';
-
-// Helper function to check if a follow-up date is today or earlier
-function isFollowUpDue(followUpDate: string | null): boolean {
-  if (!followUpDate) return false;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const followUp = new Date(followUpDate);
-  followUp.setHours(0, 0, 0, 0);
-  return followUp <= today;
-}
-
-// Helper function to sort contacts
-function sortContacts(contacts: Contact[]): Contact[] {
-  return [...contacts].sort((a, b) => {
-    // If both have followup dates, sort by date (earliest first), then by ID if dates are equal
-    if (a.followUpDate && b.followUpDate) {
-      const dateDiff = new Date(a.followUpDate).getTime() - new Date(b.followUpDate).getTime();
-      if (dateDiff !== 0) {
-        return dateDiff;
-      }
-      // If dates are equal, sort by ID
-      return a.id - b.id;
-    }
-    // If only a has a followup date, it comes first
-    if (a.followUpDate && !b.followUpDate) {
-      return -1;
-    }
-    // If only b has a followup date, it comes first
-    if (!a.followUpDate && b.followUpDate) {
-      return 1;
-    }
-    // If neither has a followup date, sort by ID
-    return a.id - b.id;
-  });
-}
 
 // Component to render priority contacts as cards
 function PriorityContactCards({ contacts, updateContact, deleteContact, interactions = [] }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[] }) {
@@ -229,7 +196,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                         </div>
                         <button
                           onClick={() => handleDeleteInteraction(interaction.id)}
-                          className={`${deleteButtonBase} ${deleteButtonSize.sm} shrink-0 mt-0.5`}
+                          className={cn(deleteButtonBase, deleteButtonSize.sm, 'shrink-0 mt-0.5')}
                           aria-label={`Delete interaction from ${interaction.date}`}
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

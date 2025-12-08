@@ -1,10 +1,14 @@
 import { useState } from 'react';
+
 import { useCreateInteraction } from '../api/interactions';
 import { INTERACTION_TYPE_OPTIONS } from '../api/types';
+
 import { InlineEditableTextarea, InlineEditableSelect, InlineEditableDate, InlineEditableTime } from './ui';
+
 import { interactionTypeConfig } from '../config/interactions';
 import { iconContainer, cardContainerDashed, cn } from '../utils/styles';
 import { getTodayISO, getCurrentTimeHHMM } from '../utils';
+
 import type { InteractionType } from '../api/types';
 
 interface NewInteractionRowProps {

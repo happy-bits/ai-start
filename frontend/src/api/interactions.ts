@@ -64,8 +64,9 @@ export function useUpdateInteraction() {
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: UpdateInteractionData }) =>
       updateInteraction(id, data),
-    onSuccess: () => {
+    onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['interactions'] });
+      queryClient.invalidateQueries({ queryKey: ['interactions', id] });
     },
   });
 }

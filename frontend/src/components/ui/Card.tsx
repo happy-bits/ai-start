@@ -1,4 +1,5 @@
 import { type ReactNode, type ElementType } from 'react';
+import { cn } from '../../utils/styles';
 
 interface CardProps {
   children: ReactNode;
@@ -26,7 +27,7 @@ export default function Card({
 
   return (
     <Component
-      className={`bg-dark-900/80 backdrop-blur-sm border border-dark-700 rounded-xl shadow-xl ${paddings[padding]} ${className}`}
+      className={cn('bg-dark-900/80 backdrop-blur-sm border border-dark-700 rounded-xl shadow-xl', paddings[padding], className)}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
     >

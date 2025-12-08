@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react';
+import { cn } from '../../utils/styles';
 
 interface EmptyStateProps {
   icon: ReactNode;
@@ -10,7 +11,7 @@ interface EmptyStateProps {
 
 export default function EmptyState({ icon, title, message, action, className = '' }: EmptyStateProps) {
   return (
-    <div className={`p-8 text-center ${className}`} role="status" aria-label={title}>
+    <div className={cn('p-8 text-center', className)} role="status" aria-label={title}>
       <div className="w-16 h-16 mx-auto rounded-full bg-dark-800 flex items-center justify-center mb-4" aria-hidden="true">
         {icon}
       </div>

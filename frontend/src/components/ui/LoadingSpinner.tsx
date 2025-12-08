@@ -1,3 +1,5 @@
+import { cn } from '../../utils/styles';
+
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
@@ -11,7 +13,7 @@ const sizeClasses = {
 
 export default function LoadingSpinner({ size = 'md', className = '' }: LoadingSpinnerProps) {
   return (
-    <div className={`animate-spin rounded-full border-t-2 border-b-2 border-warm-500 ${sizeClasses[size]} ${className}`} />
+    <div className={cn('animate-spin rounded-full border-t-2 border-b-2 border-warm-500', sizeClasses[size], className)} />
   );
 }
 
