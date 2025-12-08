@@ -77,12 +77,12 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" role="list" aria-label="Priority contacts">
       {contacts.map((contact) => {
         const latestInteractions = getLatestInteractions(interactions, contact.id, 3);
         return (
-          <Card key={contact.id} className="hover:border-warm-500/30 transition-colors">
-            <div className="space-y-4">
+          <Card key={contact.id} as="article" aria-label={`Contact: ${contact.name}`} className="hover:border-warm-500/30 transition-colors">
+            <div className="space-y-4" role="listitem">
               {/* Contact Header */}
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -150,6 +150,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                     <Button
                       variant="ghost"
                       size="sm"
+                      aria-label={`View ${contact.name}`}
                       className={actionButtonBase}
                     >
                       View
@@ -160,9 +161,10 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                     size="sm"
                     onClick={() => handleDelete(contact.id)}
                     disabled={deleteContact.isPending}
+                    aria-label={`Delete ${contact.name}`}
                     className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </Button>
@@ -245,9 +247,9 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                         <button
                           onClick={() => handleDeleteInteraction(interaction.id)}
                           className={`${deleteButtonBase} ${deleteButtonSize.sm} shrink-0 mt-0.5`}
-                          title="Delete interaction"
+                          aria-label={`Delete interaction from ${interaction.date}`}
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
@@ -387,6 +389,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                         <Button
                           variant="ghost"
                           size="sm"
+                          aria-label={`View interactions for ${contact.name}`}
                           className={actionButtonBase}
                         >
                           Interactions
@@ -397,6 +400,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                         size="sm"
                         onClick={() => handleDelete(contact.id)}
                         disabled={deleteContact.isPending}
+                        aria-label={`Delete ${contact.name}`}
                         className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                       >
                         Delete
@@ -465,9 +469,9 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                             <button
                               onClick={() => handleDeleteInteraction(interaction.id)}
                               className={cn(deleteButtonBase, deleteButtonSize.sm, 'shrink-0 mt-0.5')}
-                              title="Delete interaction"
+                              aria-label={`Delete interaction from ${interaction.date}`}
                             >
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                               </svg>
                             </button>
@@ -529,8 +533,8 @@ export default function ContactList() {
           <p className="text-dark-400 mt-1">Manage your contact relationships</p>
         </div>
         <Link to="/contacts/new">
-          <Button>
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <Button aria-label="Add new contact">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Add Contact
@@ -554,9 +558,9 @@ export default function ContactList() {
       ) : (
         <>
           {/* Priority/Todo Section */}
-          <div className="space-y-3">
+          <section aria-labelledby="priority-heading" className="space-y-3">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-white">Today's Follow-ups</h2>
+              <h2 id="priority-heading" className="text-lg font-semibold text-white">Today's Follow-ups</h2>
               {priorityContacts.length > 0 && (
                 <span className="px-2 py-1 text-xs font-medium bg-warm-500/20 text-warm-300 rounded-full">
                   {priorityContacts.length}
@@ -566,25 +570,25 @@ export default function ContactList() {
             {priorityContacts.length === 0 ? (
               <Card>
                 <EmptyState
-                  icon={
-                    <svg className="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  }
-                  title="All caught up!"
-                  message="No follow-ups due today. Great work!"
-                />
+                icon={
+                  <svg className="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                }
+                title="All caught up!"
+                message="No follow-ups due today. Great work!"
+              />
               </Card>
             ) : (
               <PriorityContactCards contacts={priorityContacts} updateContact={updateContact} deleteContact={deleteContact} interactions={interactions} />
             )}
-          </div>
+          </section>
 
           {/* Other Contacts Section */}
           {otherContacts.length > 0 && (
-            <div className="space-y-3">
+            <section aria-labelledby="other-contacts-heading" className="space-y-3">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold text-white">Other Contacts</h2>
+                <h2 id="other-contacts-heading" className="text-lg font-semibold text-white">Other Contacts</h2>
                 <span className="px-2 py-1 text-xs font-medium bg-dark-700 text-dark-300 rounded-full">
                   {otherContacts.length}
                 </span>
@@ -592,7 +596,7 @@ export default function ContactList() {
               <Card padding="none">
                 <ContactTable contacts={otherContacts} updateContact={updateContact} deleteContact={deleteContact} />
               </Card>
-            </div>
+            </section>
           )}
 
           {/* Empty state when no contacts match search */}
@@ -600,7 +604,7 @@ export default function ContactList() {
             <Card padding="none">
               <EmptyState
                 icon={
-                  <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 }
@@ -608,7 +612,7 @@ export default function ContactList() {
                 message={searchTerm ? 'Try a different search term' : 'Get started by adding your first contact'}
                 action={!searchTerm ? (
                   <Link to="/contacts/new">
-                    <Button size="sm">Add Contact</Button>
+                    <Button size="sm" aria-label="Add new contact">Add Contact</Button>
                   </Link>
                 ) : undefined}
               />

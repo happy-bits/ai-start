@@ -1,12 +1,22 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, type ElementType } from 'react';
 
 interface CardProps {
   children: ReactNode;
   className?: string;
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  as?: 'div' | 'article' | 'section';
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
 }
 
-export default function Card({ children, className = '', padding = 'md' }: CardProps) {
+export default function Card({ 
+  children, 
+  className = '', 
+  padding = 'md',
+  as: Component = 'div',
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+}: CardProps) {
   const paddings = {
     none: '',
     sm: 'p-4',
@@ -15,11 +25,13 @@ export default function Card({ children, className = '', padding = 'md' }: CardP
   };
 
   return (
-    <div
+    <Component
       className={`bg-dark-900/80 backdrop-blur-sm border border-dark-700 rounded-xl shadow-xl ${paddings[padding]} ${className}`}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
     >
       {children}
-    </div>
+    </Component>
   );
 }
 

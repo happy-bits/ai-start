@@ -13,6 +13,7 @@ interface InlineEditableTextareaProps {
   className?: string;
   emptyText?: string;
   rows?: number;
+  'aria-label'?: string;
 }
 
 export default function InlineEditableTextarea({
@@ -21,6 +22,7 @@ export default function InlineEditableTextarea({
   className = '',
   emptyText = 'Click to add notes',
   rows = 3,
+  'aria-label': ariaLabel,
 }: InlineEditableTextareaProps) {
   const {
     isEditing,
@@ -50,6 +52,7 @@ export default function InlineEditableTextarea({
           onKeyDown={handleKeyDown}
           disabled={isSaving}
           rows={rows}
+          aria-label={ariaLabel || emptyText}
           className={cn('w-full', inlineEditableInputBase, 'placeholder-dark-500 resize-none', className)}
           placeholder={emptyText}
         />

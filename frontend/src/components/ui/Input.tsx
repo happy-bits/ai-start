@@ -1,4 +1,4 @@
-import { type InputHTMLAttributes, forwardRef } from 'react';
+import { type InputHTMLAttributes, forwardRef, useId } from 'react';
 import { formInputBase, formLabel, formErrorText, getFormInputBorder, cn } from '../../utils/styles';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -8,7 +8,9 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, className = '', id, ...props }, ref) => {
-    const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
+    const generatedId = useId();
+    const inputId = id || label?.toLowerCase().replace(/\s+/g, '-') || generatedId;
+    const errorId = `${inputId}-error`;
 
     return (
       <div className="space-y-2">
@@ -23,10 +25,16 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={inputId}
+          aria-invalid={!!error}
+          aria-describedby={error ? errorId : undefined}
           className={cn(formInputBase, getFormInputBorder(!!error), className)}
           {...props}
         />
-        {error && <p className={formErrorText}>{error}</p>}
+        {error && (
+          <p id={errorId} className={formErrorText} role="alert">
+            {error}
+          </p>
+        )}
       </div>
     );
   }

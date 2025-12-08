@@ -106,7 +106,7 @@ export default function Login() {
       <div className="w-full max-w-md relative">
         {/* Logo and title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-warm-400 to-warm-600 mb-4 shadow-lg shadow-warm-500/25">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-warm-400 to-warm-600 mb-4 shadow-lg shadow-warm-500/25" aria-hidden="true">
             <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C9 5 7 8 7 11c0 2.5 1.5 4.5 3.5 5.5L9 22h6l-1.5-5.5C15.5 15.5 17 13.5 17 11c0-3-2-6-5-9zm0 4c1.5 2 2.5 4 2.5 5.5 0 1.5-1 2.5-2.5 2.5s-2.5-1-2.5-2.5C9.5 10 10.5 8 12 6z" />
             </svg>
@@ -235,9 +235,10 @@ export default function Login() {
                 type="button"
                 onClick={handleResetDatabase}
                 disabled={loginMutation.isPending || isResetting}
+                aria-label="Reset database to initial state"
                 className="w-full mt-3 py-2 px-3 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 text-red-400 rounded-lg text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 {isResetting ? 'Resetting...' : 'Reset database'}
@@ -283,6 +284,7 @@ function QuickLoginButton({
       type="button"
       onClick={() => onLogin(email, password)}
       disabled={disabled}
+      aria-label={`Quick login as ${label}${subtitle ? ` (${subtitle})` : ''}`}
       className={`${colorClasses[color]} border rounded-lg p-2 text-center transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
     >
       <p className="font-medium text-sm">{label}</p>

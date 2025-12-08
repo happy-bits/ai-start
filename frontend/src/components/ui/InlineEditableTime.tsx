@@ -12,6 +12,7 @@ interface InlineEditableTimeProps {
   onSave: (value: string | null) => Promise<void>;
   className?: string;
   emptyText?: string;
+  'aria-label'?: string;
 }
 
 export default function InlineEditableTime({
@@ -19,6 +20,7 @@ export default function InlineEditableTime({
   onSave,
   className = '',
   emptyText = 'Add time',
+  'aria-label': ariaLabel,
 }: InlineEditableTimeProps) {
   const {
     isEditing,
@@ -45,6 +47,7 @@ export default function InlineEditableTime({
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         disabled={isSaving}
+        aria-label={ariaLabel || emptyText}
         className={cn(inlineEditableInputBase, className)}
       />
     );

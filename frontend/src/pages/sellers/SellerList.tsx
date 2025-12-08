@@ -29,8 +29,8 @@ export default function SellerList() {
           <p className="text-dark-400 mt-1">Manage seller accounts</p>
         </div>
         <Link to="/sellers/new">
-          <Button>
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <Button aria-label="Add new seller">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Add Seller
@@ -54,7 +54,7 @@ export default function SellerList() {
         ) : filteredSellers.length === 0 ? (
           <EmptyState
             icon={
-              <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             }
@@ -62,7 +62,7 @@ export default function SellerList() {
             message={searchTerm ? 'Try a different search term' : 'Get started by adding your first seller'}
             action={!searchTerm ? (
               <Link to="/sellers/new">
-                <Button size="sm">Add Seller</Button>
+                <Button size="sm" aria-label="Add new seller">Add Seller</Button>
               </Link>
             ) : undefined}
           />
@@ -111,7 +111,7 @@ export default function SellerList() {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
                         <Link to={`/sellers/${seller.id}/edit`}>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" aria-label={`Edit ${seller.name}`}>
                             Edit
                           </Button>
                         </Link>
@@ -120,6 +120,7 @@ export default function SellerList() {
                           size="sm"
                           onClick={() => handleDelete(seller.id)}
                           disabled={deleteSeller.isPending}
+                          aria-label={`Delete ${seller.name}`}
                           className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                         >
                           Delete

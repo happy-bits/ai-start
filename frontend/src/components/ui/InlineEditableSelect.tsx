@@ -9,6 +9,7 @@ interface InlineEditableSelectProps {
   options: Array<{ value: string; label: string }>;
   className?: string;
   badgeVariant?: 'default' | 'warm';
+  'aria-label'?: string;
 }
 
 export default function InlineEditableSelect({
@@ -17,6 +18,7 @@ export default function InlineEditableSelect({
   options,
   className = '',
   badgeVariant = 'warm',
+  'aria-label': ariaLabel,
 }: InlineEditableSelectProps) {
   const isSavingFromChangeRef = useRef(false);
   
@@ -87,6 +89,7 @@ export default function InlineEditableSelect({
         onBlur={handleSelectBlur}
         onKeyDown={handleKeyDown}
         disabled={isSaving}
+        aria-label={ariaLabel || 'Select option'}
         className={cn(inlineEditableInputBase, 'text-xs', className)}
       >
         {options.map((option) => (

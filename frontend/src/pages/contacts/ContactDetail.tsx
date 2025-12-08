@@ -122,8 +122,8 @@ export default function ContactDetail() {
           <Card>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-white">Interactions</h2>
-              <Button size="sm" onClick={() => setShowInteractionForm(true)}>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <Button size="sm" onClick={() => setShowInteractionForm(true)} aria-label="Log new interaction">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
                 Log Interaction
@@ -148,23 +148,24 @@ export default function ContactDetail() {
               <div className="space-y-4">
                 <NewInteractionRow contactId={contactId} variant="detail" />
                 {sortedInteractions.length === 0 ? (
-                  <EmptyState
-                    icon={
-                      <svg className="w-6 h-6 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                    }
-                    title="No interactions recorded yet"
-                    message="Start logging interactions to track your contact relationships"
-                    className="py-8"
-                  />
+                <EmptyState
+                  icon={
+                    <svg className="w-6 h-6 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  }
+                  title="No interactions recorded yet"
+                  message="Start logging interactions to track your contact relationships"
+                  className="py-8"
+                />
                 ) : (
-                  sortedInteractions.map((interaction) => (
-                  <div
+                                  sortedInteractions.map((interaction) => (
+                  <article
                     key={interaction.id}
                     className={cn('flex gap-4 p-4', cardContainer)}
+                    aria-label={`${interaction.type} interaction on ${interaction.date}`}
                   >
-                    <div className={iconContainer}>
+                    <div className={iconContainer} aria-hidden="true">
                       {typeConfig[interaction.type].icon}
                     </div>
                     <div className="flex-1 min-w-0 space-y-2">
@@ -219,14 +220,14 @@ export default function ContactDetail() {
                       <button
                         onClick={() => handleDeleteInteraction(interaction.id)}
                         className={cn(deleteButtonBase, deleteButtonSize.md)}
-                        title="Delete"
+                        aria-label={`Delete ${interaction.type} interaction from ${interaction.date}`}
                       >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
                     </div>
-                  </div>
+                  </article>
                   ))
                 )}
               </div>

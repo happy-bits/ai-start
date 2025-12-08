@@ -4,6 +4,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   children: ReactNode;
+  'aria-label'?: string;
 }
 
 export default function Button({
@@ -12,6 +13,7 @@ export default function Button({
   className = '',
   children,
   disabled,
+  'aria-label': ariaLabel,
   ...props
 }: ButtonProps) {
   const baseStyles =
@@ -38,6 +40,7 @@ export default function Button({
     <button
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={disabled}
+      aria-label={ariaLabel}
       {...props}
     >
       {children}

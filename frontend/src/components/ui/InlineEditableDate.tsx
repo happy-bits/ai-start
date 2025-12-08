@@ -12,6 +12,7 @@ interface InlineEditableDateProps {
   onSave: (value: string | null) => Promise<void>;
   className?: string;
   emptyText?: string;
+  'aria-label'?: string;
 }
 
 export default function InlineEditableDate({
@@ -19,6 +20,7 @@ export default function InlineEditableDate({
   onSave,
   className = '',
   emptyText = 'Add follow-up date',
+  'aria-label': ariaLabel,
 }: InlineEditableDateProps) {
   const {
     isEditing,
@@ -45,6 +47,7 @@ export default function InlineEditableDate({
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         disabled={isSaving}
+        aria-label={ariaLabel || emptyText}
         className={cn(inlineEditableInputBase, className)}
       />
     );

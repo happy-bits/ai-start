@@ -17,6 +17,7 @@ interface InlineEditableProps {
   placeholder?: string;
   className?: string;
   emptyText?: string;
+  'aria-label'?: string;
 }
 
 export default function InlineEditable({
@@ -26,6 +27,7 @@ export default function InlineEditable({
   placeholder = '',
   className = '',
   emptyText = 'Click to edit',
+  'aria-label': ariaLabel,
 }: InlineEditableProps) {
   const validate = (val: string): string | null => {
     const trimmed = val.trim();
@@ -80,6 +82,7 @@ export default function InlineEditable({
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
+          aria-label={ariaLabel || placeholder || emptyText}
           className={cn(
             'w-full',
             inlineEditableInputBase,
