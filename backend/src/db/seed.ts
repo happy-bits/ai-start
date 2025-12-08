@@ -171,136 +171,14 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     }
   }
 
-  // Seed contacts for seller2 (Lars)
-  const larsContacts = [];
-  
-  const contact3 = db
-    .insert(schema.contacts)
-    .values({
-      sellerId: seller2.id,
-      name: 'Johan Nilsson',
-      email: 'johan.nilsson@ikea.se',
-      phone: '+46 73 345 67 89',
-      company: 'IKEA Sverige',
-      followUpDate: '2026-01-03',
-      createdAt: SEED_DATE,
-      updatedAt: SEED_DATE,
-    })
-    .returning()
-    .get();
-  larsContacts.push(contact3);
-
-  const contact4 = db
-    .insert(schema.contacts)
-    .values({
-      sellerId: seller2.id,
-      name: 'Kristina Wallin',
-      email: 'kristina.wallin@astrazeneca.com',
-      phone: '+46 73 456 78 90',
-      company: 'AstraZeneca Sverige',
-      followUpDate: '2026-01-10',
-      createdAt: SEED_DATE,
-      updatedAt: SEED_DATE,
-    })
-    .returning()
-    .get();
-  larsContacts.push(contact4);
-
-  const contact5 = db
-    .insert(schema.contacts)
-    .values({
-      sellerId: seller2.id,
-      name: 'Robert Lindgren',
-      email: 'robert.lindgren@teliacompany.se',
-      phone: '+46 73 567 89 01',
-      company: 'Telia Company',
-      followUpDate: '2025-12-15',
-      createdAt: SEED_DATE,
-      updatedAt: SEED_DATE,
-    })
-    .returning()
-    .get();
-  larsContacts.push(contact5);
-
   console.log(`Created ${mariaContacts.length} contacts for Maria`);
-  console.log(`Created ${larsContacts.length} contacts for Lars`);
-
-  // Seed interactions for Lars's contacts
-  // Contact 3 (Johan Nilsson) - 1 interaction
-  db.insert(schema.interactions).values({
-    contactId: contact3.id,
-    sellerId: seller2.id,
-    type: 'meeting',
-    date: '2026-01-02',
-    time: '15:30',
-    notes: 'Möte på plats vid deras huvudkontor.',
-    createdAt: SEED_DATE,
-    updatedAt: SEED_DATE,
-  }).run();
-
-  // Contact 4 (Kristina Wallin) - 3 interactions
-  db.insert(schema.interactions).values({
-    contactId: contact4.id,
-    sellerId: seller2.id,
-    type: 'call',
-    date: '2025-12-20',
-    time: '10:00',
-    notes: 'Inledande samtal om deras CRM-behov.',
-    createdAt: SEED_DATE,
-    updatedAt: SEED_DATE,
-  }).run();
-
-  db.insert(schema.interactions).values({
-    contactId: contact4.id,
-    sellerId: seller2.id,
-    type: 'email',
-    date: '2025-12-28',
-    time: '14:30',
-    notes: 'Skickade produktinformation och case studies.',
-    createdAt: SEED_DATE,
-    updatedAt: SEED_DATE,
-  }).run();
-
-  db.insert(schema.interactions).values({
-    contactId: contact4.id,
-    sellerId: seller2.id,
-    type: 'meeting',
-    date: '2026-01-05',
-    time: '11:00',
-    notes: 'Demo-session med beslutsfattare och IT-team.',
-    createdAt: SEED_DATE,
-    updatedAt: SEED_DATE,
-  }).run();
-
-  // Contact 5 (Robert Lindgren) - 2 interactions
-  db.insert(schema.interactions).values({
-    contactId: contact5.id,
-    sellerId: seller2.id,
-    type: 'call',
-    date: '2025-12-01',
-    time: '09:15',
-    notes: 'Kallt samtal. Intresserad av vår lösning.',
-    createdAt: SEED_DATE,
-    updatedAt: SEED_DATE,
-  }).run();
-
-  db.insert(schema.interactions).values({
-    contactId: contact5.id,
-    sellerId: seller2.id,
-    type: 'email',
-    date: '2025-12-10',
-    time: '16:45',
-    notes: 'Uppföljning med prisinformation och implementeringsplan.',
-    createdAt: SEED_DATE,
-    updatedAt: SEED_DATE,
-  }).run();
 
   console.log('Database seeded successfully!');
 
   return {
     admin: adminUser,
     sellers: [seller1, seller2],
-    contacts: [...mariaContacts, ...larsContacts],
+    contacts: mariaContacts,
   };
 }
 
