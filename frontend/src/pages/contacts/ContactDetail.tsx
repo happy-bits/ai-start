@@ -143,6 +143,7 @@ export default function ContactDetail() {
                           }}
                           options={INTERACTION_TYPE_OPTIONS}
                           badgeVariant={interactionTypeConfig[interaction.type].color}
+                          aria-label="Interaction type"
                         />
                         <span className="text-sm text-dark-400">on</span>
                         <InlineEditableDate
@@ -153,6 +154,7 @@ export default function ContactDetail() {
                               data: { date: value || undefined },
                             });
                           }}
+                          aria-label="Interaction date"
                         />
                         <span className="text-sm text-dark-400">at</span>
                         <InlineEditableTime
@@ -163,6 +165,7 @@ export default function ContactDetail() {
                               data: { time: value },
                             });
                           }}
+                          aria-label="Interaction time"
                         />
                       </div>
                       <div>
@@ -176,6 +179,7 @@ export default function ContactDetail() {
                           }}
                           emptyText="Click to add notes"
                           rows={2}
+                          aria-label="Interaction notes"
                         />
                       </div>
                     </div>

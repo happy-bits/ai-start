@@ -50,6 +50,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                       placeholder="Contact name"
                       className="text-white font-medium hover:text-white truncate"
                       emptyText="Add name"
+                      aria-label={`Contact name for ${contact.name}`}
                     />
                     <div className="mt-1">
                       <InlineEditable
@@ -64,6 +65,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                         placeholder="Company name"
                         className="text-dark-400 hover:text-white truncate"
                         emptyText="Add company"
+                        aria-label={`Company name for ${contact.name}`}
                       />
                     </div>
                     {/* Contact Info */}
@@ -79,6 +81,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                         type="email"
                         placeholder="email@example.com"
                         emptyText="Add email"
+                        aria-label={`Email for ${contact.name}`}
                       />
                       <InlineEditable
                         value={contact.phone}
@@ -91,6 +94,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                         type="tel"
                         placeholder="+46 73 345 67 89"
                         emptyText="Add phone"
+                        aria-label={`Phone for ${contact.name}`}
                       />
                     </div>
                   </div>
@@ -153,6 +157,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                             }}
                             options={INTERACTION_TYPE_OPTIONS}
                             badgeVariant="warm"
+                            aria-label="Interaction type"
                           />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -166,6 +171,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                                 });
                               }}
                               className="text-sm"
+                              aria-label="Interaction date"
                             />
                             <InlineEditableTime
                               value={interaction.time}
@@ -177,6 +183,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                               }}
                               className="text-sm"
                               emptyText="Add time"
+                              aria-label="Interaction time"
                             />
                           </div>
                           <div>
@@ -191,6 +198,7 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                               emptyText="Click to add notes"
                               rows={2}
                               className="text-xs"
+                              aria-label="Interaction notes"
                             />
                           </div>
                         </div>
@@ -274,6 +282,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                           placeholder="Contact name"
                           className="text-white font-medium hover:text-white"
                           emptyText="Add name"
+                          aria-label={`Contact name for ${contact.name}`}
                         />
                         <div className="mt-1">
                           <InlineEditable
@@ -288,6 +297,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                             placeholder="Company name"
                             className="text-dark-400 hover:text-white"
                             emptyText="Add company"
+                            aria-label={`Company name for ${contact.name}`}
                           />
                         </div>
                         <div className="mt-2">
@@ -300,6 +310,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                               });
                             }}
                             emptyText="Add follow-up date"
+                            aria-label={`Follow-up date for ${contact.name}`}
                           />
                         </div>
                       </div>
@@ -318,6 +329,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                         type="email"
                         placeholder="email@example.com"
                         emptyText="Add email"
+                        aria-label={`Email for ${contact.name}`}
                       />
                       <InlineEditable
                         value={contact.phone}
@@ -330,6 +342,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                         type="tel"
                         placeholder="+46 73 345 67 89"
                         emptyText="Add phone"
+                        aria-label={`Phone for ${contact.name}`}
                       />
                     </div>
                   </td>
@@ -375,6 +388,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                                 }}
                                 options={INTERACTION_TYPE_OPTIONS}
                                 badgeVariant="warm"
+                                aria-label="Interaction type"
                               />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -388,6 +402,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                                     });
                                   }}
                                   className="text-sm"
+                                  aria-label="Interaction date"
                                 />
                                 <InlineEditableTime
                                   value={interaction.time}
@@ -399,6 +414,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                                   }}
                                   className="text-sm"
                                   emptyText="Add time"
+                                  aria-label="Interaction time"
                                 />
                               </div>
                               <div>
@@ -413,6 +429,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                                   emptyText="Click to add notes"
                                   rows={2}
                                   className="text-xs"
+                                  aria-label="Interaction notes"
                                 />
                               </div>
                             </div>

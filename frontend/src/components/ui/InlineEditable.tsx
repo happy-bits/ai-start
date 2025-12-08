@@ -120,6 +120,8 @@ export default function InlineEditable({
           : inlineEditableTextNormal)
       )}
       title={isEmpty ? emptyText : 'Click to edit'}
+      aria-label={ariaLabel || placeholder || emptyText}
+      role="button"
     >
       {isEmpty ? emptyText : displayValue}
     </p>

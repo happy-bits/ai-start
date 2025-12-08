@@ -108,6 +108,8 @@ export default function InlineEditableSelect({
         onClick={handleClick}
         className="cursor-pointer hover:opacity-80 transition-opacity"
         title="Click to edit"
+        aria-label={ariaLabel || `Interaction type: ${selectedOption?.label || value}`}
+        role="button"
       >
         {selectedOption?.label || value}
       </span>

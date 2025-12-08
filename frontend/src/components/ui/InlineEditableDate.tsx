@@ -64,6 +64,8 @@ export default function InlineEditableDate({
         className
       )}
       title={isEmpty ? emptyText : 'Click to edit'}
+      aria-label={ariaLabel || emptyText}
+      role="button"
     >
       {isEmpty ? emptyText : value}
     </span>

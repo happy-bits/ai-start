@@ -76,6 +76,8 @@ export default function InlineEditableTextarea({
         className
       )}
       title={isEmpty ? emptyText : 'Click to edit'}
+      aria-label={ariaLabel || emptyText}
+      role="button"
     >
       {isEmpty ? emptyText : displayValue}
     </p>
