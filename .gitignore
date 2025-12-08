@@ -5,3 +5,5 @@ dist/
 *.db-wal
 *.db-shm
 
+frontend/playwright-report
+frontend/test-results
