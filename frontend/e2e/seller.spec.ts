@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Seller Editing', () => {
-  test('create and edit seller', async ({ page }) => {
+  test('create and edit and delete seller', async ({ page }) => {
     
     // 1. Reset database (Setup)
     await test.step('Reset database before test', async () => {
@@ -77,14 +77,27 @@ test.describe('Seller Editing', () => {
       });
     });
 
-    // 5. Logout
+    // 5. Delete seller
+    await test.step('Delete seller and verify it is gone', async () => {
+      // Find the seller row and click Delete button
+      const sellerRow = page.getByRole('row').filter({ hasText: 'Updated Seller Name' }).first();
+      await expect(sellerRow).toBeVisible();
+      
+      await sellerRow.getByRole('button', { name: 'Delete Updated Seller Name' }).click();
+      
+      // Verify seller is no longer in the list
+      await expect(page.getByText('Updated Seller Name')).not.toBeVisible();
+      await expect(page.getByText('updated@example.com')).not.toBeVisible();
+    });
+
+    // 6. Logout
     await test.step('Logout', async () => {
       await page.getByRole('button', { name: 'Logout' }).click();
       await page.waitForURL('**/login');
       await expect(page.getByRole('button', { name: 'Quick login as Admin' })).toBeVisible();
     });
 
-    // 6. Reset database (Cleanup)
+    // 7. Reset database (Cleanup)
     await test.step('Reset database after test', async () => {
       await page.getByRole('button', { name: 'Reset database' }).click();
       await expect(page.getByText('Database has been reset!')).toBeVisible();
