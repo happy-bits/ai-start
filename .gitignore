@@ -7,4 +7,3 @@ dist/
 
 frontend/playwright-report
 frontend/test-results
-frontend/.e2e-pids

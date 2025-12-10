@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures';
+import { test, expect } from '@playwright/test';
 
 test.describe('Interaction Editing', () => {
   test('edit interaction fields inline', async ({ page }) => {
