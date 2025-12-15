@@ -6,7 +6,7 @@ import { useInteractions, useUpdateInteraction, useDeleteInteraction } from '../
 import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 
 import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions, InlineEditableSelect, InlineEditableTime, InlineEditableTextarea } from '../../components/ui';
-import NewInteractionRow from '../../components/NewInteractionRow';
+import NewInteractionRow from '../interactions/NewInteractionRow';
 
 import { deleteButtonBase, deleteButtonSize, cn } from '../../utils/styles';
 import { getLatestInteractionsForContact, isFollowUpDue, sortContacts } from '../../utils';

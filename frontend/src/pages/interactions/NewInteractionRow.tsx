@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
-import { useCreateInteraction } from '../api/interactions';
-import { INTERACTION_TYPE_OPTIONS } from '../api/types';
+import { useCreateInteraction } from '../../api/interactions';
+import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 
-import { InlineEditableTextarea, InlineEditableSelect, InlineEditableDate, InlineEditableTime } from './ui';
+import { InlineEditableTextarea, InlineEditableSelect, InlineEditableDate, InlineEditableTime } from '../../components/ui';
 
-import { interactionTypeConfig } from '../config/interactions';
-import { iconContainer, cardContainerDashed, cn } from '../utils/styles';
-import { getTodayISO, getCurrentTimeHHMM } from '../utils';
+import { interactionTypeConfig } from '../../config/interactions';
+import { iconContainer, cardContainerDashed, cn } from '../../utils/styles';
+import { getTodayISO, getCurrentTimeHHMM } from '../../utils';
 
-import type { InteractionType } from '../api/types';
+import type { InteractionType } from '../../api/types';
 
 interface NewInteractionRowProps {
   contactId: number;
@@ -138,4 +138,3 @@ export default function NewInteractionRow({ contactId, variant = 'detail', onCre
     </div>
   );
 }
-
