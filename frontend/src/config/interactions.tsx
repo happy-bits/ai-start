@@ -1,9 +1,9 @@
-import React from 'react';
+import { type ReactNode } from 'react';
 import type { InteractionType } from '../api/types';
 
 interface InteractionTypeConfig {
   color: 'warm';
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 /**

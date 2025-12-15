@@ -24,14 +24,12 @@ export default function NewInteractionRow({ contactId, variant = 'detail', onCre
   const [date, setDate] = useState<string>(getTodayISO());
   const [time, setTime] = useState<string | null>(getCurrentTimeHHMM());
   const [notes, setNotes] = useState<string | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
 
   const handleNotesSave = async (value: string | null) => {
     if (!value || value.trim() === '') {
       return; // Don't create if empty
     }
 
-    setIsCreating(true);
     try {
       await createInteraction.mutateAsync({
         contactId,
@@ -50,8 +48,6 @@ export default function NewInteractionRow({ contactId, variant = 'detail', onCre
       onCreated?.();
     } catch (error) {
       console.error('Failed to create interaction:', error);
-    } finally {
-      setIsCreating(false);
     }
   };
 

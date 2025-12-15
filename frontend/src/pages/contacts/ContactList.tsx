@@ -225,39 +225,29 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
 }
 
 // Component to render contact table
-function ContactTable({ contacts, updateContact, deleteContact, interactions = [], showInteractions = false, showHeader = true }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[]; showInteractions?: boolean; showHeader?: boolean }) {
-  const updateInteraction = useUpdateInteraction();
-  const deleteInteraction = useDeleteInteraction();
-  
+function ContactTable({ contacts, updateContact, deleteContact }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact> }) {
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
-  };
-
-  const handleDeleteInteraction = async (interactionId: number) => {
-    deleteInteraction.mutate(interactionId);
   };
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
-        {showHeader && (
-          <thead>
-            <tr className="border-b border-dark-700">
-              <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
-                Contact
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
-                Contact Info
-              </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-        )}
+        <thead>
+          <tr className="border-b border-dark-700">
+            <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
+              Contact
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">
+              Contact Info
+            </th>
+            <th className="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
         <tbody className="divide-y divide-dark-700">
           {contacts.map((contact, index) => {
-            const latestInteractions = showInteractions ? getLatestInteractionsForContact(interactions, contact.id, 3) : [];
             return (
               <>
                 {index > 0 && (
@@ -371,90 +361,6 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                     </div>
                   </td>
                 </tr>
-                {showInteractions && latestInteractions.length > 0 && (
-                  <>
-                    {latestInteractions.map((interaction) => (
-                      <tr key={`interaction-${interaction.id}`} className="bg-dark-800/30 hover:bg-dark-800/40 transition-colors">
-                        <td colSpan={3} className="px-6 py-3">
-                          <div className="flex items-start gap-3">
-                            <div className="shrink-0 mt-0.5 w-24">
-                              <InlineEditableSelect
-                                value={interaction.type}
-                                onSave={async (value) => {
-                                  await updateInteraction.mutateAsync({
-                                    id: interaction.id,
-                                    data: { type: value as InteractionType },
-                                  });
-                                }}
-                                options={INTERACTION_TYPE_OPTIONS}
-                                badgeVariant="warm"
-                                aria-label="Interaction type"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                                <InlineEditableDate
-                                  value={interaction.date}
-                                  onSave={async (value) => {
-                                    await updateInteraction.mutateAsync({
-                                      id: interaction.id,
-                                      data: { date: value || interaction.date },
-                                    });
-                                  }}
-                                  className="text-sm"
-                                  aria-label="Interaction date"
-                                />
-                                <InlineEditableTime
-                                  value={interaction.time}
-                                  onSave={async (value) => {
-                                    await updateInteraction.mutateAsync({
-                                      id: interaction.id,
-                                      data: { time: value },
-                                    });
-                                  }}
-                                  className="text-sm"
-                                  emptyText="Add time"
-                                  aria-label="Interaction time"
-                                />
-                              </div>
-                              <div>
-                                <InlineEditableTextarea
-                                  value={interaction.notes}
-                                  onSave={async (value) => {
-                                    await updateInteraction.mutateAsync({
-                                      id: interaction.id,
-                                      data: { notes: value },
-                                    });
-                                  }}
-                                  emptyText="Click to add notes"
-                                  rows={2}
-                                  className="text-xs"
-                                  aria-label="Interaction notes"
-                                />
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => handleDeleteInteraction(interaction.id)}
-                              className={cn(deleteButtonBase, deleteButtonSize.sm, 'shrink-0 mt-0.5')}
-                              aria-label={`Delete interaction from ${interaction.date}`}
-                            >
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </>
-                )}
-                {showInteractions && latestInteractions.length === 0 && (
-                  <tr className="bg-dark-800/30">
-                    <td colSpan={3} className="px-6 py-3">
-                      <span className="text-xs text-dark-500">No interactions</span>
-                    </td>
-                  </tr>
-                )}
               </>
             );
           })}

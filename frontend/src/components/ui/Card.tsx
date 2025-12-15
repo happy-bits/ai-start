@@ -1,4 +1,4 @@
-import { type ReactNode, type ElementType } from 'react';
+import { type ReactNode } from 'react';
 import { cn } from '../../utils/styles';
 
 interface CardProps {

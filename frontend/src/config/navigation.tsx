@@ -1,9 +1,9 @@
-import React from 'react';
+import { type ReactNode } from 'react';
 
 interface NavItem {
   to: string;
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 export const navItems: NavItem[] = [
