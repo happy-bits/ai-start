@@ -13,212 +13,15 @@ import { isFollowUpDue, sortContacts, sortInteractionsByRecency } from '../../ut
 
 import type { Contact, Interaction, InteractionType } from '../../api/types';
 
-// Component to render priority contacts as cards
-function PriorityContactCards({ contacts, updateContact, deleteContact, interactions = [] }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[] }) {
-  const updateInteraction = useUpdateInteraction();
-  const deleteInteraction = useDeleteInteraction();
-  
-  const handleDelete = async (id: number) => {
-    deleteContact.mutate(id);
-  };
-
-  const handleDeleteInteraction = async (interactionId: number) => {
-    deleteInteraction.mutate(interactionId);
-  };
-
-  return (
-    <div className="space-y-4" role="list" aria-label="Priority contacts">
-      {contacts.map((contact) => {
-        const allInteractions = sortInteractionsByRecency(
-          interactions.filter((interaction) => interaction.contactId === contact.id)
-        );
-        return (
-          <Card key={contact.id} as="article" aria-label={`Contact: ${contact.name}`} className="hover:border-warm-500/30 transition-colors">
-            <div className="space-y-4" role="listitem">
-              {/* Contact Header */}
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <Avatar name={contact.name} size="md" />
-                  <div className="flex-1 min-w-0">
-                    <InlineEditable
-                      value={contact.name}
-                      onSave={async (value) => {
-                        await updateContact.mutateAsync({
-                          id: contact.id,
-                          data: { name: value || '' },
-                        });
-                      }}
-                      type="text"
-                      placeholder="Contact name"
-                      className="text-white font-medium hover:text-white truncate"
-                      emptyText="Add name"
-                      aria-label={`Contact name for ${contact.name}`}
-                    />
-                    <div className="mt-1">
-                      <InlineEditable
-                        value={contact.company}
-                        onSave={async (value) => {
-                          await updateContact.mutateAsync({
-                            id: contact.id,
-                            data: { company: value },
-                          });
-                        }}
-                        type="text"
-                        placeholder="Company name"
-                        className="text-dark-400 hover:text-white truncate"
-                        emptyText="Add company"
-                        aria-label={`Company name for ${contact.name}`}
-                      />
-                    </div>
-                    {/* Contact Info */}
-                    <div className="space-y-1 mt-2">
-                      <InlineEditable
-                        value={contact.email}
-                        onSave={async (value) => {
-                          await updateContact.mutateAsync({
-                            id: contact.id,
-                            data: { email: value },
-                          });
-                        }}
-                        type="email"
-                        placeholder="email@example.com"
-                        emptyText="Add email"
-                        aria-label={`Email for ${contact.name}`}
-                      />
-                      <InlineEditable
-                        value={contact.phone}
-                        onSave={async (value) => {
-                          await updateContact.mutateAsync({
-                            id: contact.id,
-                            data: { phone: value },
-                          });
-                        }}
-                        type="tel"
-                        placeholder="+46 73 345 67 89"
-                        emptyText="Add phone"
-                        aria-label={`Phone for ${contact.name}`}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(contact.id)}
-                    disabled={deleteContact.isPending}
-                    aria-label={`Delete ${contact.name}`}
-                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Follow-up Date */}
-              <div>
-                <InlineEditableDateWithQuickActions
-                  value={contact.followUpDate}
-                  onSave={async (value) => {
-                    await updateContact.mutateAsync({
-                      id: contact.id,
-                      data: { followUpDate: value },
-                    });
-                  }}
-                  emptyText="Add follow-up date"
-                />
-              </div>
-
-              {/* Interactions */}
-              <div className="pt-4 space-y-3">
-                <NewInteractionRow contactId={contact.id} variant="card" />
-                {allInteractions.length > 0 && (
-                  <>
-                    {allInteractions.map((interaction) => (
-                      <div key={interaction.id} className="flex items-start gap-3">
-                        <div className="shrink-0 mt-0.5 w-24">
-                          <InlineEditableSelect
-                            value={interaction.type}
-                            onSave={async (value) => {
-                              await updateInteraction.mutateAsync({
-                                id: interaction.id,
-                                data: { type: value as InteractionType },
-                              });
-                            }}
-                            options={INTERACTION_TYPE_OPTIONS}
-                            badgeVariant="warm"
-                            aria-label="Interaction type"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                            <InlineEditableDate
-                              value={interaction.date}
-                              onSave={async (value) => {
-                                await updateInteraction.mutateAsync({
-                                  id: interaction.id,
-                                  data: { date: value || interaction.date },
-                                });
-                              }}
-                              className="text-sm"
-                              aria-label="Interaction date"
-                            />
-                            <InlineEditableTime
-                              value={interaction.time}
-                              onSave={async (value) => {
-                                await updateInteraction.mutateAsync({
-                                  id: interaction.id,
-                                  data: { time: value },
-                                });
-                              }}
-                              className="text-sm"
-                              emptyText="Add time"
-                              aria-label="Interaction time"
-                            />
-                          </div>
-                          <div>
-                            <InlineEditableTextarea
-                              value={interaction.notes}
-                              onSave={async (value) => {
-                                await updateInteraction.mutateAsync({
-                                  id: interaction.id,
-                                  data: { notes: value },
-                                });
-                              }}
-                              emptyText="Click to add notes"
-                              rows={2}
-                              className="text-xs"
-                              aria-label="Interaction notes"
-                            />
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleDeleteInteraction(interaction.id)}
-                          className={cn(deleteButtonBase, deleteButtonSize.sm, 'shrink-0 mt-0.5')}
-                          aria-label={`Delete interaction from ${interaction.date}`}
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    ))}
-                  </>
-                )}
-              </div>
-            </div>
-          </Card>
-        );
-      })}
-    </div>
-  );
-}
-
 // Component to render contact list
 function ContactTable({ contacts, updateContact, deleteContact, interactions = [] }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[] }) {
-  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  // Initialize expandedIds with contacts that have follow-ups due
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(() => {
+    const dueContactIds = contacts
+      .filter((contact) => isFollowUpDue(contact.followUpDate))
+      .map((contact) => contact.id);
+    return new Set(dueContactIds);
+  });
   const updateInteraction = useUpdateInteraction();
   const deleteInteraction = useDeleteInteraction();
 
@@ -514,14 +317,9 @@ export default function ContactList() {
     );
   }, [contacts, searchTerm]);
 
-  // Split into priority (due today or earlier) and other contacts
-  const { priorityContacts, otherContacts } = useMemo(() => {
-    const priority = filteredContacts.filter((contact) => isFollowUpDue(contact.followUpDate));
-    const other = filteredContacts.filter((contact) => !isFollowUpDue(contact.followUpDate));
-    return {
-      priorityContacts: sortContacts(priority),
-      otherContacts: sortContacts(other),
-    };
+  // Sort all contacts
+  const sortedContacts = useMemo(() => {
+    return sortContacts(filteredContacts);
   }, [filteredContacts]);
 
   return (
@@ -557,50 +355,23 @@ export default function ContactList() {
         </Card>
       ) : (
         <>
-          {/* Priority/Todo Section */}
-          <section aria-labelledby="priority-heading" className="space-y-3">
-            <div className="flex items-center gap-2">
-              <h2 id="priority-heading" className="text-lg font-semibold text-white">Today's Follow-ups</h2>
-              {priorityContacts.length > 0 && (
-                <span className="px-2 py-1 text-xs font-medium bg-warm-500/20 text-warm-300 rounded-full">
-                  {priorityContacts.length}
-                </span>
-              )}
-            </div>
-            {priorityContacts.length === 0 ? (
-              <Card>
-                <EmptyState
-                icon={
-                  <svg className="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                }
-                title="All caught up!"
-                message="No follow-ups due today. Great work!"
-              />
-              </Card>
-            ) : (
-              <PriorityContactCards contacts={priorityContacts} updateContact={updateContact} deleteContact={deleteContact} interactions={interactions} />
-            )}
-          </section>
-
-          {/* Other Contacts Section */}
-          {otherContacts.length > 0 && (
-            <section aria-labelledby="other-contacts-heading" className="space-y-3">
+          {/* Contacts Section */}
+          {sortedContacts.length > 0 && (
+            <section aria-labelledby="contacts-heading" className="space-y-3">
               <div className="flex items-center gap-2">
-                <h2 id="other-contacts-heading" className="text-lg font-semibold text-white">Other Contacts</h2>
+                <h2 id="contacts-heading" className="text-lg font-semibold text-white">Contacts</h2>
                 <span className="px-2 py-1 text-xs font-medium bg-dark-700 text-dark-300 rounded-full">
-                  {otherContacts.length}
+                  {sortedContacts.length}
                 </span>
               </div>
               <Card padding="none">
-                <ContactTable contacts={otherContacts} updateContact={updateContact} deleteContact={deleteContact} interactions={interactions} />
+                <ContactTable contacts={sortedContacts} updateContact={updateContact} deleteContact={deleteContact} interactions={interactions} />
               </Card>
             </section>
           )}
 
           {/* Empty state when no contacts match search */}
-          {filteredContacts.length === 0 && (
+          {sortedContacts.length === 0 && (
             <Card padding="none">
               <EmptyState
                 icon={
