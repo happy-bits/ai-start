@@ -8,7 +8,7 @@ import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions, InlineEditableSelect, InlineEditableTime, InlineEditableTextarea } from '../../components/ui';
 import NewInteractionRow from '../../components/NewInteractionRow';
 
-import { deleteButtonBase, deleteButtonSize, actionButtonBase, cn } from '../../utils/styles';
+import { deleteButtonBase, deleteButtonSize, cn } from '../../utils/styles';
 import { getLatestInteractionsForContact, isFollowUpDue, sortContacts } from '../../utils';
 
 import type { Contact, Interaction, InteractionType } from '../../api/types';
@@ -100,16 +100,6 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Link to={`/contacts/${contact.id}`}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      aria-label={`View ${contact.name}`}
-                      className={actionButtonBase}
-                    >
-                      View
-                    </Button>
-                  </Link>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -338,16 +328,6 @@ function ContactTable({ contacts, updateContact, deleteContact }: { contacts: Co
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
-                      <Link to={`/contacts/${contact.id}`}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          aria-label={`View interactions for ${contact.name}`}
-                          className={actionButtonBase}
-                        >
-                          Interactions
-                        </Button>
-                      </Link>
                       <Button
                         variant="ghost"
                         size="sm"

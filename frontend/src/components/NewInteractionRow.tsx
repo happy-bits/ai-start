@@ -101,7 +101,7 @@ export default function NewInteractionRow({ contactId, variant = 'detail', onCre
     );
   }
 
-  // Detail variant for ContactDetail
+  // Detail variant (default)
   return (
     <div className={cn('flex gap-4 p-4', cardContainerDashed)}>
       <div className={iconContainer}>

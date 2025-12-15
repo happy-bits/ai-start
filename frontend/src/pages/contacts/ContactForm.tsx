@@ -90,7 +90,7 @@ export default function ContactForm() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <BackButton to={isEditing ? `/contacts/${contactId}` : '/contacts'} />
+        <BackButton to="/contacts" />
         <div>
           <h1 className="text-2xl font-bold text-white">
             {isEditing ? 'Edit Contact' : 'New Contact'}
@@ -152,7 +152,7 @@ export default function ContactForm() {
           />
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark-700">
-            <Link to={isEditing ? `/contacts/${contactId}` : '/contacts'}>
+            <Link to="/contacts">
               <Button type="button" variant="ghost">
                 Cancel
               </Button>
