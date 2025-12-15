@@ -38,3 +38,8 @@ Testa på fem olika sätt:
 Kör bara ett test
 
     npm run test:e2e:trace -- e2e/inline-editing.spec.ts
+
+
+Skapa e2e-tester med playwright
+
+    npx playwright codegen http://localhost:5173/
