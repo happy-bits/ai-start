@@ -9,7 +9,7 @@ import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEd
 import NewInteractionRow from '../interactions/NewInteractionRow';
 
 import { deleteButtonBase, deleteButtonSize, cn } from '../../utils/styles';
-import { getLatestInteractionsForContact, isFollowUpDue, sortContacts } from '../../utils';
+import { isFollowUpDue, sortContacts, sortInteractionsByRecency } from '../../utils';
 
 import type { Contact, Interaction, InteractionType } from '../../api/types';
 
@@ -29,7 +29,9 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
   return (
     <div className="space-y-4" role="list" aria-label="Priority contacts">
       {contacts.map((contact) => {
-        const latestInteractions = getLatestInteractionsForContact(interactions, contact.id, 3);
+        const allInteractions = sortInteractionsByRecency(
+          interactions.filter((interaction) => interaction.contactId === contact.id)
+        );
         return (
           <Card key={contact.id} as="article" aria-label={`Contact: ${contact.name}`} className="hover:border-warm-500/30 transition-colors">
             <div className="space-y-4" role="listitem">
@@ -132,9 +134,9 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
               {/* Interactions */}
               <div className="pt-4 space-y-3">
                 <NewInteractionRow contactId={contact.id} variant="card" />
-                {latestInteractions.length > 0 && (
+                {allInteractions.length > 0 && (
                   <>
-                    {latestInteractions.map((interaction) => (
+                    {allInteractions.map((interaction) => (
                       <div key={interaction.id} className="flex items-start gap-3">
                         <div className="shrink-0 mt-0.5 w-24">
                           <InlineEditableSelect
