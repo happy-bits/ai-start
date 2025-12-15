@@ -215,233 +215,70 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
 }
 
 // Component to render contact list
-function ContactTable({ contacts, updateContact, deleteContact }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact> }) {
+function ContactTable({ contacts, deleteContact }: { contacts: Contact[]; deleteContact: ReturnType<typeof useDeleteContact> }) {
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
   };
 
   return (
     <div className="space-y-0">
-      {/* Header - hidden on mobile, visible on larger screens */}
-      <div className="hidden md:grid md:grid-cols-12 gap-4 px-6 py-4 border-b border-dark-700">
-        <div className="col-span-5">
-          <span className="text-xs font-semibold text-dark-400 uppercase tracking-wider">Contact</span>
-        </div>
-        <div className="col-span-5">
-          <span className="text-xs font-semibold text-dark-400 uppercase tracking-wider">Contact Info</span>
-        </div>
-        <div className="col-span-2 text-right">
-          <span className="text-xs font-semibold text-dark-400 uppercase tracking-wider">Actions</span>
-        </div>
-      </div>
-
       {/* Contact items */}
       <div className="divide-y divide-dark-700">
-        {contacts.map((contact, index) => {
+        {contacts.map((contact) => {
           return (
-            <div key={contact.id}>
-              {index > 0 && (
-                <div className="h-6 border-b border-dark-700/50" aria-hidden="true" />
-              )}
-              <article
-                className="hover:bg-dark-800/50 transition-colors border-b border-dark-700/30"
-                aria-label={`Contact: ${contact.name}`}
-              >
-                <div className="px-4 py-4 md:px-6 md:py-4">
-                  {/* Mobile layout: stacked */}
-                  <div className="md:hidden space-y-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-center gap-4 flex-1 min-w-0">
-                        <Avatar name={contact.name} size="md" />
-                        <div className="flex-1 min-w-0">
-                          <InlineEditable
-                            value={contact.name}
-                            onSave={async (value) => {
-                              await updateContact.mutateAsync({
-                                id: contact.id,
-                                data: { name: value || '' },
-                              });
-                            }}
-                            type="text"
-                            placeholder="Contact name"
-                            className="text-white font-medium hover:text-white"
-                            emptyText="Add name"
-                            aria-label={`Contact name for ${contact.name}`}
-                          />
-                          <div className="mt-1">
-                            <InlineEditable
-                              value={contact.company}
-                              onSave={async (value) => {
-                                await updateContact.mutateAsync({
-                                  id: contact.id,
-                                  data: { company: value },
-                                });
-                              }}
-                              type="text"
-                              placeholder="Company name"
-                              className="text-dark-400 hover:text-white"
-                              emptyText="Add company"
-                              aria-label={`Company name for ${contact.name}`}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(contact.id)}
-                          disabled={deleteContact.isPending}
-                          aria-label={`Delete ${contact.name}`}
-                          className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <InlineEditable
-                        value={contact.email}
-                        onSave={async (value) => {
-                          await updateContact.mutateAsync({
-                            id: contact.id,
-                            data: { email: value },
-                          });
-                        }}
-                        type="email"
-                        placeholder="email@example.com"
-                        emptyText="Add email"
-                        aria-label={`Email for ${contact.name}`}
-                      />
-                      <InlineEditable
-                        value={contact.phone}
-                        onSave={async (value) => {
-                          await updateContact.mutateAsync({
-                            id: contact.id,
-                            data: { phone: value },
-                          });
-                        }}
-                        type="tel"
-                        placeholder="+46 73 345 67 89"
-                        emptyText="Add phone"
-                        aria-label={`Phone for ${contact.name}`}
-                      />
-                    </div>
-                    <div>
-                      <InlineEditableDate
-                        value={contact.followUpDate}
-                        onSave={async (value) => {
-                          await updateContact.mutateAsync({
-                            id: contact.id,
-                            data: { followUpDate: value },
-                          });
-                        }}
-                        emptyText="Add follow-up date"
-                        aria-label={`Follow-up date for ${contact.name}`}
-                      />
-                    </div>
+            <article
+              key={contact.id}
+              className="hover:bg-dark-800/50 transition-colors border-b border-dark-700/30"
+              aria-label={`Contact: ${contact.name}`}
+            >
+              <div className="px-4 py-2">
+                <div className="flex items-center gap-4">
+                  {/* Avatar */}
+                  <div className="shrink-0">
+                    <Avatar name={contact.name} size="sm" />
                   </div>
-
-                  {/* Desktop layout: grid */}
-                  <div className="hidden md:grid md:grid-cols-12 gap-4 items-start">
-                    <div className="col-span-5">
-                      <div className="flex items-center gap-4">
-                        <Avatar name={contact.name} size="md" />
-                        <div className="flex-1">
-                          <InlineEditable
-                            value={contact.name}
-                            onSave={async (value) => {
-                              await updateContact.mutateAsync({
-                                id: contact.id,
-                                data: { name: value || '' },
-                              });
-                            }}
-                            type="text"
-                            placeholder="Contact name"
-                            className="text-white font-medium hover:text-white"
-                            emptyText="Add name"
-                            aria-label={`Contact name for ${contact.name}`}
-                          />
-                          <div className="mt-1">
-                            <InlineEditable
-                              value={contact.company}
-                              onSave={async (value) => {
-                                await updateContact.mutateAsync({
-                                  id: contact.id,
-                                  data: { company: value },
-                                });
-                              }}
-                              type="text"
-                              placeholder="Company name"
-                              className="text-dark-400 hover:text-white"
-                              emptyText="Add company"
-                              aria-label={`Company name for ${contact.name}`}
-                            />
-                          </div>
-                          <div className="mt-2">
-                            <InlineEditableDate
-                              value={contact.followUpDate}
-                              onSave={async (value) => {
-                                await updateContact.mutateAsync({
-                                  id: contact.id,
-                                  data: { followUpDate: value },
-                                });
-                              }}
-                              emptyText="Add follow-up date"
-                              aria-label={`Follow-up date for ${contact.name}`}
-                            />
-                          </div>
-                        </div>
-                      </div>
+                  
+                  {/* Follow-up date */}
+                  {contact.followUpDate && (
+                    <div className="shrink-0 text-sm text-dark-400 font-mono w-24">
+                      {contact.followUpDate}
                     </div>
-                    <div className="col-span-5">
-                      <div className="space-y-1">
-                        <InlineEditable
-                          value={contact.email}
-                          onSave={async (value) => {
-                            await updateContact.mutateAsync({
-                              id: contact.id,
-                              data: { email: value },
-                            });
-                          }}
-                          type="email"
-                          placeholder="email@example.com"
-                          emptyText="Add email"
-                          aria-label={`Email for ${contact.name}`}
-                        />
-                        <InlineEditable
-                          value={contact.phone}
-                          onSave={async (value) => {
-                            await updateContact.mutateAsync({
-                              id: contact.id,
-                              data: { phone: value },
-                            });
-                          }}
-                          type="tel"
-                          placeholder="+46 73 345 67 89"
-                          emptyText="Add phone"
-                          aria-label={`Phone for ${contact.name}`}
-                        />
-                      </div>
+                  )}
+                  {!contact.followUpDate && (
+                    <div className="shrink-0 w-24"></div>
+                  )}
+                  
+                  {/* Name */}
+                  <div className="shrink-0 text-sm text-white font-medium min-w-[120px]">
+                    {contact.name || 'Unnamed contact'}
+                  </div>
+                  
+                  {/* Company */}
+                  {contact.company && (
+                    <div className="shrink-0 text-sm text-dark-400 min-w-[100px]">
+                      {contact.company}
                     </div>
-                    <div className="col-span-2">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(contact.id)}
-                          disabled={deleteContact.isPending}
-                          aria-label={`Delete ${contact.name}`}
-                          className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
+                  )}
+                  
+                  {/* Spacer */}
+                  <div className="flex-1"></div>
+                  
+                  {/* Delete button */}
+                  <div className="shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(contact.id)}
+                      disabled={deleteContact.isPending}
+                      aria-label={`Delete ${contact.name}`}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </div>
-              </article>
-            </div>
+              </div>
+            </article>
           );
         })}
       </div>
@@ -546,7 +383,7 @@ export default function ContactList() {
                 </span>
               </div>
               <Card padding="none">
-                <ContactTable contacts={otherContacts} updateContact={updateContact} deleteContact={deleteContact} />
+                <ContactTable contacts={otherContacts} deleteContact={deleteContact} />
               </Card>
             </section>
           )}
