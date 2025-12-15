@@ -217,9 +217,29 @@ function PriorityContactCards({ contacts, updateContact, deleteContact, interact
 }
 
 // Component to render contact list
-function ContactTable({ contacts, deleteContact }: { contacts: Contact[]; deleteContact: ReturnType<typeof useDeleteContact> }) {
+function ContactTable({ contacts, updateContact, deleteContact, interactions = [] }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[] }) {
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const updateInteraction = useUpdateInteraction();
+  const deleteInteraction = useDeleteInteraction();
+
   const handleDelete = async (id: number) => {
     deleteContact.mutate(id);
+  };
+
+  const handleDeleteInteraction = async (interactionId: number) => {
+    deleteInteraction.mutate(interactionId);
+  };
+
+  const toggleExpanded = (id: number) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   return (
@@ -227,14 +247,36 @@ function ContactTable({ contacts, deleteContact }: { contacts: Contact[]; delete
       {/* Contact items */}
       <div className="divide-y divide-dark-700">
         {contacts.map((contact) => {
+          const isExpanded = expandedIds.has(contact.id);
+          const allInteractions = sortInteractionsByRecency(
+            interactions.filter((interaction) => interaction.contactId === contact.id)
+          );
+
           return (
             <article
               key={contact.id}
               className="hover:bg-dark-800/50 transition-colors border-b border-dark-700/30"
               aria-label={`Contact: ${contact.name}`}
             >
+              {/* Compact row */}
               <div className="px-4 py-2">
                 <div className="flex items-center gap-4">
+                  {/* Toggle button */}
+                  <button
+                    onClick={() => toggleExpanded(contact.id)}
+                    className="shrink-0 text-dark-400 hover:text-white transition-colors"
+                    aria-label={isExpanded ? 'Collapse contact details' : 'Expand contact details'}
+                  >
+                    <svg
+                      className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+
                   {/* Avatar */}
                   <div className="shrink-0">
                     <Avatar name={contact.name} size="sm" />
@@ -280,6 +322,173 @@ function ContactTable({ contacts, deleteContact }: { contacts: Contact[]; delete
                   </div>
                 </div>
               </div>
+
+              {/* Expanded details */}
+              {isExpanded && (
+                <div className="px-4 pb-4 border-t border-dark-700/50">
+                  <div className="pt-4 space-y-4">
+                    {/* Contact Header */}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <Avatar name={contact.name} size="md" />
+                        <div className="flex-1 min-w-0">
+                          <InlineEditable
+                            value={contact.name}
+                            onSave={async (value) => {
+                              await updateContact.mutateAsync({
+                                id: contact.id,
+                                data: { name: value || '' },
+                              });
+                            }}
+                            type="text"
+                            placeholder="Contact name"
+                            className="text-white font-medium hover:text-white truncate"
+                            emptyText="Add name"
+                            aria-label={`Contact name for ${contact.name}`}
+                          />
+                          <div className="mt-1">
+                            <InlineEditable
+                              value={contact.company}
+                              onSave={async (value) => {
+                                await updateContact.mutateAsync({
+                                  id: contact.id,
+                                  data: { company: value },
+                                });
+                              }}
+                              type="text"
+                              placeholder="Company name"
+                              className="text-dark-400 hover:text-white truncate"
+                              emptyText="Add company"
+                              aria-label={`Company name for ${contact.name}`}
+                            />
+                          </div>
+                          {/* Contact Info */}
+                          <div className="space-y-1 mt-2">
+                            <InlineEditable
+                              value={contact.email}
+                              onSave={async (value) => {
+                                await updateContact.mutateAsync({
+                                  id: contact.id,
+                                  data: { email: value },
+                                });
+                              }}
+                              type="email"
+                              placeholder="email@example.com"
+                              emptyText="Add email"
+                              aria-label={`Email for ${contact.name}`}
+                            />
+                            <InlineEditable
+                              value={contact.phone}
+                              onSave={async (value) => {
+                                await updateContact.mutateAsync({
+                                  id: contact.id,
+                                  data: { phone: value },
+                                });
+                              }}
+                              type="tel"
+                              placeholder="+46 73 345 67 89"
+                              emptyText="Add phone"
+                              aria-label={`Phone for ${contact.name}`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Follow-up Date */}
+                    <div>
+                      <InlineEditableDateWithQuickActions
+                        value={contact.followUpDate}
+                        onSave={async (value) => {
+                          await updateContact.mutateAsync({
+                            id: contact.id,
+                            data: { followUpDate: value },
+                          });
+                        }}
+                        emptyText="Add follow-up date"
+                      />
+                    </div>
+
+                    {/* Interactions */}
+                    <div className="pt-4 space-y-3">
+                      <NewInteractionRow contactId={contact.id} variant="card" />
+                      {allInteractions.length > 0 && (
+                        <>
+                          {allInteractions.map((interaction) => (
+                            <div key={interaction.id} className="flex items-start gap-3">
+                              <div className="shrink-0 mt-0.5 w-24">
+                                <InlineEditableSelect
+                                  value={interaction.type}
+                                  onSave={async (value) => {
+                                    await updateInteraction.mutateAsync({
+                                      id: interaction.id,
+                                      data: { type: value as InteractionType },
+                                    });
+                                  }}
+                                  options={INTERACTION_TYPE_OPTIONS}
+                                  badgeVariant="warm"
+                                  aria-label="Interaction type"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                                  <InlineEditableDate
+                                    value={interaction.date}
+                                    onSave={async (value) => {
+                                      await updateInteraction.mutateAsync({
+                                        id: interaction.id,
+                                        data: { date: value || interaction.date },
+                                      });
+                                    }}
+                                    className="text-sm"
+                                    aria-label="Interaction date"
+                                  />
+                                  <InlineEditableTime
+                                    value={interaction.time}
+                                    onSave={async (value) => {
+                                      await updateInteraction.mutateAsync({
+                                        id: interaction.id,
+                                        data: { time: value },
+                                      });
+                                    }}
+                                    className="text-sm"
+                                    emptyText="Add time"
+                                    aria-label="Interaction time"
+                                  />
+                                </div>
+                                <div>
+                                  <InlineEditableTextarea
+                                    value={interaction.notes}
+                                    onSave={async (value) => {
+                                      await updateInteraction.mutateAsync({
+                                        id: interaction.id,
+                                        data: { notes: value },
+                                      });
+                                    }}
+                                    emptyText="Click to add notes"
+                                    rows={2}
+                                    className="text-xs"
+                                    aria-label="Interaction notes"
+                                  />
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => handleDeleteInteraction(interaction.id)}
+                                className={cn(deleteButtonBase, deleteButtonSize.sm, 'shrink-0 mt-0.5')}
+                                aria-label={`Delete interaction from ${interaction.date}`}
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </div>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </article>
           );
         })}
@@ -385,7 +594,7 @@ export default function ContactList() {
                 </span>
               </div>
               <Card padding="none">
-                <ContactTable contacts={otherContacts} deleteContact={deleteContact} />
+                <ContactTable contacts={otherContacts} updateContact={updateContact} deleteContact={deleteContact} interactions={interactions} />
               </Card>
             </section>
           )}
