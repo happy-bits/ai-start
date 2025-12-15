@@ -15,13 +15,8 @@ import type { Contact, Interaction, InteractionType } from '../../api/types';
 
 // Component to render contact list
 function ContactTable({ contacts, updateContact, deleteContact, interactions = [] }: { contacts: Contact[]; updateContact: ReturnType<typeof useUpdateContact>; deleteContact: ReturnType<typeof useDeleteContact>; interactions?: Interaction[] }) {
-  // Initialize expandedIds with contacts that have follow-ups due
-  const [expandedIds, setExpandedIds] = useState<Set<number>>(() => {
-    const dueContactIds = contacts
-      .filter((contact) => isFollowUpDue(contact.followUpDate))
-      .map((contact) => contact.id);
-    return new Set(dueContactIds);
-  });
+  // Initialize with all contacts collapsed
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const updateInteraction = useUpdateInteraction();
   const deleteInteraction = useDeleteInteraction();
 
@@ -80,35 +75,43 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                     </svg>
                   </button>
 
-                  {/* Avatar */}
-                  <div className="shrink-0">
-                    <Avatar name={contact.name} size="sm" />
-                  </div>
-                  
-                  {/* Follow-up date */}
-                  {contact.followUpDate && (
-                    <div className="shrink-0 text-sm text-dark-400 font-mono w-24">
-                      {contact.followUpDate}
-                    </div>
+                  {/* Show contact info only when collapsed */}
+                  {!isExpanded && (
+                    <>
+                      {/* Avatar */}
+                      <div className="shrink-0">
+                        <Avatar name={contact.name} size="sm" />
+                      </div>
+                      
+                      {/* Follow-up date */}
+                      {contact.followUpDate && (
+                        <div className="shrink-0 text-sm text-dark-400 font-mono w-24">
+                          {contact.followUpDate}
+                        </div>
+                      )}
+                      {!contact.followUpDate && (
+                        <div className="shrink-0 w-24"></div>
+                      )}
+                      
+                      {/* Name */}
+                      <div className="shrink-0 text-sm text-white font-medium min-w-[120px]">
+                        {contact.name || 'Unnamed contact'}
+                      </div>
+                      
+                      {/* Company */}
+                      {contact.company && (
+                        <div className="shrink-0 text-sm text-dark-400 min-w-[100px]">
+                          {contact.company}
+                        </div>
+                      )}
+                      
+                      {/* Spacer */}
+                      <div className="flex-1"></div>
+                    </>
                   )}
-                  {!contact.followUpDate && (
-                    <div className="shrink-0 w-24"></div>
-                  )}
-                  
-                  {/* Name */}
-                  <div className="shrink-0 text-sm text-white font-medium min-w-[120px]">
-                    {contact.name || 'Unnamed contact'}
-                  </div>
-                  
-                  {/* Company */}
-                  {contact.company && (
-                    <div className="shrink-0 text-sm text-dark-400 min-w-[100px]">
-                      {contact.company}
-                    </div>
-                  )}
-                  
-                  {/* Spacer */}
-                  <div className="flex-1"></div>
+
+                  {/* Spacer when expanded */}
+                  {isExpanded && <div className="flex-1"></div>}
                   
                   {/* Delete button */}
                   <div className="shrink-0">
