@@ -39,6 +39,8 @@ Kör bara ett test
 
     npm run test:e2e:trace -- e2e/inline-editing.spec.ts
 
+    npm run test:e2e contact-delete.spec.ts
+
 
 Skapa e2e-tester med playwright
 
