@@ -96,17 +96,59 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     'SAS', 'Swedish Match', 'Trelleborg', 'Vattenfall', 'Össur'
   ];
 
+  // Use only the first 10 companies for Maria's contacts
+  const mariaCompanies = companies.slice(0, 10);
+  
+  // Variable distribution: contacts per company
+  // Pattern: [5, 4, 6, 3, 2, 5, 1, 2, 1, 1] = 30 contacts total
+  const contactsPerCompany = [5, 4, 6, 3, 2, 5, 1, 2, 1, 1];
+  
+  // Helper function to get company index for a contact index
+  function getCompanyIndex(contactIndex: number): number {
+    let cumulative = 0;
+    for (let i = 0; i < contactsPerCompany.length; i++) {
+      cumulative += contactsPerCompany[i];
+      if (contactIndex < cumulative) {
+        return i;
+      }
+    }
+    return contactsPerCompany.length - 1;
+  }
+  
+  // Helper function to get contact number within company (0-based)
+  function getContactNumberInCompany(contactIndex: number): number {
+    let cumulative = 0;
+    for (let i = 0; i < contactsPerCompany.length; i++) {
+      if (contactIndex < cumulative + contactsPerCompany[i]) {
+        return contactIndex - cumulative;
+      }
+      cumulative += contactsPerCompany[i];
+    }
+    return 0;
+  }
+
   // Seed 30 contacts for seller1 (Maria)
   const mariaContacts = [];
   for (let i = 0; i < 30; i++) {
+    const companyIndex = getCompanyIndex(i);
+    const company = mariaCompanies[companyIndex];
+    const contactNumber = getContactNumberInCompany(i);
+    const companyDomain = company.toLowerCase().replace(/\s+/g, '');
+    
+    // Generate email with company domain, adding number suffix if multiple contacts from same company
+    const emailBase = swedishNames[i].toLowerCase().replace(' ', '.');
+    const email = contactNumber > 0 
+      ? `${emailBase}${contactNumber + 1}@${companyDomain}.se`
+      : `${emailBase}@${companyDomain}.se`;
+    
     const contact = db
       .insert(schema.contacts)
       .values({
         sellerId: seller1.id,
         name: swedishNames[i],
-        email: `${swedishNames[i].toLowerCase().replace(' ', '.')}@${companies[i].toLowerCase().replace(/\s+/g, '')}.se`,
+        email: email,
         phone: `+46 70 ${String(123 + i).padStart(3, '0')} ${String(45 + i).padStart(2, '0')} ${String(67 + i).padStart(2, '0')}`,
-        company: companies[i],
+        company: company,
         followUpDate: getFollowUpDate(i),
         createdAt: SEED_DATE,
         updatedAt: SEED_DATE,
