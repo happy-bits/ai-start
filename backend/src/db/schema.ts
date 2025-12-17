@@ -30,6 +30,7 @@ export const contacts = sqliteTable('contacts', {
   phone: text('phone'),
   company: text('company'),
   followUpDate: text('follow_up_date'),
+  deletedAt: text('deleted_at'),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
   updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),
 });

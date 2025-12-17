@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import ContactList from './pages/contacts/ContactList';
 import ContactForm from './pages/contacts/ContactForm';
+import Wastebin from './pages/contacts/Wastebin';
 import SellerList from './pages/sellers/SellerList';
 import SellerForm from './pages/sellers/SellerForm';
 
@@ -56,6 +57,7 @@ export default function App() {
         <Route index element={<Navigate to="/contacts" replace />} />
         <Route path="contacts" element={<ContactList />} />
         <Route path="contacts/new" element={<ContactForm />} />
+        <Route path="contacts/wastebin" element={<Wastebin />} />
         <Route
           path="sellers"
           element={

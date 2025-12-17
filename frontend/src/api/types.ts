@@ -19,6 +19,7 @@ export interface Contact {
   phone: string | null;
   company: string | null;
   followUpDate: string | null;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

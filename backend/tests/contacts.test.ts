@@ -256,15 +256,35 @@ describe('Contact Routes', () => {
   });
 
   describe('DELETE /api/contacts/:id', () => {
-    it('should delete own contact', async () => {
+    it('should soft delete own contact', async () => {
       await expectOk(await del(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken));
 
-      // Verify deleted
+      // Verify contact is soft-deleted (not in regular list)
+      const regularList = await expectOk<{ contacts: { id: number }[] }>(
+        await get(ctx.app, '/api/contacts', ctx.sellerToken)
+      );
+      expect(regularList.contacts.find((c) => c.id === ctx.contactId)).toBeUndefined();
+
+      // Verify contact appears in wastebin
+      const wastebin = await expectOk<{ contacts: { id: number; deletedAt: string | null }[] }>(
+        await get(ctx.app, '/api/contacts/wastebin', ctx.sellerToken)
+      );
+      const deletedContact = wastebin.contacts.find((c) => c.id === ctx.contactId);
+      expect(deletedContact).toBeDefined();
+      expect(deletedContact?.deletedAt).toBeTruthy();
+
+      // Verify contact cannot be accessed via GET /contacts/:id
       await expectNotFound(await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken));
     });
 
-    it('should delete any contact as admin', async () => {
+    it('should soft delete any contact as admin', async () => {
       await expectOk(await del(ctx.app, `/api/contacts/${ctx.contact2Id}`, ctx.adminToken));
+
+      // Verify contact appears in wastebin
+      const wastebin = await expectOk<{ contacts: { id: number; deletedAt: string | null }[] }>(
+        await get(ctx.app, '/api/contacts/wastebin', ctx.adminToken)
+      );
+      expect(wastebin.contacts.find((c) => c.id === ctx.contact2Id)).toBeDefined();
     });
 
     it('should deny delete of other sellers contact', async () => {
@@ -273,6 +293,173 @@ describe('Contact Routes', () => {
 
     it('should return 404 for non-existent contact', async () => {
       await expectNotFound(await del(ctx.app, '/api/contacts/9999', ctx.sellerToken));
+    });
+  });
+
+  describe('GET /api/contacts/wastebin', () => {
+    it('should list own deleted contacts as seller', async () => {
+      // First, soft delete a contact
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken));
+
+      const data = await expectOk<{ contacts: { id: number; name: string; deletedAt: string | null }[] }>(
+        await get(ctx.app, '/api/contacts/wastebin', ctx.sellerToken)
+      );
+      expect(data.contacts).toHaveLength(1);
+      expect(data.contacts[0].id).toBe(ctx.contactId);
+      expect(data.contacts[0].name).toBe('Test Contact');
+      expect(data.contacts[0].deletedAt).toBeTruthy();
+    });
+
+    it('should list all deleted contacts as admin', async () => {
+      // Soft delete contacts from both sellers
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken));
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contact2Id}`, ctx.seller2Token));
+
+      const data = await expectOk<{ contacts: { id: number }[] }>(
+        await get(ctx.app, '/api/contacts/wastebin', ctx.adminToken)
+      );
+      expect(data.contacts).toHaveLength(2);
+      expect(data.contacts.map((c) => c.id)).toContain(ctx.contactId);
+      expect(data.contacts.map((c) => c.id)).toContain(ctx.contact2Id);
+    });
+
+    it('should not see other sellers deleted contacts', async () => {
+      // Seller2 deletes their contact
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contact2Id}`, ctx.seller2Token));
+
+      // Seller1 should not see seller2's deleted contact
+      const data = await expectOk<{ contacts: { id: number }[] }>(
+        await get(ctx.app, '/api/contacts/wastebin', ctx.sellerToken)
+      );
+      expect(data.contacts).toHaveLength(0);
+    });
+
+    it('should return empty list when no deleted contacts', async () => {
+      const data = await expectOk<{ contacts: unknown[] }>(
+        await get(ctx.app, '/api/contacts/wastebin', ctx.sellerToken)
+      );
+      expect(data.contacts).toHaveLength(0);
+    });
+  });
+
+  describe('POST /api/contacts/:id/restore', () => {
+    it('should restore own deleted contact', async () => {
+      // First, soft delete the contact
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken));
+
+      // Restore the contact
+      const data = await expectOk<{ contact: { id: number; name: string; deletedAt: string | null } }>(
+        await post(ctx.app, `/api/contacts/${ctx.contactId}/restore`, ctx.sellerToken, {})
+      );
+      expect(data.contact.id).toBe(ctx.contactId);
+      expect(data.contact.name).toBe('Test Contact');
+      expect(data.contact.deletedAt).toBeNull();
+
+      // Verify contact is back in regular list
+      const regularList = await expectOk<{ contacts: { id: number }[] }>(
+        await get(ctx.app, '/api/contacts', ctx.sellerToken)
+      );
+      expect(regularList.contacts.find((c) => c.id === ctx.contactId)).toBeDefined();
+
+      // Verify contact is removed from wastebin
+      const wastebin = await expectOk<{ contacts: { id: number }[] }>(
+        await get(ctx.app, '/api/contacts/wastebin', ctx.sellerToken)
+      );
+      expect(wastebin.contacts.find((c) => c.id === ctx.contactId)).toBeUndefined();
+
+      // Verify contact can be accessed via GET /contacts/:id
+      const retrieved = await expectOk<{ contact: { id: number; name: string } }>(
+        await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken)
+      );
+      expect(retrieved.contact.name).toBe('Test Contact');
+    });
+
+    it('should restore any deleted contact as admin', async () => {
+      // Seller2 deletes their contact
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contact2Id}`, ctx.seller2Token));
+
+      // Admin restores it
+      const data = await expectOk<{ contact: { id: number; deletedAt: string | null } }>(
+        await post(ctx.app, `/api/contacts/${ctx.contact2Id}/restore`, ctx.adminToken, {})
+      );
+      expect(data.contact.deletedAt).toBeNull();
+    });
+
+    it('should deny restore of other sellers contact', async () => {
+      // Seller2 deletes their contact
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contact2Id}`, ctx.seller2Token));
+
+      // Seller1 tries to restore seller2's contact
+      await expectForbidden(
+        await post(ctx.app, `/api/contacts/${ctx.contact2Id}/restore`, ctx.sellerToken, {})
+      );
+    });
+
+    it('should return 400 when trying to restore non-deleted contact', async () => {
+      // Try to restore a contact that is not deleted
+      await expectBadRequest(
+        await post(ctx.app, `/api/contacts/${ctx.contactId}/restore`, ctx.sellerToken, {})
+      );
+    });
+
+    it('should return 404 for non-existent contact', async () => {
+      await expectNotFound(await post(ctx.app, '/api/contacts/9999/restore', ctx.sellerToken, {}));
+    });
+  });
+
+  describe('DELETE /api/contacts/:id/permanent', () => {
+    it('should permanently delete own deleted contact', async () => {
+      // First, soft delete the contact
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken));
+
+      // Verify it's in wastebin
+      const wastebinBefore = await expectOk<{ contacts: { id: number }[] }>(
+        await get(ctx.app, '/api/contacts/wastebin', ctx.sellerToken)
+      );
+      expect(wastebinBefore.contacts.find((c) => c.id === ctx.contactId)).toBeDefined();
+
+      // Permanently delete it
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contactId}/permanent`, ctx.sellerToken));
+
+      // Verify it's removed from wastebin
+      const wastebinAfter = await expectOk<{ contacts: { id: number }[] }>(
+        await get(ctx.app, '/api/contacts/wastebin', ctx.sellerToken)
+      );
+      expect(wastebinAfter.contacts.find((c) => c.id === ctx.contactId)).toBeUndefined();
+
+      // Verify it's truly gone (404)
+      await expectNotFound(await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken));
+    });
+
+    it('should permanently delete any deleted contact as admin', async () => {
+      // Seller2 deletes their contact
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contact2Id}`, ctx.seller2Token));
+
+      // Admin permanently deletes it
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contact2Id}/permanent`, ctx.adminToken));
+
+      // Verify it's gone
+      await expectNotFound(await get(ctx.app, `/api/contacts/${ctx.contact2Id}`, ctx.adminToken));
+    });
+
+    it('should deny permanent delete of other sellers contact', async () => {
+      // Seller2 deletes their contact
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contact2Id}`, ctx.seller2Token));
+
+      // Seller1 tries to permanently delete seller2's contact
+      await expectForbidden(await del(ctx.app, `/api/contacts/${ctx.contact2Id}/permanent`, ctx.sellerToken));
+    });
+
+    it('should return 404 for non-existent contact', async () => {
+      await expectNotFound(await del(ctx.app, '/api/contacts/9999/permanent', ctx.sellerToken));
+    });
+
+    it('should permanently delete non-deleted contact (if user has access)', async () => {
+      // Permanently delete a contact that hasn't been soft-deleted first
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contactId}/permanent`, ctx.sellerToken));
+
+      // Verify it's gone
+      await expectNotFound(await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken));
     });
   });
 });

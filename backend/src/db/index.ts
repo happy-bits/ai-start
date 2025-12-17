@@ -45,6 +45,7 @@ export function initializeDatabase() {
       phone TEXT,
       company TEXT,
       follow_up_date TEXT,
+      deleted_at TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );

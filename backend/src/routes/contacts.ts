@@ -1,12 +1,12 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { eq, isNull, and, not } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import type { InferSelectModel } from 'drizzle-orm';
 import * as schema from '../db/schema.js';
 import { type AuthVariables } from '../middleware/auth.js';
-import { withEntityAccess, buildUpdateValues } from './helpers.js';
+import { withEntityAccess, buildUpdateValues, parseIdParam, checkSellerAccess } from './helpers.js';
 import { ERROR_MESSAGES, ROLES, DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE } from '../constants.js';
 
 const createContactSchema = z.object({
@@ -28,27 +28,61 @@ const updateContactSchema = z.object({
 export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
   const app = new Hono<{ Variables: AuthVariables }>();
 
-  // GET /contacts - List contacts (sellers see their own, admins see all)
+  // GET /contacts - List contacts (sellers see their own, admins see all) - excludes soft-deleted
   app.get('/', (c) => {
     const user = c.get('user');
 
-    let query = db.select().from(schema.contacts);
+    let conditions = isNull(schema.contacts.deletedAt);
 
     // Sellers only see their own contacts
     if (user.role === ROLES.SELLER) {
-      query = query.where(eq(schema.contacts.sellerId, user.id)) as typeof query;
+      conditions = and(eq(schema.contacts.sellerId, user.id), isNull(schema.contacts.deletedAt)) as typeof conditions;
     }
 
-    const contacts = query.all();
+    const contacts = db.select().from(schema.contacts).where(conditions).all();
     return c.json({ contacts });
   });
 
-  // GET /contacts/:id - Get contact details
-  app.get('/:id', (c) => {
-    const result = withEntityAccess<InferSelectModel<typeof schema.contacts>>(c, db, schema.contacts, 'Contact');
-    if (!result.success) return result.response;
+  // GET /contacts/wastebin - List soft-deleted contacts (MUST come before /:id route)
+  app.get('/wastebin', (c) => {
+    const user = c.get('user');
 
-    return c.json({ contact: result.entity });
+    let conditions = not(isNull(schema.contacts.deletedAt));
+
+    // Sellers only see their own deleted contacts
+    if (user.role === ROLES.SELLER) {
+      conditions = and(
+        eq(schema.contacts.sellerId, user.id),
+        not(isNull(schema.contacts.deletedAt))
+      ) as typeof conditions;
+    }
+
+    const contacts = db.select().from(schema.contacts).where(conditions).all();
+    return c.json({ contacts });
+  });
+
+  // GET /contacts/:id - Get contact details (excludes soft-deleted)
+  app.get('/:id', (c) => {
+    const user = c.get('user');
+    const parsed = parseIdParam(c, 'id', 'Contact');
+    if (!parsed.success) return parsed.response;
+
+    const contact = db
+      .select()
+      .from(schema.contacts)
+      .where(and(eq(schema.contacts.id, parsed.id), isNull(schema.contacts.deletedAt)))
+      .get() as InferSelectModel<typeof schema.contacts> | undefined;
+
+    if (!contact) {
+      return c.json({ error: ERROR_MESSAGES.notFound('Contact') }, 404);
+    }
+
+    const accessDenied = checkSellerAccess(user, contact.sellerId);
+    if (accessDenied) {
+      return c.json({ error: accessDenied.error }, 403);
+    }
+
+    return c.json({ contact });
   });
 
   // POST /contacts - Create new contact
@@ -94,14 +128,82 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
     return c.json({ contact });
   });
 
-  // DELETE /contacts/:id - Delete contact
+  // DELETE /contacts/:id - Soft delete contact (move to wastebin)
   app.delete('/:id', (c) => {
     const result = withEntityAccess<InferSelectModel<typeof schema.contacts>>(c, db, schema.contacts, 'Contact');
     if (!result.success) return result.response;
 
-    db.delete(schema.contacts).where(eq(schema.contacts.id, result.entity.id)).run();
+    const now = new Date().toISOString();
+    db.update(schema.contacts)
+      .set({ deletedAt: now, updatedAt: now })
+      .where(eq(schema.contacts.id, result.entity.id))
+      .run();
 
     return c.json({ message: ERROR_MESSAGES.deletedSuccessfully('Contact') });
+  });
+
+  // POST /contacts/:id/restore - Restore soft-deleted contact
+  app.post('/:id/restore', (c) => {
+    const user = c.get('user');
+    const parsed = parseIdParam(c, 'id', 'Contact');
+    if (!parsed.success) return parsed.response;
+
+    // Allow access to deleted contacts for restore
+    const contact = db
+      .select()
+      .from(schema.contacts)
+      .where(eq(schema.contacts.id, parsed.id))
+      .get() as InferSelectModel<typeof schema.contacts> | undefined;
+
+    if (!contact) {
+      return c.json({ error: ERROR_MESSAGES.notFound('Contact') }, 404);
+    }
+
+    if (!contact.deletedAt) {
+      return c.json({ error: 'Contact is not deleted' }, 400);
+    }
+
+    const accessDenied = checkSellerAccess(user, contact.sellerId);
+    if (accessDenied) {
+      return c.json({ error: accessDenied.error }, 403);
+    }
+
+    const now = new Date().toISOString();
+    const restored = db
+      .update(schema.contacts)
+      .set({ deletedAt: null, updatedAt: now })
+      .where(eq(schema.contacts.id, parsed.id))
+      .returning()
+      .get();
+
+    return c.json({ contact: restored });
+  });
+
+  // DELETE /contacts/:id/permanent - Permanently delete contact
+  app.delete('/:id/permanent', (c) => {
+    const user = c.get('user');
+    const parsed = parseIdParam(c, 'id', 'Contact');
+    if (!parsed.success) return parsed.response;
+
+    // Allow access to deleted contacts for permanent deletion
+    const contact = db
+      .select()
+      .from(schema.contacts)
+      .where(eq(schema.contacts.id, parsed.id))
+      .get() as InferSelectModel<typeof schema.contacts> | undefined;
+
+    if (!contact) {
+      return c.json({ error: ERROR_MESSAGES.notFound('Contact') }, 404);
+    }
+
+    const accessDenied = checkSellerAccess(user, contact.sellerId);
+    if (accessDenied) {
+      return c.json({ error: accessDenied.error }, 403);
+    }
+
+    db.delete(schema.contacts).where(eq(schema.contacts.id, parsed.id)).run();
+
+    return c.json({ message: 'Contact permanently deleted' });
   });
 
   return app;
