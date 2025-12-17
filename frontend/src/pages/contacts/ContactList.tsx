@@ -5,7 +5,7 @@ import { useContacts, useDeleteContact, useUpdateContact } from '../../api/conta
 import { useInteractions, useUpdateInteraction, useDeleteInteraction } from '../../api/interactions';
 import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 
-import { Button, Card, LoadingSpinner, EmptyState, Avatar, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions, InlineEditableSelect, InlineEditableTime, InlineEditableTextarea } from '../../components/ui';
+import { Button, Card, LoadingSpinner, EmptyState, SearchInput, InlineEditable, InlineEditableDate, InlineEditableDateWithQuickActions, InlineEditableSelect, InlineEditableTime, InlineEditableTextarea } from '../../components/ui';
 import NewInteractionRow from '../interactions/NewInteractionRow';
 
 import { deleteButtonBase, deleteButtonSize, cn } from '../../utils/styles';
@@ -78,11 +78,6 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                   {/* Show contact info only when collapsed */}
                   {!isExpanded && (
                     <>
-                      {/* Avatar */}
-                      <div className="shrink-0">
-                        <Avatar name={contact.name} size="sm" />
-                      </div>
-                      
                       {/* Follow-up date */}
                       {contact.followUpDate && (
                         <div className="shrink-0 text-sm text-dark-400 font-mono w-24">
@@ -136,7 +131,6 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                     {/* Contact Header */}
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <Avatar name={contact.name} size="md" />
                         <div className="flex-1 min-w-0">
                           <InlineEditable
                             value={contact.name}
