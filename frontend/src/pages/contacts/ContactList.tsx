@@ -9,7 +9,7 @@ import { Button, Card, LoadingSpinner, EmptyState, SearchInput, InlineEditable, 
 import NewInteractionRow from '../interactions/NewInteractionRow';
 
 import { deleteButtonBase, deleteButtonSize, cn } from '../../utils/styles';
-import { isFollowUpDue, sortContacts, sortInteractionsByRecency } from '../../utils';
+import { sortContacts, sortInteractionsByRecency } from '../../utils';
 
 import type { Contact, Interaction, InteractionType } from '../../api/types';
 
@@ -57,14 +57,22 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
               aria-label={`Contact: ${contact.name}`}
             >
               {/* Compact row */}
-              <div className="px-4 py-2">
+              <div 
+                className="px-4 py-2 cursor-pointer"
+                onClick={() => toggleExpanded(contact.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleExpanded(contact.id);
+                  }
+                }}
+                aria-label={isExpanded ? 'Collapse contact details' : 'Expand contact details'}
+              >
                 <div className="flex items-center gap-4">
-                  {/* Toggle button */}
-                  <button
-                    onClick={() => toggleExpanded(contact.id)}
-                    className="shrink-0 text-dark-400 hover:text-white transition-colors"
-                    aria-label={isExpanded ? 'Collapse contact details' : 'Expand contact details'}
-                  >
+                  {/* Toggle indicator */}
+                  <div className="shrink-0 text-dark-400">
                     <svg
                       className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                       fill="none"
@@ -73,7 +81,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                  </button>
+                  </div>
 
                   {/* Show contact info only when collapsed */}
                   {!isExpanded && (
@@ -109,7 +117,7 @@ function ContactTable({ contacts, updateContact, deleteContact, interactions = [
                   {isExpanded && <div className="flex-1"></div>}
                   
                   {/* Delete button */}
-                  <div className="shrink-0">
+                  <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
                     <Button
                       variant="ghost"
                       size="sm"
