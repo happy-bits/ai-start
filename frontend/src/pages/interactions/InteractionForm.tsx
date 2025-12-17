@@ -29,7 +29,7 @@ export default function InteractionForm({
   const updateInteraction = useUpdateInteraction();
 
   const [formData, setFormData] = useState({
-    type: 'call' as InteractionType,
+    type: 'note' as InteractionType,
     date: getTodayISO(),
     time: getCurrentTimeHHMM(),
     notes: '',

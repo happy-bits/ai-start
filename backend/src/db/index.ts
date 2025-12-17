@@ -53,7 +53,7 @@ export function initializeDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
       seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      type TEXT NOT NULL CHECK(type IN ('call', 'meeting', 'email')),
+      type TEXT NOT NULL CHECK(type IN ('call', 'meeting', 'email', 'video_call', 'note')),
       date TEXT NOT NULL,
       time TEXT,
       notes TEXT,

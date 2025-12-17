@@ -5,7 +5,7 @@ export const ROLES = {
 } as const;
 
 // Interaction types
-export const INTERACTION_TYPE_VALUES = ['call', 'meeting', 'email'] as const;
+export const INTERACTION_TYPE_VALUES = ['call', 'meeting', 'email', 'video_call', 'note'] as const;
 
 // Session configuration
 export const SESSION_CONFIG = {

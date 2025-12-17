@@ -39,7 +39,7 @@ export const interactions = sqliteTable('interactions', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   contactId: integer('contact_id').notNull().references(() => contacts.id, { onDelete: 'cascade' }),
   sellerId: integer('seller_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  type: text('type', { enum: ['call', 'meeting', 'email'] }).notNull(),
+  type: text('type', { enum: ['call', 'meeting', 'email', 'video_call', 'note'] }).notNull(),
   date: text('date').notNull(),
   time: text('time'),
   notes: text('notes'),

@@ -20,7 +20,7 @@ interface NewInteractionRowProps {
 export default function NewInteractionRow({ contactId, variant = 'detail', onCreated }: NewInteractionRowProps) {
   const createInteraction = useCreateInteraction();
   
-  const [type, setType] = useState<InteractionType>('call');
+  const [type, setType] = useState<InteractionType>('note');
   const [date, setDate] = useState<string>(getTodayISO());
   const [time, setTime] = useState<string | null>(getCurrentTimeHHMM());
   const [notes, setNotes] = useState<string | null>(null);
@@ -41,7 +41,7 @@ export default function NewInteractionRow({ contactId, variant = 'detail', onCre
       
       // Reset form with fresh date/time
       setNotes(null);
-      setType('call');
+      setType('note');
       setDate(getTodayISO());
       setTime(getCurrentTimeHHMM());
       

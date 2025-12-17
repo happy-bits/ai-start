@@ -159,7 +159,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   }
 
   // Seed interactions for Maria's contacts (0-5 per contact)
-  const interactionTypes: Array<'call' | 'meeting' | 'email'> = ['call', 'meeting', 'email'];
+  const interactionTypes: Array<'call' | 'meeting' | 'email' | 'video_call' | 'note'> = ['call', 'meeting', 'email', 'video_call', 'note'];
   const interactionNotes = [
     'Inledande upptäcktsamtal. Diskuterade deras nuvarande CRM-behov.',
     'Skickade produktbroschyr och prisinformation.',

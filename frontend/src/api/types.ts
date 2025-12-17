@@ -40,7 +40,7 @@ export interface UpdateContactData {
 }
 
 // Interaction types
-export type InteractionType = 'call' | 'meeting' | 'email';
+export type InteractionType = 'call' | 'meeting' | 'email' | 'video_call' | 'note';
 
 export interface InteractionTypeOption {
   value: InteractionType;
@@ -51,6 +51,8 @@ export const INTERACTION_TYPE_OPTIONS: InteractionTypeOption[] = [
   { value: 'call', label: 'Phone Call' },
   { value: 'meeting', label: 'Meeting' },
   { value: 'email', label: 'Email' },
+  { value: 'video_call', label: 'Video Call' },
+  { value: 'note', label: 'Note' },
 ];
 
 export interface Interaction {
