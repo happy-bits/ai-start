@@ -5,7 +5,20 @@ Gå in i projektmappen
 
     cd backend
 
-Starta
+Installera
+    
+    npm install
+
+
+Starta första gången
+
+    SEED_DB=true npm run dev  
+
+    If you use PowerShell you write this instead: $env:SEED_DB="true"; npm run dev
+
+    If you use Command line (PC) you write: SEED_DB=true && npm run dev
+
+Starta i fortsättningen
     
     npm run dev
 
