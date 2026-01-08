@@ -1,53 +1,81 @@
-# Copilot instructions (keepwarm)
+# KeepWarm CRM - Copilot Instructions
 
-## Repo shape + data flow
-- This is a **monorepo** with `backend/` (REST API) and `frontend/` (React app).
-- Backend is **Hono** + **Drizzle ORM** + **better-sqlite3**. Server entry is `backend/src/index.ts`, app wiring is `backend/src/app.ts`.
-- Frontend is **Vite + React Router + TanStack Query**. App wiring: `frontend/src/main.tsx` + routes in `frontend/src/App.tsx`.
-- Auth is **Bearer token** sessions:
-  - Backend middleware: `backend/src/middleware/auth.ts` reads `Authorization: Bearer <token>` and loads the user from `sessions` + `users` tables.
-  - Frontend stores token in `localStorage` via `frontend/src/api/client.ts` and validates it on boot in `frontend/src/context/AuthContext.tsx`.
+## Project Overview
+A full-stack CRM for managing sales contacts and interactions. Monorepo with separate `backend/` (REST API) and `frontend/` (React SPA) directories.
 
-## Backend conventions (Hono + Drizzle)
-- Routes are mounted under `/api/*` in `backend/src/app.ts`; `/auth/*` is public.
-- Prefer the shared route helpers in `backend/src/routes/helpers.ts`:
-  - `parseIdParam(c, 'id', 'Contact')` for id validation
-  - `withEntityAccess(c, db, schema.contacts, 'Contact')` for (404 + seller access) checks
-  - `buildUpdateValues(updates, ['name', ...])` to keep partial updates consistent and always bump `updatedAt`.
-- Role rules: sellers only see their own data; admins see all. Example pattern in `backend/src/routes/contacts.ts`.
-- Contacts use **soft delete** via `contacts.deleted_at` with a dedicated wastebin endpoint:
-  - list: `GET /api/contacts` (excludes deleted)
-  - wastebin: `GET /api/contacts/wastebin` (deleted only)
-  - restore: `POST /api/contacts/:id/restore`
-  - permanent delete: `DELETE /api/contacts/:id/permanent`
+## Architecture
 
-## Database model + seeding
-- SQLite schema lives in two places:
-  - runtime table creation: `backend/src/db/index.ts` (`initializeDatabase()` uses raw SQL)
-  - Drizzle model definitions: `backend/src/db/schema.ts` (match column names!)
-- Dev seeding:
-  - `SEED_DB=true` on `npm run dev` resets + seeds in `backend/src/index.ts`.
-  - There is also a dev-only endpoint: `POST /api/dev/reset` (admin-only, blocked in production) in `backend/src/app.ts`.
+### Backend (`backend/`)
+- **Framework**: Hono (lightweight Express-like) with TypeScript
+- **Database**: SQLite via Drizzle ORM + better-sqlite3
+- **Auth**: Bearer token sessions stored in DB, Argon2 password hashing
+- **Validation**: Zod schemas for request validation (`@hono/zod-validator`)
 
-## Frontend conventions
-- API calls go through `frontend/src/api/client.ts` so the auth header and error-shape handling stay consistent.
-- App routing uses guards:
-  - `ProtectedRoute` blocks unauthenticated users
-  - `AdminRoute` blocks non-admins
-  (see `frontend/src/App.tsx`).
+**Key patterns:**
+- Routes use factory functions: `createContactRoutes(db)` returns Hono router
+- Helper `withEntityAccess()` in [routes/helpers.ts](backend/src/routes/helpers.ts) handles ID parsing, entity lookup, and seller access check in one call
+- Sellers only see their own data; admins see all (role-based filtering in route handlers)
+- Soft delete for contacts via `deletedAt` field; wastebin route at `/contacts/wastebin`
 
-## Tests + selector rules
-- Backend tests: `backend/tests/*.test.ts` are Vitest; helpers in `backend/tests/setup.ts`.
-- Frontend unit tests use Vitest (`frontend/src/utils/__tests__/*` etc.).
-- E2E uses Playwright (`frontend/e2e/*.spec.ts`). Follow selector rules in `.cursor/rules/e2e-selectors.mdc`:
-  - prefer `getByRole()` / `getByLabel()`; avoid raw element selectors (`page.locator('button')`, `input[type=...]`, etc.)
-  - if needed, **change the UI** to add `aria-label` / roles rather than weakening the test.
+### Frontend (`frontend/`)
+- **Stack**: React 19 + TypeScript + Vite + Tailwind CSS v4
+- **State**: TanStack Query for server state, Context for auth
+- **Routing**: React Router v7
 
-## Common workflows (repo-specific)
-- Backend:
-  - dev server: `npm run dev` (watch via `tsx`) from `backend/`
-  - seed+dev: `SEED_DB=true npm run dev`
-  - tests: `npm test` (watch) or `npm run test:run`
-- Frontend:
-  - dev server: `npm run dev` from `frontend/`
-  - e2e modes: `npm run test:e2e` / `test:e2e:ui` / `test:e2e:trace` etc. (see root `readme.md`).
+**Key patterns:**
+- API client singleton in [api/client.ts](frontend/src/api/client.ts) handles auth token and error formatting
+- Inline editing components (`InlineEditable*`) in [components/ui/](frontend/src/components/ui/) use `useInlineEdit` hook
+- Shared types defined in [api/types.ts](frontend/src/api/types.ts)
+- `ROLES` constant must stay in sync between frontend and backend `constants.ts`
+
+## Development Commands
+
+```bash
+# Backend (from backend/)
+SEED_DB=true npm run dev   # First run with seed data
+npm run dev                # Subsequent runs
+npm test                   # Watch mode tests
+
+# Frontend (from frontend/)
+npm run dev                # Vite dev server
+npm test                   # Unit tests (vitest)
+npm run test:e2e           # Playwright headless
+npm run test:e2e:ui        # Playwright visual debugger
+npm run test:e2e:trace     # With network/screenshot traces
+```
+
+## Testing Conventions
+
+### Backend Tests
+- In-memory SQLite database created fresh per test via `createTestDatabase()`
+- Use helpers: `get()`, `post()`, `put()`, `del()` and assertion helpers like `expectOk()`, `expectForbidden()`
+- See [tests/setup.ts](backend/tests/setup.ts) for test context setup pattern
+
+### E2E Tests (Playwright)
+- **Always use semantic selectors** (see [.cursor/rules/e2e-selectors.mdc](.cursor/rules/e2e-selectors.mdc))
+- ✅ `page.getByRole('button', { name: 'Sign in' })`
+- ✅ `page.getByLabel('Email')`
+- ❌ Never use `page.locator('input[type="text"]')` or raw HTML selectors
+- Login page has "Reset database" and "Quick login" buttons for test setup
+
+## Code Patterns
+
+### Adding a New Entity
+1. Add table in [db/schema.ts](backend/src/db/schema.ts) with Drizzle schema
+2. Create Zod schemas and route file in `backend/src/routes/`
+3. Mount routes in [app.ts](backend/src/app.ts) under `protectedApp`
+4. Add frontend types in [api/types.ts](frontend/src/api/types.ts)
+5. Create API functions in `frontend/src/api/`
+
+### Error Handling
+- Backend: Use `ERROR_MESSAGES` constants from [constants.ts](backend/src/constants.ts)
+- Frontend: API client extracts error messages from Zod validation or string responses
+
+### Date Format
+- All dates stored and transferred as `YYYY-MM-DD` strings (validated by `DATE_FORMAT_REGEX`)
+
+## File Organization
+- `backend/sql/` - Reference SQL files (schema documentation)
+- `backend/doc/` - User stories and flow documentation
+- `frontend/src/components/ui/` - Reusable UI primitives
+- `frontend/src/pages/` - Route-level page components
