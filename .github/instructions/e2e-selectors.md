@@ -1,0 +1,135 @@
+---
+applyTo:
+  - "**/e2e/**/*.spec.ts"
+  - "**/e2e/**/*.test.ts"
+  - "**/*.e2e.ts"
+---
+
+# E2E Test Selector Guidelines
+
+When writing e2e tests, always prefer semantic selectors over HTML element selectors.
+
+## Preferred Methods (in order of preference):
+
+1. **getByRole()** - Use for buttons, links, headings, articles, etc.
+   - ✅ `page.getByRole('button', { name: 'Sign in' })`
+   - ✅ `page.getByRole('article', { name: /Contact:/ })`
+   - ✅ `page.getByRole('heading', { name: 'Contacts' })`
+
+2. **getByLabel()** - Use for form inputs and labeled elements
+   - ✅ `page.getByLabel('Email')`
+   - ✅ `page.getByLabel('Interaction date')`
+   - ✅ `page.getByLabel(/Contact name for/)`
+
+3. **getByText()** - Use sparingly, only when semantic selectors aren't available
+   - ✅ `page.getByText('Database has been reset!')`
+   - ⚠️ Avoid for interactive elements - prefer getByRole/getByLabel
+
+## Avoid HTML Element Selectors:
+
+❌ **Never use:**
+- `page.locator('input[type="text"]')`
+- `page.locator('input[type="email"]')`
+- `page.locator('input[type="date"]')`
+- `page.locator('input[type="time"]')`
+- `page.locator('input[type="tel"]')`
+- `page.locator('textarea')`
+- `page.locator('select')`
+- `page.locator('button')`
+- `page.locator('tr')`
+- `page.locator('div')`
+- `page.locator('span')`
+
+## Scoping Best Practices:
+
+- Always scope selectors to parent elements when possible:
+  - ✅ `interactionArticle.getByLabel('Interaction date')`
+  - ❌ `page.locator('input[type="date"]').first()`
+
+- Use parent elements with semantic roles:
+  - ✅ `contactCard.getByLabel(/Email for/)`
+  - ✅ `interactionArticle.getByRole('button', { name: /Interaction type/ })`
+
+## Examples:
+
+### Good:
+```typescript
+// Find interaction article using role
+const interactionArticle = page.getByRole('article', { name: /interaction on/ });
+
+// Find input using label
+const dateInput = interactionArticle.getByLabel('Interaction date');
+
+// Find button using role and name
+const submitButton = page.getByRole('button', { name: 'Sign in' });
+```
+
+### Bad:
+```typescript
+// Don't use HTML element selectors
+const dateInput = page.locator('input[type="date"]').first();
+const submitButton = page.locator('button').filter({ hasText: 'Sign in' });
+const textarea = page.locator('textarea').first();
+```
+
+## Updating Frontend Code:
+
+If semantic selectors are not available, **update the frontend code** to add the necessary attributes:
+
+1. **Add aria-label** to form inputs and interactive elements:
+   ```tsx
+   // Before
+   <input type="date" value={date} onChange={handleChange} />
+   
+   // After
+   <input 
+     type="date" 
+     value={date} 
+     onChange={handleChange}
+     aria-label="Interaction date"
+   />
+   ```
+
+2. **Add role attribute** when needed:
+   ```tsx
+   // Before
+   <span onClick={handleClick}>Click me</span>
+   
+   // After
+   <span 
+     onClick={handleClick}
+     role="button"
+     aria-label="Interaction type"
+   >
+     Click me
+   </span>
+   ```
+
+3. **Use semantic HTML** elements when possible:
+   ```tsx
+   // Prefer semantic elements
+   <button onClick={handleClick}>Submit</button>
+   // Instead of
+   <div onClick={handleClick} role="button">Submit</div>
+   ```
+
+4. **Ensure labels are properly associated**:
+   ```tsx
+   // Good: label is associated with input
+   <label htmlFor="email">Email</label>
+   <input id="email" type="email" />
+   
+   // Also good: aria-label directly on input
+   <input type="email" aria-label="Email" />
+   ```
+
+**Remember:** Adding aria-labels and roles improves both testability AND accessibility!
+
+## Rationale:
+
+- Semantic selectors are more stable and less brittle
+- They reflect how users interact with the page (by role and label)
+- They improve accessibility testing
+- They survive UI refactorings better
+- They make tests more readable and maintainable
+- Adding aria-attributes benefits all users, not just tests
