@@ -1,3 +1,6 @@
+---
+agent: ask
+---
 Analyze the problem carefully.
 Describe how you interpret the problem.
 Do not change any code and do not suggest a solution yet.

@@ -1,3 +1,6 @@
+---
+agent: ask
+---
 The user wants to report a bug.
 
 Follow these steps, ask one question at a time:
