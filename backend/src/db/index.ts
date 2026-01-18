@@ -2,8 +2,25 @@ import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import * as schema from './schema.js';
 import { ROLES } from '../constants.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { mkdirSync } from 'fs';
 
-const DB_PATH = process.env.DB_PATH || 'keepwarm.db';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Default to data/ directory in backend root
+const DEFAULT_DB_PATH = path.join(__dirname, '../../data/keepwarm.db');
+const DB_PATH = process.env.DB_PATH || DEFAULT_DB_PATH;
+
+// Ensure data directory exists
+const dbDir = path.dirname(DB_PATH);
+try {
+  mkdirSync(dbDir, { recursive: true });
+} catch (error) {
+  // Directory might already exist, ignore
+}
 
 // Create SQLite database connection
 const sqlite = new Database(DB_PATH);
