@@ -1,5 +1,5 @@
 ---
-agent: ask
+agent: agent
 ---
 Analyze the entire project. Create an overview of the project and put the answer in a new file `overview.md` with the following content:
 
