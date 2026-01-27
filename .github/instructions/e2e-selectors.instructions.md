@@ -1,8 +1,5 @@
 ---
-applyTo:
-  - "**/e2e/**/*.spec.ts"
-  - "**/e2e/**/*.test.ts"
-  - "**/*.e2e.ts"
+applyTo: "**/e2e/**/*.spec.ts, **/e2e/**/*.test.ts, **/*.e2e.ts"
 ---
 
 # E2E Test Selector Guidelines
