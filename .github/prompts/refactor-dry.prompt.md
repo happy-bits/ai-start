@@ -1,5 +1,5 @@
 ---
-agent: ask
+agent: agent
 ---
 Apply the DRY (Don’t Repeat Yourself) principle to the existing code by identifying and extracting truly duplicated logic.
 

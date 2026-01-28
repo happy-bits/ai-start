@@ -1,5 +1,5 @@
 ---
-agent: ask
+agent: agent
 ---
 Identify all unused or dead code in the project, including functions, variables, classes, imports, or any other code that is never called, referenced, or has no effect on the program’s behavior.
 
