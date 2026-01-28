@@ -1,5 +1,5 @@
 ---
-agent: ask
+agent: agent
 ---
 Analyze the problem carefully.
 Describe how you interpret the problem.

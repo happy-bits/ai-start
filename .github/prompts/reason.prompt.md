@@ -1,5 +1,5 @@
 ---
-agent: ask
+agent: agent
 ---
 Analyze the problem.
 Focus on problem understanding.

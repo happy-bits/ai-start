@@ -1,5 +1,5 @@
 ---
-agent: ask
+agent: agent
 ---
 The user wants to report a bug.
 
