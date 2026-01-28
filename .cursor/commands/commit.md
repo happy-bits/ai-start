@@ -1,6 +1,3 @@
----
-agent: agent
----
 Create a commit message based on the code changes in this format:
 [feat/fix/style/refactor/doc]: [Description in English, one sentence, max 100 characters, first letter should be capitalized, use present tense]
 
