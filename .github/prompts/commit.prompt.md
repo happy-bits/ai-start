@@ -10,6 +10,6 @@ fix: Display date as Stockholm timezone
 If the code changes fit as a commit, write
 ✅ Suitable as a commit
 Otherwise write
-⚠️ Recommend splitting into multiple commits due to [...]
+⚠️ Recommend splitting into multiple commits, give a motivation and suggest commit messages for each part.
 
 Do not commit (the user will do that)
