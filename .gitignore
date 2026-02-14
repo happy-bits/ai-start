@@ -5,4 +5,4 @@ data/
 frontend/playwright-report
 frontend/test-results
 
-.vs
+.husky/_
