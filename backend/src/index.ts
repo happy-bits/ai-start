@@ -1,6 +1,6 @@
 import { serve } from '@hono/node-server';
-import { db, initializeDatabase, resetDatabase } from './db/index.js';
 import { createApp } from './app.js';
+import { db, initializeDatabase, resetDatabase } from './db/index.js';
 import { seedDatabase } from './db/seed.js';
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -12,7 +12,7 @@ initializeDatabase();
 if (process.env.SEED_DB === 'true') {
   console.log('Resetting database...');
   resetDatabase();
-  
+
   console.log('Seeding database...');
   await seedDatabase(db);
 }
@@ -27,6 +27,3 @@ serve({
   fetch: app.fetch,
   port: PORT,
 });
-
-
-

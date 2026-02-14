@@ -1,10 +1,10 @@
 import { useInlineEdit } from '../../hooks/useInlineEdit';
 import {
-  inlineEditableInputBase,
+  cn,
   inlineEditableDisplayBase,
   inlineEditableEmpty,
+  inlineEditableInputBase,
   inlineEditableTextNormal,
-  cn,
 } from '../../utils/styles';
 
 interface InlineEditableDateProps {
@@ -56,19 +56,19 @@ export default function InlineEditableDate({
   const isEmpty = !value;
 
   return (
-    <span
+    <button
+      type="button"
       onClick={handleClick}
       className={cn(
+        'text-left w-full bg-transparent border-none p-0',
         inlineEditableDisplayBase,
         isEmpty ? inlineEditableEmpty : inlineEditableTextNormal,
-        className
+        className,
       )}
       title={isEmpty ? emptyText : 'Click to edit'}
       aria-label={ariaLabel || emptyText}
-      role="button"
     >
       {isEmpty ? emptyText : value}
-    </span>
+    </button>
   );
 }
-

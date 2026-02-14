@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import type { Contact, Interaction } from '../../api/types';
 import {
-  sortInteractionsByRecency,
   getLatestInteractionsForContact,
   isFollowUpDue,
   sortContacts,
+  sortInteractionsByRecency,
 } from '../interactions';
-import type { Interaction, Contact } from '../../api/types';
 
 describe('interactions utilities', () => {
   describe('sortInteractionsByRecency', () => {
@@ -264,7 +264,7 @@ describe('interactions utilities', () => {
     it('filters interactions by contact ID', () => {
       const result = getLatestInteractionsForContact(allInteractions, 1);
       expect(result.length).toBe(3);
-      expect(result.every(i => i.contactId === 1)).toBe(true);
+      expect(result.every((i) => i.contactId === 1)).toBe(true);
     });
 
     it('returns latest interactions first', () => {

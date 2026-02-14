@@ -1,18 +1,22 @@
-import { test, expect } from '@playwright/test';
-
+import { expect, test } from '@playwright/test';
 
 test('wastebin', async ({ page }) => {
-
   // Login as Maria
 
   await page.goto('http://localhost:5173/login');
   await page.getByRole('button', { name: 'Reset database to initial' }).click();
   await page.getByRole('button', { name: 'Quick login as Maria (Seller)' }).click();
 
-  // Delete a contact 
+  // Delete a contact
 
-  await expect(page.getByRole('article', { name: 'Contact: Erik Andersson' }).getByLabel('Expand contact details')).toBeVisible();
-  await expect(page.getByLabel('Contact: Erik Andersson').getByLabel('Expand contact details')).toMatchAriaSnapshot(`
+  await expect(
+    page
+      .getByRole('article', { name: 'Contact: Erik Andersson' })
+      .getByLabel('Expand contact details'),
+  ).toBeVisible();
+  await expect(
+    page.getByLabel('Contact: Erik Andersson').getByLabel('Expand contact details'),
+  ).toMatchAriaSnapshot(`
     - button "Expand contact details":
       - img
       - text: /\\d+-\\d+-\\d+ Erik Andersson Volvo AB/
@@ -44,19 +48,24 @@ test('wastebin', async ({ page }) => {
   await expect(page.getByRole('status', { name: 'Wastebin is empty' })).toBeVisible();
   await page.getByRole('link', { name: 'Contacts', exact: true }).click();
   await expect(page.getByText('Contacts30')).toBeVisible();
-  await expect(page.getByRole('article', { name: 'Contact: Erik Andersson' }).getByLabel('Expand contact details')).toBeVisible();
+  await expect(
+    page
+      .getByRole('article', { name: 'Contact: Erik Andersson' })
+      .getByLabel('Expand contact details'),
+  ).toBeVisible();
 });
 
-
-
 test('permanent delete', async ({ page }) => {
-
   // Login as Maria
 
   await page.goto('http://localhost:5173/login');
   await page.getByRole('button', { name: 'Reset database to initial' }).click();
   await page.getByRole('button', { name: 'Quick login as Maria (Seller)' }).click();
-  await expect(page.getByRole('article', { name: 'Contact: Erik Andersson' }).getByLabel('Expand contact details')).toBeVisible();
+  await expect(
+    page
+      .getByRole('article', { name: 'Contact: Erik Andersson' })
+      .getByLabel('Expand contact details'),
+  ).toBeVisible();
   await expect(page.getByText('Contacts30')).toBeVisible();
 
   // Delete contact
@@ -79,4 +88,3 @@ test('permanent delete', async ({ page }) => {
   await page.getByRole('link', { name: 'Contacts', exact: true }).click();
   await expect(page.getByText('Contacts29')).toBeVisible();
 });
-

@@ -1,12 +1,12 @@
-import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
 import { verify } from '@node-rs/argon2';
 import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import * as schema from '../db/schema.js';
-import { createSession, deleteSession, type AuthVariables } from '../middleware/auth.js';
+import { Hono } from 'hono';
+import { z } from 'zod';
 import { AUTH_HEADER_PREFIX, ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants.js';
+import * as schema from '../db/schema.js';
+import { type AuthVariables, createSession, deleteSession } from '../middleware/auth.js';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -60,5 +60,3 @@ export function createAuthRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   return app;
 }
-
-

@@ -17,14 +17,12 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
-    locale: 'sv-SE'
+    locale: 'sv-SE',
   },
   projects: [
     {
       name: 'chromium',
       use: { browserName: 'chromium' },
     },
-  ]
+  ],
 });
-
-

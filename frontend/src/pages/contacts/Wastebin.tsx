@@ -1,25 +1,27 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { useWastebinContacts, useRestoreContact, usePermanentlyDeleteContact } from '../../api/contacts';
+import {
+  usePermanentlyDeleteContact,
+  useRestoreContact,
+  useWastebinContacts,
+} from '../../api/contacts';
 import { useInteractions } from '../../api/interactions';
-
-import { Button, Card, LoadingSpinner, EmptyState, SearchInput } from '../../components/ui';
+import type { Contact, Interaction } from '../../api/types';
+import { Button, Card, EmptyState, LoadingSpinner, SearchInput } from '../../components/ui';
 import { sortContacts, sortInteractionsByRecency } from '../../utils';
 
-import type { Contact, Interaction } from '../../api/types';
-
 // Component to render wastebin contact list
-function WastebinTable({ 
-  contacts, 
-  restoreContact, 
-  permanentlyDeleteContact, 
-  interactions = [] 
-}: { 
-  contacts: Contact[]; 
-  restoreContact: ReturnType<typeof useRestoreContact>; 
-  permanentlyDeleteContact: ReturnType<typeof usePermanentlyDeleteContact>; 
-  interactions?: Interaction[] 
+function WastebinTable({
+  contacts,
+  restoreContact,
+  permanentlyDeleteContact,
+  interactions = [],
+}: {
+  contacts: Contact[];
+  restoreContact: ReturnType<typeof useRestoreContact>;
+  permanentlyDeleteContact: ReturnType<typeof usePermanentlyDeleteContact>;
+  interactions?: Interaction[];
 }) {
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
 
@@ -49,7 +51,7 @@ function WastebinTable({
         {contacts.map((contact) => {
           const isExpanded = expandedIds.has(contact.id);
           const allInteractions = sortInteractionsByRecency(
-            interactions.filter((interaction) => interaction.contactId === contact.id)
+            interactions.filter((interaction) => interaction.contactId === contact.id),
           );
 
           return (
@@ -59,17 +61,10 @@ function WastebinTable({
               aria-label={`Deleted contact: ${contact.name}`}
             >
               {/* Compact row */}
-              <div 
-                className="px-4 py-2 cursor-pointer"
+              <button
+                type="button"
+                className="px-4 py-2 cursor-pointer w-full text-left bg-transparent border-none"
                 onClick={() => toggleExpanded(contact.id)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleExpanded(contact.id);
-                  }
-                }}
                 aria-label={isExpanded ? 'Collapse contact details' : 'Expand contact details'}
               >
                 <div className="flex items-center gap-4">
@@ -80,8 +75,15 @@ function WastebinTable({
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      aria-hidden
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      <title>Expand</title>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
                     </svg>
                   </div>
 
@@ -94,22 +96,20 @@ function WastebinTable({
                           {new Date(contact.deletedAt).toLocaleDateString()}
                         </div>
                       )}
-                      {!contact.deletedAt && (
-                        <div className="shrink-0 w-24"></div>
-                      )}
-                      
+                      {!contact.deletedAt && <div className="shrink-0 w-24"></div>}
+
                       {/* Name */}
                       <div className="shrink-0 text-sm text-white font-medium min-w-[120px] line-through opacity-60">
                         {contact.name || 'Unnamed contact'}
                       </div>
-                      
+
                       {/* Company */}
                       {contact.company && (
                         <div className="shrink-0 text-sm text-dark-400 min-w-[100px] line-through opacity-60">
                           {contact.company}
                         </div>
                       )}
-                      
+
                       {/* Spacer */}
                       <div className="flex-1"></div>
                     </>
@@ -117,13 +117,16 @@ function WastebinTable({
 
                   {/* Spacer when expanded */}
                   {isExpanded && <div className="flex-1"></div>}
-                  
+
                   {/* Action buttons */}
-                  <div className="shrink-0 flex gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="shrink-0 flex gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleRestore(contact.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRestore(contact.id);
+                      }}
                       disabled={restoreContact.isPending}
                       aria-label={`Restore ${contact.name}`}
                       className="text-green-400 hover:text-green-300 hover:bg-green-500/10"
@@ -133,7 +136,10 @@ function WastebinTable({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handlePermanentDelete(contact.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePermanentDelete(contact.id);
+                      }}
                       disabled={permanentlyDeleteContact.isPending}
                       aria-label={`Permanently delete ${contact.name}`}
                       className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
@@ -142,7 +148,7 @@ function WastebinTable({
                     </Button>
                   </div>
                 </div>
-              </div>
+              </button>
 
               {/* Expanded details */}
               {isExpanded && (
@@ -183,12 +189,19 @@ function WastebinTable({
                     {/* Interactions */}
                     {allInteractions.length > 0 && (
                       <div className="pt-4 space-y-3">
-                        <div className="text-sm font-medium text-dark-400">Interactions ({allInteractions.length})</div>
+                        <div className="text-sm font-medium text-dark-400">
+                          Interactions ({allInteractions.length})
+                        </div>
                         {allInteractions.map((interaction) => (
-                          <div key={interaction.id} className="flex items-start gap-3 text-sm text-dark-400 opacity-60">
+                          <div
+                            key={interaction.id}
+                            className="flex items-start gap-3 text-sm text-dark-400 opacity-60"
+                          >
                             <div className="shrink-0 w-24">{interaction.type}</div>
                             <div className="flex-1">
-                              <div>{interaction.date} {interaction.time && `at ${interaction.time}`}</div>
+                              <div>
+                                {interaction.date} {interaction.time && `at ${interaction.time}`}
+                              </div>
                               {interaction.notes && <div className="mt-1">{interaction.notes}</div>}
                             </div>
                           </div>
@@ -219,7 +232,7 @@ export default function Wastebin() {
       (contact) =>
         contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        contact.email?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [contacts, searchTerm]);
 
@@ -238,8 +251,19 @@ export default function Wastebin() {
         </div>
         <Link to="/contacts">
           <Button variant="ghost" aria-label="Back to contacts">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             Back to Contacts
           </Button>
@@ -265,17 +289,19 @@ export default function Wastebin() {
           {sortedContacts.length > 0 && (
             <section aria-labelledby="wastebin-heading" className="space-y-3">
               <div className="flex items-center gap-2">
-                <h2 id="wastebin-heading" className="text-lg font-semibold text-white">Deleted Contacts</h2>
+                <h2 id="wastebin-heading" className="text-lg font-semibold text-white">
+                  Deleted Contacts
+                </h2>
                 <span className="px-2 py-1 text-xs font-medium bg-dark-700 text-dark-300 rounded-full">
                   {sortedContacts.length}
                 </span>
               </div>
               <Card padding="none">
-                <WastebinTable 
-                  contacts={sortedContacts} 
-                  restoreContact={restoreContact} 
+                <WastebinTable
+                  contacts={sortedContacts}
+                  restoreContact={restoreContact}
                   permanentlyDeleteContact={permanentlyDeleteContact}
-                  interactions={interactions} 
+                  interactions={interactions}
                 />
               </Card>
             </section>
@@ -286,17 +312,34 @@ export default function Wastebin() {
             <Card padding="none">
               <EmptyState
                 icon={
-                  <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <svg
+                    className="w-8 h-8 text-dark-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
                   </svg>
                 }
                 title="Wastebin is empty"
-                message={searchTerm ? 'No deleted contacts match your search' : 'No deleted contacts'}
-                action={!searchTerm ? (
-                  <Link to="/contacts">
-                    <Button size="sm" aria-label="Go to contacts">Go to Contacts</Button>
-                  </Link>
-                ) : undefined}
+                message={
+                  searchTerm ? 'No deleted contacts match your search' : 'No deleted contacts'
+                }
+                action={
+                  !searchTerm ? (
+                    <Link to="/contacts">
+                      <Button size="sm" aria-label="Go to contacts">
+                        Go to Contacts
+                      </Button>
+                    </Link>
+                  ) : undefined
+                }
               />
             </Card>
           )}

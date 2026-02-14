@@ -2,7 +2,7 @@
 
 @theme {
   --font-family-sans: "Outfit", system-ui, sans-serif;
-  
+
   /* Warm color palette */
   --color-warm-50: #fffbeb;
   --color-warm-100: #fef3c7;
@@ -15,7 +15,7 @@
   --color-warm-800: #92400e;
   --color-warm-900: #78350f;
   --color-warm-950: #451a03;
-  
+
   /* Dark theme colors */
   --color-dark-50: #fafafa;
   --color-dark-100: #f4f4f5;
@@ -54,4 +54,3 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-dark-500);
 }
-

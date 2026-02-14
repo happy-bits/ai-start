@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { cn } from '../../utils/styles';
 
 interface BadgeProps {
@@ -15,10 +15,13 @@ export default function Badge({ children, variant = 'default', className = '' }:
 
   return (
     <span
-      className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', variants[variant], className)}
+      className={cn(
+        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+        variants[variant],
+        className,
+      )}
     >
       {children}
     </span>
   );
 }
-

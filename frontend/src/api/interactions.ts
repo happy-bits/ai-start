@@ -1,12 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './client';
-import type { Interaction, CreateInteractionData, UpdateInteractionData } from './types';
+import type { CreateInteractionData, Interaction, UpdateInteractionData } from './types';
 
 // API functions
 export async function getInteractions(contactId?: number): Promise<Interaction[]> {
-  const url = contactId
-    ? `/api/interactions?contactId=${contactId}`
-    : '/api/interactions';
+  const url = contactId ? `/api/interactions?contactId=${contactId}` : '/api/interactions';
   const response = await apiClient.get<{ interactions: Interaction[] }>(url);
   return response.interactions;
 }
@@ -21,8 +19,14 @@ export async function createInteraction(data: CreateInteractionData): Promise<In
   return response.interaction;
 }
 
-export async function updateInteraction(id: number, data: UpdateInteractionData): Promise<Interaction> {
-  const response = await apiClient.put<{ interaction: Interaction }>(`/api/interactions/${id}`, data);
+export async function updateInteraction(
+  id: number,
+  data: UpdateInteractionData,
+): Promise<Interaction> {
+  const response = await apiClient.put<{ interaction: Interaction }>(
+    `/api/interactions/${id}`,
+    data,
+  );
   return response.interaction;
 }
 
@@ -81,4 +85,3 @@ export function useDeleteInteraction() {
     },
   });
 }
-

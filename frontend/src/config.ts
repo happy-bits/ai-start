@@ -1,6 +1,6 @@
 /**
  * Application configuration
- * 
+ *
  * Set developerTools to true during development/testing
  * to enable quick login buttons and other debugging features.
  */
@@ -12,4 +12,3 @@ export const config = {
    */
   developerTools: true,
 } as const;
-

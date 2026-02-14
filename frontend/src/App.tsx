@@ -1,18 +1,14 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-
-import { useAuth } from './context/AuthContext';
-
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
-import Login from './pages/Login';
-import ContactList from './pages/contacts/ContactList';
-import ContactForm from './pages/contacts/ContactForm';
-import Wastebin from './pages/contacts/Wastebin';
-import SellerList from './pages/sellers/SellerList';
-import SellerForm from './pages/sellers/SellerForm';
-
 import { LoadingSpinner } from './components/ui';
-
 import { ROLES } from './constants';
+import { useAuth } from './context/AuthContext';
+import ContactForm from './pages/contacts/ContactForm';
+import ContactList from './pages/contacts/ContactList';
+import Wastebin from './pages/contacts/Wastebin';
+import Login from './pages/Login';
+import SellerForm from './pages/sellers/SellerForm';
+import SellerList from './pages/sellers/SellerList';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -86,4 +82,3 @@ export default function App() {
     </Routes>
   );
 }
-

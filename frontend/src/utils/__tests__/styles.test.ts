@@ -1,6 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { getFormInputBorder, cn } from '../styles';
-import { formInputBorderNormal, formInputBorderError } from '../styles';
+import { describe, expect, it } from 'vitest';
+import { cn, formInputBorderError, formInputBorderNormal, getFormInputBorder } from '../styles';
 
 describe('styles utilities', () => {
   describe('getFormInputBorder', () => {
@@ -48,7 +47,9 @@ describe('styles utilities', () => {
     });
 
     it('handles mixed truthy and falsy values', () => {
-      expect(cn('class1', undefined, 'class2', null, false, 'class3', '')).toBe('class1 class2 class3');
+      expect(cn('class1', undefined, 'class2', null, false, 'class3', '')).toBe(
+        'class1 class2 class3',
+      );
     });
 
     it('preserves whitespace within class strings', () => {

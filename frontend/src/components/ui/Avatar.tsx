@@ -17,15 +17,24 @@ const gradientClasses = {
   warm: 'bg-gradient-to-br from-warm-500 to-warm-600',
 };
 
-export default function Avatar({ name, size = 'md', className = '', gradient = 'warm' }: AvatarProps) {
+export default function Avatar({
+  name,
+  size = 'md',
+  className = '',
+  gradient = 'warm',
+}: AvatarProps) {
   const initial = name.charAt(0).toUpperCase();
 
   return (
     <div
-      className={cn(sizeClasses[size], gradientClasses[gradient], 'rounded-full flex items-center justify-center text-white font-medium shrink-0', className)}
+      className={cn(
+        sizeClasses[size],
+        gradientClasses[gradient],
+        'rounded-full flex items-center justify-center text-white font-medium shrink-0',
+        className,
+      )}
     >
       {initial}
     </div>
   );
 }
-

@@ -60,4 +60,3 @@ export const SUCCESS_MESSAGES = {
   LOGGED_OUT: 'Logged out successfully',
   DATABASE_RESET: 'Database reset and seeded successfully',
 } as const;
-

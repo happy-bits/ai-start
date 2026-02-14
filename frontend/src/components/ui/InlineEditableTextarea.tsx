@@ -1,10 +1,10 @@
 import { useInlineEdit } from '../../hooks/useInlineEdit';
 import {
-  inlineEditableInputBase,
+  cn,
   inlineEditableDisplayBase,
   inlineEditableEmpty,
+  inlineEditableInputBase,
   inlineEditableTextareaDisplay,
-  cn,
 } from '../../utils/styles';
 
 interface InlineEditableTextareaProps {
@@ -53,12 +53,15 @@ export default function InlineEditableTextarea({
           disabled={isSaving}
           rows={rows}
           aria-label={ariaLabel || emptyText}
-          className={cn('w-full', inlineEditableInputBase, 'placeholder-dark-500 resize-none', className)}
+          className={cn(
+            'w-full',
+            inlineEditableInputBase,
+            'placeholder-dark-500 resize-none',
+            className,
+          )}
           placeholder={emptyText}
         />
-        <p className="mt-1 text-xs text-dark-500">
-          Press Cmd/Ctrl+Enter to save, Escape to cancel
-        </p>
+        <p className="mt-1 text-xs text-dark-500">Press Cmd/Ctrl+Enter to save, Escape to cancel</p>
       </div>
     );
   }
@@ -67,20 +70,20 @@ export default function InlineEditableTextarea({
   const isEmpty = !displayValue;
 
   return (
-    <p
+    <button
+      type="button"
       onClick={handleClick}
       className={cn(
+        'text-left w-full bg-transparent border-none p-0',
         inlineEditableDisplayBase,
         'whitespace-pre-wrap',
         isEmpty ? inlineEditableEmpty : inlineEditableTextareaDisplay,
-        className
+        className,
       )}
       title={isEmpty ? emptyText : 'Click to edit'}
       aria-label={ariaLabel || emptyText}
-      role="button"
     >
       {isEmpty ? emptyText : displayValue}
-    </p>
+    </button>
   );
 }
-

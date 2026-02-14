@@ -1,6 +1,6 @@
 /**
  * Shared Tailwind CSS class constants
- * 
+ *
  * This file contains commonly used class strings to follow DRY principles.
  * Use these constants instead of repeating class strings across components.
  */
@@ -41,7 +41,8 @@ export const formErrorText = 'text-sm text-red-400';
 export const formErrorTextSmall = 'text-xs text-red-400';
 
 /** Error message container styles */
-export const errorMessageContainer = 'bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm';
+export const errorMessageContainer =
+  'bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm';
 
 // ============================================================================
 // InlineEditable Styles
@@ -82,16 +83,14 @@ export const deleteButtonSize = {
 };
 
 /** Action button base styles (warm/primary actions) */
-export const actionButtonBase =
-  'text-warm-400 hover:text-warm-300 hover:bg-warm-500/10';
+export const actionButtonBase = 'text-warm-400 hover:text-warm-300 hover:bg-warm-500/10';
 
 // ============================================================================
 // Navigation Styles
 // ============================================================================
 
 /** Active navigation link styles */
-export const navLinkActive =
-  'bg-warm-500/10 text-warm-400 border border-warm-500/20';
+export const navLinkActive = 'bg-warm-500/10 text-warm-400 border border-warm-500/20';
 
 /** Inactive navigation link styles */
 export const navLinkInactive = 'text-dark-400 hover:text-white hover:bg-dark-800';
@@ -108,7 +107,8 @@ export const navLinkBase =
 export const cardContainer = 'bg-dark-800/50 rounded-lg border border-dark-700';
 
 /** Dashed border card container */
-export const cardContainerDashed = 'bg-dark-800/30 rounded-lg border border-dashed border-dark-600 hover:border-warm-500/30 transition-colors';
+export const cardContainerDashed =
+  'bg-dark-800/30 rounded-lg border border-dashed border-dark-600 hover:border-warm-500/30 transition-colors';
 
 // ============================================================================
 // Icon Container Styles

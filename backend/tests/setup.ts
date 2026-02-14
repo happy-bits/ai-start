@@ -1,10 +1,10 @@
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { expect } from 'vitest';
-import * as schema from '../src/db/schema.js';
 import { createApp } from '../src/app.js';
-import { createSession, hashPassword } from '../src/middleware/auth.js';
 import { ROLES } from '../src/constants.js';
+import * as schema from '../src/db/schema.js';
+import { createSession, hashPassword } from '../src/middleware/auth.js';
 
 export type TestContext = {
   db: ReturnType<typeof drizzle<typeof schema>>;
@@ -271,4 +271,3 @@ export async function expectCreated<T = unknown>(res: Response): Promise<T> {
 export async function expectOk<T = unknown>(res: Response): Promise<T> {
   return expectJson<T>(res, 200);
 }
-

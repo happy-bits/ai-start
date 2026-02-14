@@ -72,8 +72,7 @@ export function useUpdateContact() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateContactData }) =>
-      updateContact(id, data),
+    mutationFn: ({ id, data }: { id: number; data: UpdateContactData }) => updateContact(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
       queryClient.invalidateQueries({ queryKey: ['contacts', id] });
@@ -123,4 +122,3 @@ export function usePermanentlyDeleteContact() {
     },
   });
 }
-

@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, type ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../utils/styles';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -27,8 +27,7 @@ export default function Button({
       'bg-dark-700 hover:bg-dark-600 text-white border border-dark-600 focus:ring-dark-500',
     danger:
       'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 focus:ring-red-500',
-    ghost:
-      'hover:bg-dark-700 text-dark-300 hover:text-white focus:ring-dark-500',
+    ghost: 'hover:bg-dark-700 text-dark-300 hover:text-white focus:ring-dark-500',
   };
 
   const sizes = {
@@ -48,4 +47,3 @@ export default function Button({
     </button>
   );
 }
-

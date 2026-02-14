@@ -1,4 +1,4 @@
-import { errorMessageContainer, cn } from '../../utils/styles';
+import { cn, errorMessageContainer } from '../../utils/styles';
 
 interface ErrorMessageProps {
   error: string;
@@ -8,10 +8,5 @@ interface ErrorMessageProps {
 export default function ErrorMessage({ error, className = '' }: ErrorMessageProps) {
   if (!error) return null;
 
-  return (
-    <div className={cn(errorMessageContainer, className)}>
-      {error}
-    </div>
-  );
+  return <div className={cn(errorMessageContainer, className)}>{error}</div>;
 }
-

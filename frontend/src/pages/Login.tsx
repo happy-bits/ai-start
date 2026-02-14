@@ -1,16 +1,15 @@
-import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { type FormEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { useLogin, login as loginApi } from '../api/auth';
+import { login as loginApi, useLogin } from '../api/auth';
 import { apiClient } from '../api/client';
 
 import { ErrorMessage, LoadingSpinner } from '../components/ui';
-
-import { useAuth } from '../context/AuthContext';
 import { config } from '../config';
+import { useAuth } from '../context/AuthContext';
 import { getErrorMessage } from '../utils';
-import { formInputBase, formInputBorderNormal, formLabel, cn } from '../utils/styles';
+import { cn, formInputBase, formInputBorderNormal, formLabel } from '../utils/styles';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
@@ -22,7 +21,7 @@ async function checkHealth(): Promise<{ status: string }> {
       throw new Error('Backend is not responding');
     }
     return response.json();
-  } catch (error) {
+  } catch (_error) {
     // Handle network errors (backend offline, CORS, etc.)
     throw new Error('Backend is not responding');
   }
@@ -51,19 +50,19 @@ export default function Login() {
     setIsResetting(true);
     setError('');
     setResetSuccess(false);
-    
+
     try {
       // Log in as admin
       const response = await loginApi({ email: 'admin@keepwarm.com', password: 'admin123' });
       apiClient.setToken(response.token);
-      
+
       // Reset the database
       await apiClient.post('/api/dev/reset');
-      
+
       // Log out
       await apiClient.post('/auth/logout').catch(() => {});
       apiClient.setToken(null);
-      
+
       setResetSuccess(true);
     } catch (err) {
       setError(getErrorMessage(err) || 'Could not reset database');
@@ -89,7 +88,10 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await loginMutation.mutateAsync({ email: quickEmail, password: quickPassword });
+      const response = await loginMutation.mutateAsync({
+        email: quickEmail,
+        password: quickPassword,
+      });
       login(response.token, response.user);
       navigate('/');
     } catch (err) {
@@ -108,8 +110,12 @@ export default function Login() {
       <div className="w-full max-w-md relative">
         {/* Logo and title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-warm-400 to-warm-600 mb-4 shadow-lg shadow-warm-500/25" aria-hidden="true">
-            <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-warm-400 to-warm-600 mb-4 shadow-lg shadow-warm-500/25"
+            aria-hidden="true"
+          >
+            <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <title>KeepWarm logo</title>
               <path d="M12 2C9 5 7 8 7 11c0 2.5 1.5 4.5 3.5 5.5L9 22h6l-1.5-5.5C15.5 15.5 17 13.5 17 11c0-3-2-6-5-9zm0 4c1.5 2 2.5 4 2.5 5.5 0 1.5-1 2.5-2.5 2.5s-2.5-1-2.5-2.5C9.5 10 10.5 8 12 6z" />
             </svg>
           </div>
@@ -171,9 +177,7 @@ export default function Login() {
           {config.developerTools && (
             <div className="mt-6 pt-6 border-t border-dark-700">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-dark-500">
-                  Developer tools
-                </p>
+                <p className="text-xs text-dark-500">Developer tools</p>
                 {/* Backend status indicator */}
                 <div className="flex items-center gap-1.5">
                   <div
@@ -182,27 +186,32 @@ export default function Login() {
                     }`}
                   />
                   <span className="text-xs text-dark-400">
-                    {isSuccess && healthData?.status === 'ok' ? 'Backend online' : 'Backend offline'}
+                    {isSuccess && healthData?.status === 'ok'
+                      ? 'Backend online'
+                      : 'Backend offline'}
                   </span>
                 </div>
               </div>
-              
+
               {/* Credentials Display */}
               <div className="mb-4 space-y-1.5">
                 <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
                   <span className="text-dark-400 font-medium">Admin:</span>{' '}
-                  <span className="text-warm-400 select-all">admin@keepwarm.com</span> / <span className="text-warm-400 select-all">admin123</span>
+                  <span className="text-warm-400 select-all">admin@keepwarm.com</span> /{' '}
+                  <span className="text-warm-400 select-all">admin123</span>
                 </div>
                 <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
                   <span className="text-dark-400 font-medium">Maria:</span>{' '}
-                  <span className="text-warm-400 select-all">maria@sellmore.se</span> / <span className="text-warm-400 select-all">seller123</span>
+                  <span className="text-warm-400 select-all">maria@sellmore.se</span> /{' '}
+                  <span className="text-warm-400 select-all">seller123</span>
                 </div>
                 <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
                   <span className="text-dark-400 font-medium">Lars:</span>{' '}
-                  <span className="text-warm-400 select-all">lars@hotmail.com</span> / <span className="text-warm-400 select-all">seller123</span>
+                  <span className="text-warm-400 select-all">lars@hotmail.com</span> /{' '}
+                  <span className="text-warm-400 select-all">seller123</span>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-3 gap-2">
                 <QuickLoginButton
                   label="Admin"
@@ -231,7 +240,7 @@ export default function Login() {
                   disabled={loginMutation.isPending || isResetting}
                 />
               </div>
-              
+
               {/* Reset Database */}
               <button
                 type="button"
@@ -240,12 +249,23 @@ export default function Login() {
                 aria-label="Reset database to initial state"
                 className="w-full mt-3 py-2 px-3 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 text-red-400 rounded-lg text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
                 </svg>
                 {isResetting ? 'Resetting...' : 'Reset database'}
               </button>
-              
+
               {resetSuccess && (
                 <div className="bg-warm-500/10 border border-warm-500/20 text-warm-400 px-4 py-3 rounded-lg text-sm mt-3">
                   Database has been reset!
@@ -294,4 +314,3 @@ function QuickLoginButton({
     </button>
   );
 }
-

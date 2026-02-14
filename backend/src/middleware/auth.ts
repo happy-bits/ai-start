@@ -1,9 +1,8 @@
-import { Context, Next } from 'hono';
-import { HTTPException } from 'hono/http-exception';
 import { hash } from '@node-rs/argon2';
-import { eq, and, gt } from 'drizzle-orm';
+import { and, eq, gt } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import * as schema from '../db/schema.js';
+import type { Context, Next } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import {
   ARGON_OPTIONS,
   AUTH_HEADER_PREFIX,
@@ -11,6 +10,7 @@ import {
   ROLES,
   SESSION_CONFIG,
 } from '../constants.js';
+import * as schema from '../db/schema.js';
 
 // Hash a password using Argon2
 export function hashPassword(password: string) {
@@ -105,7 +105,7 @@ function generateToken(): string {
 export function createSession(
   db: BetterSQLite3Database<typeof schema>,
   userId: number,
-  expiresInHours: number = SESSION_CONFIG.DEFAULT_EXPIRY_HOURS
+  expiresInHours: number = SESSION_CONFIG.DEFAULT_EXPIRY_HOURS,
 ): string {
   const token = generateToken();
   const expiresAt = new Date(Date.now() + expiresInHours * 60 * 60 * 1000).toISOString();
@@ -127,5 +127,3 @@ export function deleteSession(db: BetterSQLite3Database<typeof schema>, token: s
   const result = db.delete(schema.sessions).where(eq(schema.sessions.token, token)).run();
   return result.changes > 0;
 }
-
-

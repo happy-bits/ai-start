@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { cn } from '../../utils/styles';
 
 interface CardProps {
@@ -10,9 +10,9 @@ interface CardProps {
   'aria-labelledby'?: string;
 }
 
-export default function Card({ 
-  children, 
-  className = '', 
+export default function Card({
+  children,
+  className = '',
   padding = 'md',
   as: Component = 'div',
   'aria-label': ariaLabel,
@@ -27,7 +27,11 @@ export default function Card({
 
   return (
     <Component
-      className={cn('bg-dark-900/80 backdrop-blur-sm border border-dark-700 rounded-xl shadow-xl', paddings[padding], className)}
+      className={cn(
+        'bg-dark-900/80 backdrop-blur-sm border border-dark-700 rounded-xl shadow-xl',
+        paddings[padding],
+        className,
+      )}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
     >
@@ -35,4 +39,3 @@ export default function Card({
     </Component>
   );
 }
-

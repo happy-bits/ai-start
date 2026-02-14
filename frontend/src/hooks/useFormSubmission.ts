@@ -1,10 +1,10 @@
-import { useState, type FormEvent } from 'react';
+import { type FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getErrorMessage } from '../utils';
 
 interface UseFormSubmissionOptions<TData, TResponse> {
   onSubmit: (data: TData) => Promise<TResponse>;
-  onSuccess?: (response: TResponse) => void | string; // Return string to navigate, void to call callback
+  onSuccess?: (response: TResponse) => undefined | string; // Return string to navigate, void to call callback
   onSuccessCallback?: () => void; // Optional callback function (for embedded forms)
   validate?: (data: TData) => string | null; // Return error message or null
 }
@@ -55,4 +55,3 @@ export function useFormSubmission<TData, TResponse>({
     handleSubmit,
   };
 }
-

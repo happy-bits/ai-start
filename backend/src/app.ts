@@ -1,19 +1,22 @@
+import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { logger } from 'hono/logger';
 import { HTTPException } from 'hono/http-exception';
-import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { logger } from 'hono/logger';
+import { ERROR_MESSAGES, ROLES, SUCCESS_MESSAGES } from './constants.js';
+import { resetDatabase } from './db/index.js';
 import type * as schema from './db/schema.js';
-import { authMiddleware, type AuthVariables } from './middleware/auth.js';
+import { seedDatabase } from './db/seed.js';
+import { type AuthVariables, authMiddleware } from './middleware/auth.js';
 import { createAuthRoutes } from './routes/auth.js';
-import { createSellerRoutes } from './routes/sellers.js';
 import { createContactRoutes } from './routes/contacts.js';
 import { createInteractionRoutes } from './routes/interactions.js';
-import { seedDatabase } from './db/seed.js';
-import { resetDatabase } from './db/index.js';
-import { ERROR_MESSAGES, ROLES, SUCCESS_MESSAGES } from './constants.js';
+import { createSellerRoutes } from './routes/sellers.js';
 
-export function createApp(db: BetterSQLite3Database<typeof schema>, options?: { enableLogging?: boolean }) {
+export function createApp(
+  db: BetterSQLite3Database<typeof schema>,
+  options?: { enableLogging?: boolean },
+) {
   const app = new Hono<{ Variables: AuthVariables }>();
 
   // Middleware
@@ -84,6 +87,3 @@ export function createApp(db: BetterSQLite3Database<typeof schema>, options?: { 
 
   return app;
 }
-
-
-

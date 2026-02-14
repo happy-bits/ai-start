@@ -1,15 +1,17 @@
 import { useState } from 'react';
 
 import { useCreateInteraction } from '../../api/interactions';
-import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
-
-import { InlineEditableTextarea, InlineEditableSelect, InlineEditableDate, InlineEditableTime } from '../../components/ui';
-
-import { interactionTypeConfig } from '../../config/interactions';
-import { iconContainer, cardContainerDashed, cn } from '../../utils/styles';
-import { getTodayISO, getCurrentTimeHHMM } from '../../utils';
-
 import type { InteractionType } from '../../api/types';
+import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
+import {
+  InlineEditableDate,
+  InlineEditableSelect,
+  InlineEditableTextarea,
+  InlineEditableTime,
+} from '../../components/ui';
+import { interactionTypeConfig } from '../../config/interactions';
+import { getCurrentTimeHHMM, getTodayISO } from '../../utils';
+import { cardContainerDashed, cn, iconContainer } from '../../utils/styles';
 
 interface NewInteractionRowProps {
   contactId: number;
@@ -17,9 +19,13 @@ interface NewInteractionRowProps {
   onCreated?: () => void;
 }
 
-export default function NewInteractionRow({ contactId, variant = 'detail', onCreated }: NewInteractionRowProps) {
+export default function NewInteractionRow({
+  contactId,
+  variant = 'detail',
+  onCreated,
+}: NewInteractionRowProps) {
   const createInteraction = useCreateInteraction();
-  
+
   const [type, setType] = useState<InteractionType>('note');
   const [date, setDate] = useState<string>(getTodayISO());
   const [time, setTime] = useState<string | null>(getCurrentTimeHHMM());
@@ -38,13 +44,13 @@ export default function NewInteractionRow({ contactId, variant = 'detail', onCre
         time: time || null,
         notes: value.trim() || null,
       });
-      
+
       // Reset form with fresh date/time
       setNotes(null);
       setType('note');
       setDate(getTodayISO());
       setTime(getCurrentTimeHHMM());
-      
+
       onCreated?.();
     } catch (error) {
       console.error('Failed to create interaction:', error);
@@ -77,11 +83,7 @@ export default function NewInteractionRow({ contactId, variant = 'detail', onCre
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1.5">
-            <InlineEditableDate
-              value={date}
-              onSave={handleDateChange}
-              className="text-sm"
-            />
+            <InlineEditableDate value={date} onSave={handleDateChange} className="text-sm" />
             <InlineEditableTime
               value={time}
               onSave={handleTimeChange}
@@ -104,9 +106,7 @@ export default function NewInteractionRow({ contactId, variant = 'detail', onCre
   // Detail variant (default)
   return (
     <div className={cn('flex gap-4 p-4', cardContainerDashed)}>
-      <div className={iconContainer}>
-        {interactionTypeConfig[type].icon}
-      </div>
+      <div className={iconContainer}>{interactionTypeConfig[type].icon}</div>
       <div className="flex-1 min-w-0 space-y-2">
         <div className="flex items-center gap-2 flex-wrap">
           <InlineEditableSelect
@@ -116,15 +116,9 @@ export default function NewInteractionRow({ contactId, variant = 'detail', onCre
             badgeVariant={interactionTypeConfig[type].color}
           />
           <span className="text-sm text-dark-400">on</span>
-          <InlineEditableDate
-            value={date}
-            onSave={handleDateChange}
-          />
+          <InlineEditableDate value={date} onSave={handleDateChange} />
           <span className="text-sm text-dark-400">at</span>
-          <InlineEditableTime
-            value={time}
-            onSave={handleTimeChange}
-          />
+          <InlineEditableTime value={time} onSave={handleTimeChange} />
         </div>
         <div>
           <InlineEditableTextarea

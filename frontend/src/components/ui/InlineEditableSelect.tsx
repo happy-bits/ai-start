@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useInlineEdit } from '../../hooks/useInlineEdit';
+import { cn, inlineEditableInputBase } from '../../utils/styles';
 import Badge from './Badge';
-import { inlineEditableInputBase, cn } from '../../utils/styles';
 
 interface InlineEditableSelectProps {
   value: string;
@@ -21,7 +21,7 @@ export default function InlineEditableSelect({
   'aria-label': ariaLabel,
 }: InlineEditableSelectProps) {
   const isSavingFromChangeRef = useRef(false);
-  
+
   const {
     isEditing,
     editValue,
@@ -39,13 +39,13 @@ export default function InlineEditableSelect({
 
   const handleSelectChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = e.target.value.trim();
-    
+
     // Prevent onBlur from also saving
     isSavingFromChangeRef.current = true;
-    
+
     // Update local state
     handleChange(newValue);
-    
+
     // Auto-save on change for select - save directly with the new value
     if (newValue !== value) {
       try {
@@ -58,7 +58,7 @@ export default function InlineEditableSelect({
           // At this point value prop should be updated, so handleBlur will just exit
           handleBlur();
         }, 100);
-      } catch (err) {
+      } catch (_err) {
         isSavingFromChangeRef.current = false;
         // Revert on error
         handleChange(value || '');
@@ -104,15 +104,15 @@ export default function InlineEditableSelect({
   // When not editing, wrap in Badge
   return (
     <Badge variant={badgeVariant}>
-      <span
+      <button
+        type="button"
         onClick={handleClick}
-        className="cursor-pointer hover:opacity-80 transition-opacity"
+        className="cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none p-0 font-inherit"
         title="Click to edit"
         aria-label={ariaLabel || `Interaction type: ${selectedOption?.label || value}`}
-        role="button"
       >
         {selectedOption?.label || value}
-      </span>
+      </button>
     </Badge>
   );
 }

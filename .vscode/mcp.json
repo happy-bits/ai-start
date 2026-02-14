@@ -1,19 +1,19 @@
 {
-    "servers": {
-        "my-keepwarm-database-mcp": {
-            "type": "stdio",
-            "command": "docker",
-            "args": [
-                "run",
-                "--rm",
-                "-i",
-                "-v",
-                "/Users/oscar/Projects/keepwarm/backend/data:/data",
-                "mcp/sqlite",
-                "--db-path",
-                "/data/keepwarm.db"
-            ]
-        }
-    },
-    "inputs": []
+  "servers": {
+    "my-keepwarm-database-mcp": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "-v",
+        "/Users/oscar/Projects/keepwarm/backend/data:/data",
+        "mcp/sqlite",
+        "--db-path",
+        "/data/keepwarm.db"
+      ]
+    }
+  },
+  "inputs": []
 }

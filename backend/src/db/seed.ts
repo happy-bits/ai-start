@@ -1,7 +1,7 @@
 import { hash } from '@node-rs/argon2';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import * as schema from './schema.js';
 import { ARGON_OPTIONS, ROLES } from '../constants.js';
+import * as schema from './schema.js';
 
 // Deterministic seed data (no random values, fixed dates)
 const SEED_DATE = '2024-01-15T10:00:00.000Z';
@@ -62,7 +62,9 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   // Helper function to generate deterministic number of interactions (0-5) based on index
   function getInteractionCount(index: number): number {
     // Deterministic pattern: cycles through 0-5 based on index
-    const pattern = [3, 1, 5, 0, 2, 4, 3, 2, 1, 5, 0, 4, 3, 2, 1, 0, 5, 4, 3, 2, 1, 0, 4, 3, 2, 5, 1, 0, 4, 3];
+    const pattern = [
+      3, 1, 5, 0, 2, 4, 3, 2, 1, 5, 0, 4, 3, 2, 1, 0, 5, 4, 3, 2, 1, 0, 4, 3, 2, 5, 1, 0, 4, 3,
+    ];
     return pattern[index % pattern.length];
   }
 
@@ -79,30 +81,78 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
 
   // Swedish names and companies for seed data
   const swedishNames = [
-    'Erik Andersson', 'Anna Larsson', 'Johan Nilsson', 'Maria Johansson', 'Lars Eriksson',
-    'Emma Svensson', 'Anders Gustafsson', 'Sara Berg', 'Peter Lindqvist', 'Lisa Holm',
-    'Mikael Persson', 'Jenny Lundberg', 'Daniel Olsson', 'Karin Nordström', 'Thomas Ek',
-    'Helena Forsberg', 'Magnus Dahl', 'Camilla Sandberg', 'Fredrik Åberg', 'Malin Bergström',
-    'Henrik Larsson', 'Sofia Andersson', 'Jonas Lind', 'Elin Johansson', 'Martin Berg',
-    'Amanda Nilsson', 'Andreas Persson', 'Ida Gustafsson', 'Niklas Holm', 'Frida Ek'
+    'Erik Andersson',
+    'Anna Larsson',
+    'Johan Nilsson',
+    'Maria Johansson',
+    'Lars Eriksson',
+    'Emma Svensson',
+    'Anders Gustafsson',
+    'Sara Berg',
+    'Peter Lindqvist',
+    'Lisa Holm',
+    'Mikael Persson',
+    'Jenny Lundberg',
+    'Daniel Olsson',
+    'Karin Nordström',
+    'Thomas Ek',
+    'Helena Forsberg',
+    'Magnus Dahl',
+    'Camilla Sandberg',
+    'Fredrik Åberg',
+    'Malin Bergström',
+    'Henrik Larsson',
+    'Sofia Andersson',
+    'Jonas Lind',
+    'Elin Johansson',
+    'Martin Berg',
+    'Amanda Nilsson',
+    'Andreas Persson',
+    'Ida Gustafsson',
+    'Niklas Holm',
+    'Frida Ek',
   ];
 
   const companies = [
-    'Volvo AB', 'Spotify', 'IKEA Sverige', 'H&M', 'Ericsson',
-    'Atlas Copco', 'Sandvik', 'SKF', 'Electrolux', 'AstraZeneca',
-    'Telia Company', 'Swedbank', 'SEB', 'Handelsbanken', 'Scania',
-    'Saab', 'ABB', 'Alfa Laval', 'Assa Abloy', 'Atlas Copco',
-    'Autoliv', 'Boliden', 'Getinge', 'Hexagon', 'Investor',
-    'SAS', 'Swedish Match', 'Trelleborg', 'Vattenfall', 'Össur'
+    'Volvo AB',
+    'Spotify',
+    'IKEA Sverige',
+    'H&M',
+    'Ericsson',
+    'Atlas Copco',
+    'Sandvik',
+    'SKF',
+    'Electrolux',
+    'AstraZeneca',
+    'Telia Company',
+    'Swedbank',
+    'SEB',
+    'Handelsbanken',
+    'Scania',
+    'Saab',
+    'ABB',
+    'Alfa Laval',
+    'Assa Abloy',
+    'Atlas Copco',
+    'Autoliv',
+    'Boliden',
+    'Getinge',
+    'Hexagon',
+    'Investor',
+    'SAS',
+    'Swedish Match',
+    'Trelleborg',
+    'Vattenfall',
+    'Össur',
   ];
 
   // Use only the first 10 companies for Maria's contacts
   const mariaCompanies = companies.slice(0, 10);
-  
+
   // Variable distribution: contacts per company
   // Pattern: [5, 4, 6, 3, 2, 5, 1, 2, 1, 1] = 30 contacts total
   const contactsPerCompany = [5, 4, 6, 3, 2, 5, 1, 2, 1, 1];
-  
+
   // Helper function to get company index for a contact index
   function getCompanyIndex(contactIndex: number): number {
     let cumulative = 0;
@@ -114,7 +164,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     }
     return contactsPerCompany.length - 1;
   }
-  
+
   // Helper function to get contact number within company (0-based)
   function getContactNumberInCompany(contactIndex: number): number {
     let cumulative = 0;
@@ -134,13 +184,14 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     const company = mariaCompanies[companyIndex];
     const contactNumber = getContactNumberInCompany(i);
     const companyDomain = company.toLowerCase().replace(/\s+/g, '');
-    
+
     // Generate email with company domain, adding number suffix if multiple contacts from same company
     const emailBase = swedishNames[i].toLowerCase().replace(' ', '.');
-    const email = contactNumber > 0 
-      ? `${emailBase}${contactNumber + 1}@${companyDomain}.se`
-      : `${emailBase}@${companyDomain}.se`;
-    
+    const email =
+      contactNumber > 0
+        ? `${emailBase}${contactNumber + 1}@${companyDomain}.se`
+        : `${emailBase}@${companyDomain}.se`;
+
     const contact = db
       .insert(schema.contacts)
       .values({
@@ -159,7 +210,13 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   }
 
   // Seed interactions for Maria's contacts (0-5 per contact)
-  const interactionTypes: Array<'call' | 'meeting' | 'email' | 'video_call' | 'note'> = ['call', 'meeting', 'email', 'video_call', 'note'];
+  const interactionTypes: Array<'call' | 'meeting' | 'email' | 'video_call' | 'note'> = [
+    'call',
+    'meeting',
+    'email',
+    'video_call',
+    'note',
+  ];
   const interactionNotes = [
     'Inledande upptäcktsamtal. Diskuterade deras nuvarande CRM-behov.',
     'Skickade produktbroschyr och prisinformation.',
@@ -175,41 +232,45 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     'Bokade demo med tekniskt team.',
     'Diskuterade prissättning och licenser.',
     'Uppföljning på skickad information.',
-    'Kvalificerade lead och behov.'
+    'Kvalificerade lead och behov.',
   ];
 
   for (let i = 0; i < mariaContacts.length; i++) {
     const contact = mariaContacts[i];
     const interactionCount = getInteractionCount(i);
-    
+
     // Generate interactions with dates before the follow-up date
-    const followUpDate = new Date(contact.followUpDate!);
-    
+    const followUpDateStr = contact.followUpDate;
+    if (!followUpDateStr) continue;
+    const followUpDate = new Date(followUpDateStr);
+
     for (let j = 0; j < interactionCount; j++) {
       // Distribute interactions over time before follow-up date
-      const daysBefore = (interactionCount - j) * 7 + (j * 3); // Spread out interactions
+      const daysBefore = (interactionCount - j) * 7 + j * 3; // Spread out interactions
       const interactionDate = new Date(followUpDate);
       interactionDate.setDate(interactionDate.getDate() - daysBefore);
-      
+
       // Ensure date is within reasonable range (not before 2025-11-01)
       const minDate = new Date('2025-11-01');
       if (interactionDate < minDate) {
-        interactionDate.setTime(minDate.getTime() + (j * 86400000)); // Add days if needed
+        interactionDate.setTime(minDate.getTime() + j * 86400000); // Add days if needed
       }
-      
+
       const hour = 9 + (j % 8); // Distribute times throughout the day
       const minute = (j * 15) % 60;
-      
-      db.insert(schema.interactions).values({
-        contactId: contact.id,
-        sellerId: seller1.id,
-        type: interactionTypes[j % interactionTypes.length],
-        date: interactionDate.toISOString().split('T')[0],
-        time: `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
-        notes: interactionNotes[(i + j) % interactionNotes.length],
-        createdAt: SEED_DATE,
-        updatedAt: SEED_DATE,
-      }).run();
+
+      db.insert(schema.interactions)
+        .values({
+          contactId: contact.id,
+          sellerId: seller1.id,
+          type: interactionTypes[j % interactionTypes.length],
+          date: interactionDate.toISOString().split('T')[0],
+          time: `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
+          notes: interactionNotes[(i + j) % interactionNotes.length],
+          createdAt: SEED_DATE,
+          updatedAt: SEED_DATE,
+        })
+        .run();
     }
   }
 
@@ -226,7 +287,8 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
 
 // Run seed if called directly
 // Check if this module is being run directly (not imported) by comparing file paths
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
+
 const currentFile = fileURLToPath(import.meta.url);
 const entryFile = process.argv[1];
 if (currentFile === entryFile || entryFile?.endsWith('seed.ts')) {
@@ -236,6 +298,3 @@ if (currentFile === entryFile || entryFile?.endsWith('seed.ts')) {
   await seedDatabase(db);
   rawDb.close();
 }
-
-
-

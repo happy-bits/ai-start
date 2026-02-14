@@ -1,9 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { useSellers, useDeleteSeller } from '../../api/sellers';
+import { useDeleteSeller, useSellers } from '../../api/sellers';
 
-import { Button, Card, Badge, LoadingSpinner, EmptyState, Avatar, SearchInput } from '../../components/ui';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  LoadingSpinner,
+  SearchInput,
+} from '../../components/ui';
 
 import { formatDate } from '../../utils';
 
@@ -15,7 +23,7 @@ export default function SellerList() {
   const filteredSellers = sellers.filter(
     (seller) =>
       seller.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      seller.email.toLowerCase().includes(searchTerm.toLowerCase())
+      seller.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleDelete = async (id: number) => {
@@ -32,8 +40,19 @@ export default function SellerList() {
         </div>
         <Link to="/sellers/new">
           <Button aria-label="Add new seller">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Add Seller
           </Button>
@@ -56,17 +75,34 @@ export default function SellerList() {
         ) : filteredSellers.length === 0 ? (
           <EmptyState
             icon={
-              <svg className="w-8 h-8 text-dark-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              <svg
+                className="w-8 h-8 text-dark-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                />
               </svg>
             }
             title="No sellers found"
-            message={searchTerm ? 'Try a different search term' : 'Get started by adding your first seller'}
-            action={!searchTerm ? (
-              <Link to="/sellers/new">
-                <Button size="sm" aria-label="Add new seller">Add Seller</Button>
-              </Link>
-            ) : undefined}
+            message={
+              searchTerm ? 'Try a different search term' : 'Get started by adding your first seller'
+            }
+            action={
+              !searchTerm ? (
+                <Link to="/sellers/new">
+                  <Button size="sm" aria-label="Add new seller">
+                    Add Seller
+                  </Button>
+                </Link>
+              ) : undefined
+            }
           />
         ) : (
           <div className="overflow-x-auto">
@@ -106,9 +142,7 @@ export default function SellerList() {
                       <Badge variant="warm">Seller</Badge>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm text-dark-400">
-                        {formatDate(seller.createdAt)}
-                      </p>
+                      <p className="text-sm text-dark-400">{formatDate(seller.createdAt)}</p>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
@@ -139,4 +173,3 @@ export default function SellerList() {
     </div>
   );
 }
-

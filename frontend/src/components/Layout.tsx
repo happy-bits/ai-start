@@ -5,10 +5,10 @@ import TopNav from './TopNav';
 export default function Layout() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header role="banner">
+      <header>
         <TopNav />
       </header>
-      <main className="flex-1 overflow-auto" role="main">
+      <main className="flex-1 overflow-auto">
         <div className="p-8">
           <Outlet />
         </div>
@@ -16,4 +16,3 @@ export default function Layout() {
     </div>
   );
 }
-

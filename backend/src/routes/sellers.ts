@@ -1,12 +1,12 @@
-import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
-import { eq, and, ne } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { Hono } from 'hono';
+import { z } from 'zod';
+import { ERROR_MESSAGES, ROLES } from '../constants.js';
 import * as schema from '../db/schema.js';
 import { type AuthVariables, adminOnly, hashPassword } from '../middleware/auth.js';
-import { parseIdParam, buildUpdateValues } from './helpers.js';
-import { ERROR_MESSAGES, ROLES } from '../constants.js';
+import { buildUpdateValues, parseIdParam } from './helpers.js';
 
 const createSellerSchema = z.object({
   email: z.string().email(),
@@ -167,6 +167,3 @@ export function createSellerRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   return app;
 }
-
-
-

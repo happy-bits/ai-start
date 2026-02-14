@@ -1,9 +1,9 @@
-import { Context } from 'hono';
 import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import type { AuthUser, AuthVariables } from '../middleware/auth.js';
-import type * as schema from '../db/schema.js';
+import type { Context } from 'hono';
 import { ERROR_MESSAGES, ROLES } from '../constants.js';
+import type * as schema from '../db/schema.js';
+import type { AuthUser, AuthVariables } from '../middleware/auth.js';
 
 type ParseResult = { success: true; id: number } | { success: false; response: Response };
 
@@ -11,11 +11,14 @@ type ParseResult = { success: true; id: number } | { success: false; response: R
 export function parseIdParam(
   c: Context<{ Variables: AuthVariables }>,
   param = 'id',
-  entityName = 'Resource'
+  entityName = 'Resource',
 ): ParseResult {
   const id = parseInt(c.req.param(param), 10);
-  if (isNaN(id)) {
-    return { success: false, response: c.json({ error: ERROR_MESSAGES.invalidId(entityName) }, 400) };
+  if (Number.isNaN(id)) {
+    return {
+      success: false,
+      response: c.json({ error: ERROR_MESSAGES.invalidId(entityName) }, 400),
+    };
   }
   return { success: true, id };
 }
@@ -31,7 +34,7 @@ export function checkSellerAccess(user: AuthUser, sellerId: number) {
 // Build update values object from partial updates, filtering out undefined values
 export function buildUpdateValues<T extends Record<string, unknown>>(
   updates: Partial<T>,
-  allowedFields: (keyof T)[]
+  allowedFields: (keyof T)[],
 ): Record<string, unknown> {
   const updateValues: Record<string, unknown> = {
     updatedAt: new Date().toISOString(),
@@ -47,17 +50,15 @@ export function buildUpdateValues<T extends Record<string, unknown>>(
 }
 
 // Entity access check result type
-type EntityAccessResult<T> =
-  | { success: true; entity: T }
-  | { success: false; response: Response };
+type EntityAccessResult<T> = { success: true; entity: T } | { success: false; response: Response };
 
 // Combined helper: parse ID, fetch entity, check 404, check seller access
 export function withEntityAccess<T extends { sellerId: number }>(
   c: Context<{ Variables: AuthVariables }>,
   db: BetterSQLite3Database<typeof schema>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: Drizzle table type lacks id in generic signature
   table: any,
-  entityName: string
+  entityName: string,
 ): EntityAccessResult<T> {
   const user = c.get('user');
   const parsed = parseIdParam(c, 'id', entityName);
@@ -68,7 +69,10 @@ export function withEntityAccess<T extends { sellerId: number }>(
   const entity = db.select().from(table).where(eq(table.id, parsed.id)).get() as T | undefined;
 
   if (!entity) {
-    return { success: false, response: c.json({ error: ERROR_MESSAGES.notFound(entityName) }, 404) };
+    return {
+      success: false,
+      response: c.json({ error: ERROR_MESSAGES.notFound(entityName) }, 404),
+    };
   }
 
   const accessDenied = checkSellerAccess(user, entity.sellerId);

@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  getTodayISO,
-  getCurrentTimeHHMM,
-  formatDate,
-  addWorkDaysFromToday,
   addDaysFromToday,
   addMonthsFromToday,
+  addWorkDaysFromToday,
+  formatDate,
+  getCurrentTimeHHMM,
+  getTodayISO,
 } from '../dates';
 
 describe('dates utilities', () => {
@@ -15,7 +15,7 @@ describe('dates utilities', () => {
       expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
-    it('returns today\'s date', () => {
+    it("returns today's date", () => {
       const today = new Date();
       const expected = today.toISOString().split('T')[0];
       expect(getTodayISO()).toBe(expected);

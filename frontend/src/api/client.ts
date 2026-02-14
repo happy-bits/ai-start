@@ -20,17 +20,14 @@ class ApiClient {
     return this.token;
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
 
     if (this.token) {
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${this.token}`;
+      (headers as Record<string, string>).Authorization = `Bearer ${this.token}`;
     }
 
     const response = await fetch(`${API_BASE}${endpoint}`, {
@@ -42,7 +39,7 @@ class ApiClient {
       const errorData = await response.json().catch(() => ({
         error: 'An unexpected error occurred',
       }));
-      
+
       // Handle different error formats
       let errorMessage: string;
       if (typeof errorData.error === 'string') {
@@ -55,7 +52,7 @@ class ApiClient {
       } else {
         errorMessage = 'An unexpected error occurred';
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -86,4 +83,3 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
-

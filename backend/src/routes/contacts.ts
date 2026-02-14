@@ -1,13 +1,13 @@
-import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
-import { eq, isNull, and, not } from 'drizzle-orm';
-import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import type { InferSelectModel } from 'drizzle-orm';
+import { and, eq, isNull, not } from 'drizzle-orm';
+import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { Hono } from 'hono';
+import { z } from 'zod';
+import { DATE_FORMAT_MESSAGE, DATE_FORMAT_REGEX, ERROR_MESSAGES, ROLES } from '../constants.js';
 import * as schema from '../db/schema.js';
-import { type AuthVariables } from '../middleware/auth.js';
-import { withEntityAccess, buildUpdateValues, parseIdParam, checkSellerAccess } from './helpers.js';
-import { ERROR_MESSAGES, ROLES, DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE } from '../constants.js';
+import type { AuthVariables } from '../middleware/auth.js';
+import { buildUpdateValues, checkSellerAccess, parseIdParam, withEntityAccess } from './helpers.js';
 
 const createContactSchema = z.object({
   name: z.string().min(1),
@@ -36,7 +36,10 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
 
     // Sellers only see their own contacts
     if (user.role === ROLES.SELLER) {
-      conditions = and(eq(schema.contacts.sellerId, user.id), isNull(schema.contacts.deletedAt)) as typeof conditions;
+      conditions = and(
+        eq(schema.contacts.sellerId, user.id),
+        isNull(schema.contacts.deletedAt),
+      ) as typeof conditions;
     }
 
     const contacts = db.select().from(schema.contacts).where(conditions).all();
@@ -53,7 +56,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
     if (user.role === ROLES.SELLER) {
       conditions = and(
         eq(schema.contacts.sellerId, user.id),
-        not(isNull(schema.contacts.deletedAt))
+        not(isNull(schema.contacts.deletedAt)),
       ) as typeof conditions;
     }
 
@@ -112,11 +115,22 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   // PUT /contacts/:id - Update contact
   app.put('/:id', zValidator('json', updateContactSchema), (c) => {
-    const result = withEntityAccess<InferSelectModel<typeof schema.contacts>>(c, db, schema.contacts, 'Contact');
+    const result = withEntityAccess<InferSelectModel<typeof schema.contacts>>(
+      c,
+      db,
+      schema.contacts,
+      'Contact',
+    );
     if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
-    const updateValues = buildUpdateValues(updates, ['name', 'email', 'phone', 'company', 'followUpDate']);
+    const updateValues = buildUpdateValues(updates, [
+      'name',
+      'email',
+      'phone',
+      'company',
+      'followUpDate',
+    ]);
 
     const contact = db
       .update(schema.contacts)
@@ -130,7 +144,12 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   // DELETE /contacts/:id - Soft delete contact (move to wastebin)
   app.delete('/:id', (c) => {
-    const result = withEntityAccess<InferSelectModel<typeof schema.contacts>>(c, db, schema.contacts, 'Contact');
+    const result = withEntityAccess<InferSelectModel<typeof schema.contacts>>(
+      c,
+      db,
+      schema.contacts,
+      'Contact',
+    );
     if (!result.success) return result.response;
 
     const now = new Date().toISOString();
@@ -208,4 +227,3 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
 
   return app;
 }
-

@@ -1,10 +1,8 @@
 import { NavLink } from 'react-router-dom';
-
-import { useAuth } from '../context/AuthContext';
-
-import { navItems, adminItems } from '../config/navigation';
-import { navLinkBase, navLinkActive, navLinkInactive, cn } from '../utils/styles';
+import { adminItems, navItems } from '../config/navigation';
 import { ROLES } from '../constants';
+import { useAuth } from '../context/AuthContext';
+import { cn, navLinkActive, navLinkBase, navLinkInactive } from '../utils/styles';
 
 export default function TopNav() {
   const { user, logout } = useAuth();
@@ -16,7 +14,13 @@ export default function TopNav() {
           {/* Logo and App Name */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-warm-400 to-warm-600 flex items-center justify-center shadow-lg shadow-warm-500/25">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                className="w-5 h-5 text-white"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden
+              >
+                <title>KeepWarm logo</title>
                 <path d="M12 2C9 5 7 8 7 11c0 2.5 1.5 4.5 3.5 5.5L9 22h6l-1.5-5.5C15.5 15.5 17 13.5 17 11c0-3-2-6-5-9zm0 4c1.5 2 2.5 4 2.5 5.5 0 1.5-1 2.5-2.5 2.5s-2.5-1-2.5-2.5C9.5 10 10.5 8 12 6z" />
               </svg>
             </div>
@@ -62,16 +66,30 @@ export default function TopNav() {
             {user && (
               <div className="text-right">
                 <p className="text-sm font-medium text-white">{user.name}</p>
-                <p className="text-xs text-dark-400">{user.role === ROLES.ADMIN ? 'Admin' : 'Seller'}</p>
+                <p className="text-xs text-dark-400">
+                  {user.role === ROLES.ADMIN ? 'Admin' : 'Seller'}
+                </p>
               </div>
             )}
             <button
+              type="button"
               onClick={logout}
               className="p-2 text-dark-400 hover:text-white hover:bg-dark-800 rounded-lg transition-colors"
               aria-label="Logout"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
               </svg>
             </button>
           </div>
@@ -80,4 +98,3 @@ export default function TopNav() {
     </nav>
   );
 }
-

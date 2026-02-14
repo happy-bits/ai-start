@@ -1,15 +1,15 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { ROLES } from '../src/constants.js';
 import {
-  setupTest,
-  get,
-  post,
-  expectOk,
-  expectUnauthorized,
   expectBadRequest,
   expectJson,
+  expectOk,
+  expectUnauthorized,
+  get,
+  post,
+  setupTest,
   type TestContext,
 } from './setup.js';
-import { ROLES } from '../src/constants.js';
 
 describe('Auth Routes', () => {
   let ctx: TestContext;
@@ -24,7 +24,7 @@ describe('Auth Routes', () => {
         await post(ctx.app, '/auth/login', null, {
           email: 'admin@test.com',
           password: 'password123',
-        })
+        }),
       );
       expect(data.token).toBeDefined();
       expect(data.user.email).toBe('admin@test.com');
@@ -37,7 +37,7 @@ describe('Auth Routes', () => {
           email: 'admin@test.com',
           password: 'wrongpassword',
         }),
-        401
+        401,
       );
       expect(data.error).toBe('Invalid email or password');
     });
@@ -47,7 +47,7 @@ describe('Auth Routes', () => {
         await post(ctx.app, '/auth/login', null, {
           email: 'nobody@test.com',
           password: 'password123',
-        })
+        }),
       );
     });
 
@@ -56,7 +56,7 @@ describe('Auth Routes', () => {
         await post(ctx.app, '/auth/login', null, {
           email: 'not-an-email',
           password: 'password123',
-        })
+        }),
       );
     });
   });
@@ -64,7 +64,7 @@ describe('Auth Routes', () => {
   describe('POST /auth/logout', () => {
     it('should logout successfully', async () => {
       const data = await expectOk<{ message: string }>(
-        await post(ctx.app, '/auth/logout', ctx.adminToken, {})
+        await post(ctx.app, '/auth/logout', ctx.adminToken, {}),
       );
       expect(data.message).toBe('Logged out successfully');
     });
@@ -81,7 +81,7 @@ describe('Auth Routes', () => {
   describe('GET /api/me', () => {
     it('should return current user info', async () => {
       const data = await expectOk<{ user: { email: string; role: string } }>(
-        await get(ctx.app, '/api/me', ctx.sellerToken)
+        await get(ctx.app, '/api/me', ctx.sellerToken),
       );
       expect(data.user.email).toBe('seller@test.com');
       expect(data.user.role).toBe(ROLES.SELLER);
@@ -96,5 +96,3 @@ describe('Auth Routes', () => {
     });
   });
 });
-
-

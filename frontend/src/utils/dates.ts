@@ -24,7 +24,7 @@ export function formatDate(
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  }
+  },
 ): string {
   const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
   return date.toLocaleDateString(undefined, options);
@@ -38,7 +38,7 @@ export function formatDate(
 function isWorkDay(dateString: string | Date): boolean {
   const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
   const dayOfWeek = date.getDay();
-  
+
   // Weekend check (0 = Sunday, 6 = Saturday)
   // Work days are Monday (1) through Friday (5)
   return dayOfWeek >= 1 && dayOfWeek <= 5;
@@ -51,9 +51,9 @@ function isWorkDay(dateString: string | Date): boolean {
  */
 export function addWorkDaysFromToday(workDays: number): string {
   const today = new Date();
-  let currentDate = new Date(today);
+  const currentDate = new Date(today);
   let daysAdded = 0;
-  
+
   // Add work days
   while (daysAdded < workDays) {
     currentDate.setDate(currentDate.getDate() + 1);
@@ -61,7 +61,7 @@ export function addWorkDaysFromToday(workDays: number): string {
       daysAdded++;
     }
   }
-  
+
   return currentDate.toISOString().split('T')[0];
 }
 
@@ -86,4 +86,3 @@ export function addMonthsFromToday(months: number): string {
   date.setMonth(date.getMonth() + months);
   return date.toISOString().split('T')[0];
 }
-

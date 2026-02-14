@@ -1,11 +1,10 @@
+import { mkdirSync } from 'node:fs';
+import path, { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
-import * as schema from './schema.js';
 import { ROLES } from '../constants.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { mkdirSync } from 'fs';
+import * as schema from './schema.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -18,7 +17,7 @@ const DB_PATH = process.env.DB_PATH || DEFAULT_DB_PATH;
 const dbDir = path.dirname(DB_PATH);
 try {
   mkdirSync(dbDir, { recursive: true });
-} catch (error) {
+} catch (_error) {
   // Directory might already exist, ignore
 }
 
@@ -96,6 +95,3 @@ export function resetDatabase() {
   `);
   initializeDatabase();
 }
-
-
-

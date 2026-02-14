@@ -1,14 +1,16 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 
-import { useInteraction, useCreateInteraction, useUpdateInteraction } from '../../api/interactions';
+import { useCreateInteraction, useInteraction, useUpdateInteraction } from '../../api/interactions';
+import type {
+  CreateInteractionData,
+  Interaction,
+  InteractionType,
+  UpdateInteractionData,
+} from '../../api/types';
 import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
-
-import { Button, Input, Select, Textarea, LoadingSpinner, ErrorMessage } from '../../components/ui';
-
+import { Button, ErrorMessage, Input, LoadingSpinner, Select, Textarea } from '../../components/ui';
 import { useFormSubmission } from '../../hooks/useFormSubmission';
-import { getTodayISO, getCurrentTimeHHMM } from '../../utils';
-
-import type { InteractionType, Interaction, CreateInteractionData, UpdateInteractionData } from '../../api/types';
+import { getCurrentTimeHHMM, getTodayISO } from '../../utils';
 
 interface InteractionFormProps {
   contactId: number;
@@ -106,9 +108,7 @@ export default function InteractionForm({
       <Select
         label="Type"
         value={formData.type}
-        onChange={(e) =>
-          setFormData({ ...formData, type: e.target.value as InteractionType })
-        }
+        onChange={(e) => setFormData({ ...formData, type: e.target.value as InteractionType })}
         options={INTERACTION_TYPE_OPTIONS}
       />
 
@@ -141,11 +141,7 @@ export default function InteractionForm({
         <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-          type="submit"
-          size="sm"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" size="sm" disabled={isSubmitting}>
           {isSubmitting ? (
             <span className="flex items-center gap-2">
               <LoadingSpinner size="sm" />
@@ -161,4 +157,3 @@ export default function InteractionForm({
     </form>
   );
 }
-

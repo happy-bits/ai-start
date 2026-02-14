@@ -3,4 +3,3 @@ export const ROLES = {
   ADMIN: 'admin',
   SELLER: 'seller',
 } as const;
-

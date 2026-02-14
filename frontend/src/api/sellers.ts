@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './client';
-import type { Seller, CreateSellerData, UpdateSellerData } from './types';
+import type { CreateSellerData, Seller, UpdateSellerData } from './types';
 
 // API functions
 export async function getSellers(): Promise<Seller[]> {
@@ -58,8 +58,7 @@ export function useUpdateSeller() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateSellerData }) =>
-      updateSeller(id, data),
+    mutationFn: ({ id, data }: { id: number; data: UpdateSellerData }) => updateSeller(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['sellers'] });
       queryClient.invalidateQueries({ queryKey: ['sellers', id] });
@@ -77,4 +76,3 @@ export function useDeleteSeller() {
     },
   });
 }
-

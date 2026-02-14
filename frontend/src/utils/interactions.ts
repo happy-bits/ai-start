@@ -31,7 +31,7 @@ export function sortInteractionsByRecency(interactions: Interaction[]): Interact
 export function getLatestInteractionsForContact(
   interactions: Interaction[],
   contactId: number,
-  limit: number = 3
+  limit: number = 3,
 ): Interaction[] {
   const filtered = interactions.filter((interaction) => interaction.contactId === contactId);
   return sortInteractionsByRecency(filtered).slice(0, limit);

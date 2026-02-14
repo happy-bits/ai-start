@@ -1,4 +1,4 @@
-import { ROLES } from '../constants';
+import type { ROLES } from '../constants';
 
 // User types
 export interface User {
@@ -115,4 +115,3 @@ export interface LoginResponse {
   token: string;
   user: User;
 }
-

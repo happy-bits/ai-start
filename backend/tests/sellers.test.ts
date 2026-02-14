@@ -1,20 +1,20 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { ROLES } from '../src/constants.js';
 import {
-  setupTest,
+  del,
+  expectBadRequest,
+  expectCreated,
+  expectForbidden,
+  expectJson,
+  expectNotFound,
+  expectOk,
+  expectUnauthorized,
   get,
   post,
   put,
-  del,
-  expectOk,
-  expectCreated,
-  expectNotFound,
-  expectForbidden,
-  expectUnauthorized,
-  expectBadRequest,
-  expectJson,
+  setupTest,
   type TestContext,
 } from './setup.js';
-import { ROLES } from '../src/constants.js';
 
 describe('Seller Routes', () => {
   let ctx: TestContext;
@@ -26,7 +26,7 @@ describe('Seller Routes', () => {
   describe('GET /api/sellers', () => {
     it('should list all sellers as admin', async () => {
       const data = await expectOk<{ sellers: { email: string }[] }>(
-        await get(ctx.app, '/api/sellers', ctx.adminToken)
+        await get(ctx.app, '/api/sellers', ctx.adminToken),
       );
       expect(data.sellers).toHaveLength(2);
       expect(data.sellers.map((s) => s.email)).toContain('seller@test.com');
@@ -45,7 +45,7 @@ describe('Seller Routes', () => {
   describe('GET /api/sellers/:id', () => {
     it('should get seller details as admin', async () => {
       const data = await expectOk<{ seller: { email: string; name: string } }>(
-        await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken)
+        await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken),
       );
       expect(data.seller.email).toBe('seller@test.com');
       expect(data.seller.name).toBe('Test Seller');
@@ -62,16 +62,18 @@ describe('Seller Routes', () => {
 
   describe('POST /api/sellers', () => {
     it('should create new seller as admin', async () => {
-      const data = await expectCreated<{ seller: { email: string; name: string; role: string; id: number } }>(
+      const data = await expectCreated<{
+        seller: { email: string; name: string; role: string; id: number };
+      }>(
         await post(ctx.app, '/api/sellers', ctx.adminToken, {
           email: 'newseller@test.com',
           password: 'newpassword123',
           name: 'New Seller',
-        })
+        }),
       );
 
       const retrieved = await expectOk<{ seller: { email: string; name: string; role: string } }>(
-        await get(ctx.app, `/api/sellers/${data.seller.id}`, ctx.adminToken)
+        await get(ctx.app, `/api/sellers/${data.seller.id}`, ctx.adminToken),
       );
       expect(retrieved.seller.email).toBe('newseller@test.com');
       expect(retrieved.seller.name).toBe('New Seller');
@@ -85,7 +87,7 @@ describe('Seller Routes', () => {
           password: 'password123',
           name: 'Duplicate Seller',
         }),
-        409
+        409,
       );
     });
 
@@ -95,7 +97,7 @@ describe('Seller Routes', () => {
           email: 'newseller@test.com',
           password: '123',
           name: 'New Seller',
-        })
+        }),
       );
     });
 
@@ -105,34 +107,34 @@ describe('Seller Routes', () => {
           email: 'newseller@test.com',
           password: 'newpassword123',
           name: 'New Seller',
-        })
+        }),
       );
     });
   });
 
   describe('PUT /api/sellers/:id', () => {
     it('should update seller as admin', async () => {
-      const data = await expectOk<{ seller: { name: string } }>(
+      const _data = await expectOk<{ seller: { name: string } }>(
         await put(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken, {
           name: 'Updated Seller Name',
-        })
+        }),
       );
 
       const retrieved = await expectOk<{ seller: { name: string } }>(
-        await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken)
+        await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken),
       );
       expect(retrieved.seller.name).toBe('Updated Seller Name');
     });
 
     it('should update seller email', async () => {
-      const data = await expectOk<{ seller: { email: string } }>(
+      const _data = await expectOk<{ seller: { email: string } }>(
         await put(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken, {
           email: 'updated@test.com',
-        })
+        }),
       );
 
       const retrieved = await expectOk<{ seller: { email: string } }>(
-        await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken)
+        await get(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken),
       );
       expect(retrieved.seller.email).toBe('updated@test.com');
     });
@@ -142,7 +144,7 @@ describe('Seller Routes', () => {
         await put(ctx.app, `/api/sellers/${ctx.sellerId}`, ctx.adminToken, {
           email: 'seller2@test.com',
         }),
-        409
+        409,
       );
     });
 
@@ -150,7 +152,7 @@ describe('Seller Routes', () => {
       await expectNotFound(
         await put(ctx.app, '/api/sellers/9999', ctx.adminToken, {
           name: 'Updated',
-        })
+        }),
       );
     });
   });

@@ -1,13 +1,13 @@
 import { useInlineEdit } from '../../hooks/useInlineEdit';
 import {
-  inlineEditableInputBase,
+  cn,
+  formErrorTextSmall,
+  formInputBorderError,
   inlineEditableDisplayBase,
   inlineEditableEmpty,
-  inlineEditableTextNormal,
+  inlineEditableInputBase,
   inlineEditableTextEmail,
-  formInputBorderError,
-  formErrorTextSmall,
-  cn,
+  inlineEditableTextNormal,
 } from '../../utils/styles';
 
 interface InlineEditableProps {
@@ -31,7 +31,7 @@ export default function InlineEditable({
 }: InlineEditableProps) {
   const validate = (val: string): string | null => {
     const trimmed = val.trim();
-    
+
     if (trimmed === '') {
       return null; // Empty is valid (will be saved as null)
     }
@@ -45,7 +45,7 @@ export default function InlineEditable({
 
     if (type === 'tel') {
       // Basic phone validation - allow international format
-      const phoneRegex = /^[\d\s\+\-\(\)]+$/;
+      const phoneRegex = /^[\d\s+\-()]+$/;
       if (!phoneRegex.test(trimmed) || trimmed.length < 3) {
         return 'Invalid phone format';
       }
@@ -88,15 +88,11 @@ export default function InlineEditable({
             inlineEditableInputBase,
             error ? formInputBorderError : '',
             error ? 'focus:ring-red-500/50' : '',
-            className
+            className,
           )}
           disabled={isSaving}
         />
-        {error && (
-          <p className={cn('mt-1', formErrorTextSmall)}>
-            {error}
-          </p>
-        )}
+        {error && <p className={cn('mt-1', formErrorTextSmall)}>{error}</p>}
       </div>
     );
   }
@@ -108,23 +104,24 @@ export default function InlineEditable({
   const hasTextColor = /\btext-/.test(className);
 
   return (
-    <p
+    <button
+      type="button"
       onClick={handleClick}
       className={cn(
+        'text-left w-full bg-transparent border-none p-0',
         inlineEditableDisplayBase,
         className,
-        !hasTextColor && (isEmpty
-          ? inlineEditableEmpty
-          : type === 'email'
-          ? inlineEditableTextEmail
-          : inlineEditableTextNormal)
+        !hasTextColor &&
+          (isEmpty
+            ? inlineEditableEmpty
+            : type === 'email'
+              ? inlineEditableTextEmail
+              : inlineEditableTextNormal),
       )}
       title={isEmpty ? emptyText : 'Click to edit'}
       aria-label={ariaLabel || placeholder || emptyText}
-      role="button"
     >
       {isEmpty ? emptyText : displayValue}
-    </p>
+    </button>
   );
 }
-

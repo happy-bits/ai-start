@@ -1,12 +1,9 @@
-import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
-import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import type { InferSelectModel } from 'drizzle-orm';
-import * as schema from '../db/schema.js';
-import { type AuthVariables } from '../middleware/auth.js';
-import { withEntityAccess, buildUpdateValues, checkSellerAccess } from './helpers.js';
+import { and, eq } from 'drizzle-orm';
+import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { Hono } from 'hono';
+import { z } from 'zod';
 import {
   DATE_FORMAT_MESSAGE,
   DATE_FORMAT_REGEX,
@@ -14,6 +11,9 @@ import {
   INTERACTION_TYPE_VALUES,
   ROLES,
 } from '../constants.js';
+import * as schema from '../db/schema.js';
+import type { AuthVariables } from '../middleware/auth.js';
+import { buildUpdateValues, checkSellerAccess, withEntityAccess } from './helpers.js';
 
 const createInteractionSchema = z.object({
   contactId: z.number().int().positive(),
@@ -38,12 +38,12 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
     const user = c.get('user');
     const contactId = c.req.query('contactId');
 
-    let conditions: ReturnType<typeof eq>[] = [];
+    const conditions: ReturnType<typeof eq>[] = [];
 
     // Filter by contact if provided
     if (contactId) {
       const id = parseInt(contactId, 10);
-      if (isNaN(id)) {
+      if (Number.isNaN(id)) {
         return c.json({ error: ERROR_MESSAGES.INVALID_CONTACT_ID }, 400);
       }
       conditions.push(eq(schema.interactions.contactId, id));
@@ -65,7 +65,12 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
   // GET /interactions/:id - Get interaction details
   app.get('/:id', (c) => {
-    const result = withEntityAccess<InferSelectModel<typeof schema.interactions>>(c, db, schema.interactions, 'Interaction');
+    const result = withEntityAccess<InferSelectModel<typeof schema.interactions>>(
+      c,
+      db,
+      schema.interactions,
+      'Interaction',
+    );
     if (!result.success) return result.response;
 
     return c.json({ interaction: result.entity });
@@ -114,7 +119,12 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
   // PUT /interactions/:id - Update interaction
   app.put('/:id', zValidator('json', updateInteractionSchema), (c) => {
-    const result = withEntityAccess<InferSelectModel<typeof schema.interactions>>(c, db, schema.interactions, 'Interaction');
+    const result = withEntityAccess<InferSelectModel<typeof schema.interactions>>(
+      c,
+      db,
+      schema.interactions,
+      'Interaction',
+    );
     if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
@@ -132,7 +142,12 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
   // DELETE /interactions/:id - Delete interaction
   app.delete('/:id', (c) => {
-    const result = withEntityAccess<InferSelectModel<typeof schema.interactions>>(c, db, schema.interactions, 'Interaction');
+    const result = withEntityAccess<InferSelectModel<typeof schema.interactions>>(
+      c,
+      db,
+      schema.interactions,
+      'Interaction',
+    );
     if (!result.success) return result.response;
 
     db.delete(schema.interactions).where(eq(schema.interactions.id, result.entity.id)).run();
@@ -142,6 +157,3 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
 
   return app;
 }
-
-
-

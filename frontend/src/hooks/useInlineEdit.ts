@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type KeyboardEvent } from 'react';
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 interface UseInlineEditOptions<TValue> {
   value: TValue;
@@ -47,7 +47,7 @@ export function useInlineEdit<TValue extends string | null>({
 
   const handleBlur = async () => {
     const trimmed = editValue.trim();
-    
+
     // Validate if validator provided
     if (validate) {
       const validationError = validate(editValue);
@@ -61,7 +61,9 @@ export function useInlineEdit<TValue extends string | null>({
     setError(null);
 
     // Transform value if transformer provided
-    const newValue = transformValue ? transformValue(trimmed) : (trimmed === '' ? null : trimmed) as TValue;
+    const newValue = transformValue
+      ? transformValue(trimmed)
+      : ((trimmed === '' ? null : trimmed) as TValue);
 
     // Only save if value changed
     if (newValue !== value) {
@@ -69,7 +71,7 @@ export function useInlineEdit<TValue extends string | null>({
       try {
         await onSave(newValue);
         setIsEditing(false);
-      } catch (err) {
+      } catch (_err) {
         // Revert on error
         setEditValue(value || '');
         setError('Failed to save');
@@ -114,4 +116,3 @@ export function useInlineEdit<TValue extends string | null>({
     handleChange,
   };
 }
-

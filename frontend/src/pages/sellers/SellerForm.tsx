@@ -1,14 +1,11 @@
-import { useState, useEffect, type FormEvent } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { type FormEvent, useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 
-import { useSeller, useCreateSeller, useUpdateSeller } from '../../api/sellers';
-
-import { Button, Card, Input, LoadingSpinner, BackButton, ErrorMessage } from '../../components/ui';
-
+import { useCreateSeller, useSeller, useUpdateSeller } from '../../api/sellers';
+import type { CreateSellerData, Seller, UpdateSellerData } from '../../api/types';
+import { BackButton, Button, Card, ErrorMessage, Input, LoadingSpinner } from '../../components/ui';
 import { config } from '../../config';
 import { useFormSubmission } from '../../hooks/useFormSubmission';
-
-import type { Seller, CreateSellerData, UpdateSellerData } from '../../api/types';
 
 export default function SellerForm() {
   const { id } = useParams<{ id: string }>();
@@ -166,9 +163,7 @@ export default function SellerForm() {
           />
 
           {!isEditing && (
-            <p className="text-sm text-dark-500">
-              Password must be at least 6 characters
-            </p>
+            <p className="text-sm text-dark-500">Password must be at least 6 characters</p>
           )}
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark-700">
@@ -177,10 +172,7 @@ export default function SellerForm() {
                 Cancel
               </Button>
             </Link>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <LoadingSpinner size="sm" />
@@ -198,4 +190,3 @@ export default function SellerForm() {
     </div>
   );
 }
-
