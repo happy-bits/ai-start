@@ -9,6 +9,7 @@ import type * as schema from './db/schema.js';
 import { seedDatabase } from './db/seed.js';
 import { type AuthVariables, authMiddleware } from './middleware/auth.js';
 import { createAuthRoutes } from './routes/auth.js';
+
 import { createContactRoutes } from './routes/contacts.js';
 import { createInteractionRoutes } from './routes/interactions.js';
 import { createSellerRoutes } from './routes/sellers.js';
