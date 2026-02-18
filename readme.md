@@ -44,7 +44,11 @@ Starta
     npm run dev
 
 
-Testa på fem olika sätt:
+Kör tester:
+
+    npm run test                "Vitest", kör alla tester utom "e2e"
+
+Kör e2e-tester
 
     npm run test:e2e	        Snabbast stättet att köra (ingen browser eller ui)
     npm run test:e2e:ui	        Visuell interaktiv debugger
