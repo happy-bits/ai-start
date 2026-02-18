@@ -33,6 +33,7 @@ export default function TopNav() {
               <NavLink
                 key={item.to}
                 to={item.to}
+                end={item.end}
                 className={({ isActive }) =>
                   cn(navLinkBase, isActive ? navLinkActive : navLinkInactive)
                 }

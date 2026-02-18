@@ -29,6 +29,10 @@ test('wastebin', async ({ page }) => {
   await expect(page.getByText('Contacts29')).toBeVisible();
   await page.getByRole('link', { name: 'Wastebin' }).click();
   await expect(page.getByText('Deleted Contacts1')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Contacts', exact: true })).not.toHaveAttribute(
+    'aria-current',
+    'page',
+  );
 
   await expect(page.getByLabel('Expand contact details')).toMatchAriaSnapshot(`
     - button "Expand contact details":
@@ -75,6 +79,10 @@ test('permanent delete', async ({ page }) => {
   await expect(page.getByText('Contacts29')).toBeVisible();
   await page.getByRole('link', { name: 'Wastebin' }).click();
   await expect(page.getByText('Deleted Contacts1')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Contacts', exact: true })).not.toHaveAttribute(
+    'aria-current',
+    'page',
+  );
 
   // Permanent delete
 

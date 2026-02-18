@@ -4,12 +4,14 @@ interface NavItem {
   to: string;
   label: string;
   icon: ReactNode;
+  end?: boolean;
 }
 
 export const navItems: NavItem[] = [
   {
     to: '/contacts',
     label: 'Contacts',
+    end: true,
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
         <title>Contacts</title>
