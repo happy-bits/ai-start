@@ -1,15 +1,17 @@
+import { getToday } from './clock';
+
 /**
  * Get today's date as an ISO string (YYYY-MM-DD)
  */
 export function getTodayISO(): string {
-  return new Date().toISOString().split('T')[0];
+  return getToday().toISOString().split('T')[0];
 }
 
 /**
  * Get the current time in HH:MM format
  */
 export function getCurrentTimeHHMM(): string {
-  return new Date().toTimeString().slice(0, 5);
+  return getToday().toTimeString().slice(0, 5);
 }
 
 /**
@@ -50,7 +52,7 @@ function isWorkDay(dateString: string | Date): boolean {
  * @returns New ISO date string (YYYY-MM-DD)
  */
 export function addWorkDaysFromToday(workDays: number): string {
-  const today = new Date();
+  const today = getToday();
   const currentDate = new Date(today);
   let daysAdded = 0;
 
@@ -71,7 +73,7 @@ export function addWorkDaysFromToday(workDays: number): string {
  * @returns New ISO date string (YYYY-MM-DD)
  */
 export function addDaysFromToday(days: number): string {
-  const date = new Date();
+  const date = new Date(getToday());
   date.setDate(date.getDate() + days);
   return date.toISOString().split('T')[0];
 }
@@ -82,7 +84,7 @@ export function addDaysFromToday(days: number): string {
  * @returns New ISO date string (YYYY-MM-DD)
  */
 export function addMonthsFromToday(months: number): string {
-  const date = new Date();
+  const date = new Date(getToday());
   date.setMonth(date.getMonth() + months);
   return date.toISOString().split('T')[0];
 }
