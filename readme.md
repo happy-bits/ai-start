@@ -64,5 +64,6 @@ Kör enstaka tester
 
     npm run test:e2e:trace -- e2e/inline-editing.spec.ts
     npm run test:e2e contact-delete.spec.ts
+    npm run test:e2e:debug e2e/contact-followup-date.spec.ts
 
 
