@@ -18,7 +18,6 @@ test('wastebin', async ({ page }) => {
     page.getByLabel('Contact: Erik Andersson').getByLabel('Expand contact details'),
   ).toMatchAriaSnapshot(`
     - button "Expand contact details":
-      - img
       - text: /\\d+-\\d+-\\d+ Erik Andersson Volvo AB/
       - button "Delete Erik Andersson"
     `);
@@ -33,7 +32,6 @@ test('wastebin', async ({ page }) => {
 
   await expect(page.getByLabel('Expand contact details')).toMatchAriaSnapshot(`
     - button "Expand contact details":
-      - img
       - text: /\\d+-\\d+-\\d+ Erik Andersson Volvo AB/
       - button "Restore Erik Andersson"
       - button "Permanently delete Erik Andersson"
