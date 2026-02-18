@@ -48,21 +48,21 @@ Kör tester:
 
     npm run test                "Vitest", kör alla tester utom "e2e"
 
-Kör e2e-tester
+Kör e2e-tester 🦄
 
-    npm run test:e2e	        Snabbast stättet att köra (ingen browser eller ui) 🦄
+    npm run test:e2e	        Snabbast stättet att köra (ingen browser eller ui) 
+    npm run test:e2e:debug	    Kan stega, interaktivt 
+    npm run test:e2e:codegen    Skapa e2e-tester grafiskt 
+
+Fler sätt:
+
     npm run test:e2e:ui	        Visuell interaktiv debugger
     npm run test:e2e:headed	    Öppnar en webläsare och kör testet
     npm run test:e2e:trace	    Skapa en interaktiv rapport med skärmdumpar o nätverkslogg
-    npm run test:e2e:debug	    Kan stega, interaktivt 🦄
 
-Kör bara ett test
+Kör enstaka tester
 
     npm run test:e2e:trace -- e2e/inline-editing.spec.ts
-
     npm run test:e2e contact-delete.spec.ts
 
 
-Skapa e2e-tester med playwright
-
-    npx playwright codegen http://localhost:5173/ 🦄
