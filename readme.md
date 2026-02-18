@@ -50,11 +50,11 @@ Kör tester:
 
 Kör e2e-tester
 
-    npm run test:e2e	        Snabbast stättet att köra (ingen browser eller ui)
+    npm run test:e2e	        Snabbast stättet att köra (ingen browser eller ui) 🦄
     npm run test:e2e:ui	        Visuell interaktiv debugger
     npm run test:e2e:headed	    Öppnar en webläsare och kör testet
     npm run test:e2e:trace	    Skapa en interaktiv rapport med skärmdumpar o nätverkslogg
-    npm run test:e2e:debug	    Kan stega, interaktivt
+    npm run test:e2e:debug	    Kan stega, interaktivt 🦄
 
 Kör bara ett test
 
@@ -65,4 +65,4 @@ Kör bara ett test
 
 Skapa e2e-tester med playwright
 
-    npx playwright codegen http://localhost:5173/
+    npx playwright codegen http://localhost:5173/ 🦄
