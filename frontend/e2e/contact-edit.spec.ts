@@ -1,13 +1,21 @@
 import { expect, test } from '@playwright/test';
 
 test('edit a contact', async ({ page }) => {
-  // Login as Maria
+  /*
+  STARTUP
+
+  Reset database and login as Maria
+  */
 
   await page.goto('http://localhost:5173/login');
   await page.getByRole('button', { name: 'Reset database to initial' }).click();
   await page.getByRole('button', { name: 'Quick login as Maria (Seller)' }).click();
 
-  // Edit a contact's name, email, phonenumber
+  /*
+  EDIT CONTACT
+
+  Expand Erik's details and edit name, company, email, and phone number
+  */
 
   await page
     .getByRole('article', { name: 'Contact: Erik Andersson' })
@@ -25,7 +33,11 @@ test('edit a contact', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Phone for Erik Anderssonnnn' }).fill('+46 70 123 45 88');
   await page.getByRole('heading', { name: 'Follow-up Date' }).click();
 
-  // Verify
+  /*
+  VERIFY
+
+  Verify the updated contact fields are displayed correctly
+  */
 
   await expect(page.getByLabel('Contact: Erik Anderssonnnn')).toMatchAriaSnapshot(`
     - button "Contact name for Erik Anderssonnnn"
