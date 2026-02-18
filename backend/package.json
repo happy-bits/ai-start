@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "dev:seed": "SEED_DB=true npm run dev",
+    "dev:seed:powershell": "$env:SEED_DB=\"true\"; npm run dev",
+    "dev:seed:commandline": "SEED_DB=true && npm run dev",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "vitest",

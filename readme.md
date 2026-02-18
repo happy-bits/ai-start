@@ -12,13 +12,17 @@ Installera
 
 Starta första gången
 
-    SEED_DB=true npm run dev  
+    npm run dev:seed 
 
-    If you use PowerShell you write this instead: $env:SEED_DB="true"; npm run dev
+    Alternativt om du använder Powershell:
 
-    If you use Command line (PC) you write: SEED_DB=true && npm run dev
+    npm run dev:seed:powershell
 
-Starta i fortsättningen
+    Alternativt om du använder Commandline:
+
+    npm run dev:seed:commandline
+
+I fortsättningen kan du starta backend utan att seeda med:
     
     npm run dev
 
@@ -26,7 +30,7 @@ Kör tester
 
     npm run test
 
-Testerna körs automatiskt om när det behövs
+Testerna körs automatiskt när en fil ändras
 
 
 # Frontend
