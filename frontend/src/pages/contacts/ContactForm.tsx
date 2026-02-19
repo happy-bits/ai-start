@@ -20,6 +20,7 @@ export default function ContactForm() {
     name: '',
     email: '',
     phone: '',
+    linkedin: '',
     company: '',
   });
 
@@ -29,6 +30,7 @@ export default function ContactForm() {
         name: existingContact.name,
         email: existingContact.email || '',
         phone: existingContact.phone || '',
+        linkedin: existingContact.linkedin || '',
         company: existingContact.company || '',
       });
     }
@@ -61,6 +63,7 @@ export default function ContactForm() {
       name: formData.name.trim(),
       email: formData.email.trim() || null,
       phone: formData.phone.trim() || null,
+      linkedin: formData.linkedin.trim() || null,
       company: formData.company.trim() || null,
     };
     handleSubmit(e, data);
@@ -71,6 +74,7 @@ export default function ContactForm() {
       name: 'Mikael Pettersson',
       email: 'mikael.petterson@volvo.com',
       phone: '+46 70 123 45 67',
+      linkedin: 'mikael-pettersson',
       company: 'Volvo AB',
     });
   };
@@ -123,7 +127,7 @@ export default function ContactForm() {
             required
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <Input
               label="Email"
               type="email"
@@ -138,6 +142,13 @@ export default function ContactForm() {
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               placeholder="+1 (555) 123-4567"
+            />
+
+            <Input
+              label="LinkedIn"
+              value={formData.linkedin}
+              onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+              placeholder="username"
             />
           </div>
 

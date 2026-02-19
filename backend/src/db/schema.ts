@@ -40,6 +40,7 @@ export const contacts = sqliteTable('contacts', {
   email: text('email'),
   phone: text('phone'),
   company: text('company'),
+  linkedin: text('linkedin'),
   followUpDate: text('follow_up_date'),
   deletedAt: text('deleted_at'),
   createdAt: text('created_at')

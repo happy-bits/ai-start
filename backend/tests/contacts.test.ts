@@ -162,6 +162,39 @@ describe('Contact Routes', () => {
         }),
       );
     });
+
+    it('should create contact with LinkedIn username and store as username only', async () => {
+      const data = await expectCreated<{
+        contact: { name: string; linkedin: string | null; id: number };
+      }>(
+        await post(ctx.app, '/api/contacts', ctx.sellerToken, {
+          name: 'LinkedIn Contact',
+          linkedin: 'jane-doe',
+        }),
+      );
+
+      const retrieved = await expectOk<{ contact: { name: string; linkedin: string | null } }>(
+        await get(ctx.app, `/api/contacts/${data.contact.id}`, ctx.sellerToken),
+      );
+      expect(retrieved.contact.name).toBe('LinkedIn Contact');
+      expect(retrieved.contact.linkedin).toBe('jane-doe');
+    });
+
+    it('should normalize full LinkedIn URL to username on create', async () => {
+      const data = await expectCreated<{
+        contact: { name: string; linkedin: string | null; id: number };
+      }>(
+        await post(ctx.app, '/api/contacts', ctx.sellerToken, {
+          name: 'URL LinkedIn Contact',
+          linkedin: 'https://www.linkedin.com/in/john-smith/',
+        }),
+      );
+
+      const retrieved = await expectOk<{ contact: { name: string; linkedin: string | null } }>(
+        await get(ctx.app, `/api/contacts/${data.contact.id}`, ctx.sellerToken),
+      );
+      expect(retrieved.contact.linkedin).toBe('john-smith');
+    });
   });
 
   describe('PUT /api/contacts/:id', () => {

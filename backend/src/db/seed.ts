@@ -192,6 +192,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
         ? `${emailBase}${contactNumber + 1}@${companyDomain}.se`
         : `${emailBase}@${companyDomain}.se`;
 
+    const linkedinUsername = swedishNames[i].toLowerCase().replace(/\s+/g, '-');
     const contact = db
       .insert(schema.contacts)
       .values({
@@ -200,6 +201,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
         email: email,
         phone: `+46 70 ${String(123 + i).padStart(3, '0')} ${String(45 + i).padStart(2, '0')} ${String(67 + i).padStart(2, '0')}`,
         company: company,
+        linkedin: i % 3 === 0 ? linkedinUsername : null,
         followUpDate: getFollowUpDate(i),
         createdAt: SEED_DATE,
         updatedAt: SEED_DATE,
