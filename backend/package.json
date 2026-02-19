@@ -12,7 +12,9 @@
     "start": "node dist/index.js",
     "test": "vitest",
     "test:run": "vitest run",
-    "db:seed": "tsx src/db/seed.ts"
+    "db:seed": "tsx src/db/seed.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.6",

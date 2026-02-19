@@ -1,12 +1,12 @@
 import { serve } from '@hono/node-server';
 import { createApp } from './app.js';
-import { db, initializeDatabase, resetDatabase } from './db/index.js';
+import { db, resetDatabase, runMigrations } from './db/index.js';
 import { seedDatabase } from './db/seed.js';
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
-// Initialize database
-initializeDatabase();
+// Run migrations on startup
+runMigrations();
 
 // Seed database if SEED_DB environment variable is set
 if (process.env.SEED_DB === 'true') {

@@ -1,13 +1,12 @@
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { expect } from 'vitest';
 import { createApp } from '../src/app.js';
 import { ROLES } from '../src/constants.js';
+import { createMigratedDatabase } from '../src/db/index.js';
 import * as schema from '../src/db/schema.js';
 import { createSession, hashPassword } from '../src/middleware/auth.js';
 
 export type TestContext = {
-  db: ReturnType<typeof drizzle<typeof schema>>;
+  db: ReturnType<typeof createMigratedDatabase>['db'];
   app: ReturnType<typeof createApp>;
   adminToken: string;
   sellerToken: string;
@@ -20,63 +19,9 @@ export type TestContext = {
   interactionId: number;
 };
 
-// Create a fresh test database
+// Create a fresh test database with migrations applied
 export function createTestDatabase() {
-  const sqlite = new Database(':memory:');
-  sqlite.pragma('foreign_keys = ON');
-
-  // Create tables
-  sqlite.exec(`
-    CREATE TABLE users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT NOT NULL UNIQUE,
-      password_hash TEXT NOT NULL,
-      name TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT '${ROLES.SELLER}' CHECK(role IN ('${ROLES.ADMIN}', '${ROLES.SELLER}')),
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-
-    CREATE TABLE sessions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      token TEXT NOT NULL UNIQUE,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      expires_at TEXT NOT NULL,
-      created_at TEXT NOT NULL
-    );
-
-    CREATE TABLE contacts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      name TEXT NOT NULL,
-      email TEXT,
-      phone TEXT,
-      company TEXT,
-      follow_up_date TEXT,
-      deleted_at TEXT,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-
-    CREATE TABLE interactions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
-      seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      type TEXT NOT NULL CHECK(type IN ('call', 'meeting', 'email', 'video_call', 'note')),
-      date TEXT NOT NULL,
-      time TEXT,
-      notes TEXT,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-
-    CREATE INDEX idx_contacts_seller_id ON contacts(seller_id);
-    CREATE INDEX idx_interactions_contact_id ON interactions(contact_id);
-    CREATE INDEX idx_interactions_seller_id ON interactions(seller_id);
-    CREATE INDEX idx_sessions_token ON sessions(token);
-  `);
-
-  const db = drizzle(sqlite, { schema });
+  const { db } = createMigratedDatabase(':memory:');
   return { db };
 }
 

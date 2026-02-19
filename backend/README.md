@@ -43,9 +43,15 @@ npm test
 npm run test:run
 ```
 
-### Database Seeding
+### Database
 
 ```bash
+# Generate migration from schema changes
+npm run db:generate
+
+# Apply migrations (CLI; migrations also run automatically on dev start)
+npm run db:migrate
+
 # Seed the database manually
 npm run db:seed
 ```

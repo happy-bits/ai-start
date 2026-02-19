@@ -292,9 +292,8 @@ import { fileURLToPath } from 'node:url';
 const currentFile = fileURLToPath(import.meta.url);
 const entryFile = process.argv[1];
 if (currentFile === entryFile || entryFile?.endsWith('seed.ts')) {
-  const { db, rawDb } = await import('./index.js');
-  const { initializeDatabase } = await import('./index.js');
-  initializeDatabase();
+  const { db, rawDb, runMigrations } = await import('./index.js');
+  runMigrations();
   await seedDatabase(db);
   rawDb.close();
 }
