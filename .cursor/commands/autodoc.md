@@ -1,27 +1,27 @@
-Uppdatera dokumentationen i mappen `docs` enligt följande:
+Update the documentation in the `docs` folder according to the following:
 
-## 1. Vad som ska uppdateras
+## 1. What to update
 
-- **Enstaka fil**: Om användaren skriver `/autodoc <filnamn>` uppdateras endast `docs/<filnamn>.md`. Avsluta direkt utan att fråga om nästa dokument.
-  - Exempel: `/autodoc abc` → uppdaterar endast `docs/abc.md` och avslutar.
-- **Alla dokument**: Om inget filnamn anges uppdateras alla dokument (se punkt 2). Uppdatera ett i taget och vänta på bekräftelse mellan varje.
+- **Single file**: If the user types `/autodoc <filename>` only `docs/<filename>.md` is updated. Exit immediately without asking about the next document.
+  - Example: `/autodoc abc` → updates only `docs/abc.md` and exits.
+- **All documents**: If no filename is specified, all documents are updated (see point 2). Update one at a time and wait for confirmation between each.
 
-## 2. Vilka dokument
+## 2. Which documents
 
-- **Alla dokument** = alla `.md`-filer i `docs/` utom `_ai_instructions.md`.
-- **Gör aldrig ändringar** i `docs/_ai_instructions.md`.
+- **All documents** = all `.md` files in `docs/` except `_ai_instructions.md`.
+- **Never make changes** to `docs/_ai_instructions.md`.
 
-## 3. Hur varje dokument uppdateras
+## 3. How each document is updated
 
-Utgå från:
-- Instruktioner i `docs/_ai_instructions.md`
-- Rubriken "Syfte" i dokumentet
+Base the update on:
+- Instructions in `docs/_ai_instructions.md`
+- The "Purpose" heading in the document
 
-Om dokumentet har en sektion "Instruktioner till AI" gäller den före `_ai_instructions.md` vid konflikt.
+If the document has an "Instructions for AI" section, it takes precedence over `_ai_instructions.md` in case of conflict.
 
-## 4. Bekräftelse mellan dokument
+## 4. Confirmation between documents
 
-När flera dokument ska uppdateras:
-- Efter varje uppdatering, ställ frågan "Ska jag fortsätta?"
-- Tomt svar (bara Enter), punktum (`.`), eller korta bekräftelser (t.ex. `j`, `ok`) tolkas som ja.
-- Fortsätt tills alla dokument är uppdaterade eller användaren avbryter.
+When multiple documents are to be updated:
+- After each update, ask the question "Should I continue?"
+- Empty response (just Enter), period (`.`), or short confirmations (e.g. `y`, `ok`) are interpreted as yes.
+- Continue until all documents are updated or the user cancels.
