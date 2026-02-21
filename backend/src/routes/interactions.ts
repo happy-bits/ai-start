@@ -1,6 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import type { InferSelectModel } from 'drizzle-orm';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { Hono } from 'hono';
 import { z } from 'zod';
@@ -81,11 +81,11 @@ export function createInteractionRoutes(db: BetterSQLite3Database<typeof schema>
     const user = c.get('user');
     const data = c.req.valid('json');
 
-    // Verify contact exists and belongs to the seller (or user is admin)
+    // Verify contact exists, is not soft-deleted, and belongs to the seller (or user is admin)
     const contact = db
       .select()
       .from(schema.contacts)
-      .where(eq(schema.contacts.id, data.contactId))
+      .where(and(eq(schema.contacts.id, data.contactId), isNull(schema.contacts.deletedAt)))
       .get();
 
     if (!contact) {

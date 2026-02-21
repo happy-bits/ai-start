@@ -156,6 +156,19 @@ describe('Interaction Routes', () => {
         }),
       );
     });
+
+    it('should reject interaction for soft-deleted contact', async () => {
+      // Soft-delete the contact via API (DELETE /contacts/:id)
+      await expectOk(await del(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken));
+
+      await expectNotFound(
+        await post(ctx.app, '/api/interactions', ctx.sellerToken, {
+          contactId: ctx.contactId,
+          type: 'call',
+          date: '2024-01-22',
+        }),
+      );
+    });
   });
 
   describe('PUT /api/interactions/:id', () => {
