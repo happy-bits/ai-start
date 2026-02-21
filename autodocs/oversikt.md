@@ -116,8 +116,8 @@ Relationer: users → sessions, users → contacts, users → interactions, cont
 
 ### Kontakter
 
-- **ContactList** (`/contacts`) – Lista med sökning, filter, sortering. Kontakter visas i expanderbara rader (expand/collapse). Inline-redigering av namn, företag, email, telefon, LinkedIn, följupp-datum. Varje kontakt kan ha interaktioner; nya interaktioner läggs till via NewInteractionRow. Delete → soft delete (deleted_at sätts).
-- **ContactForm** (`/contacts/new`, `/contacts/:id/edit`) – Formulär för att skapa/redigera kontakt. Används vid "Add Contact" eller redigering.
+- **ContactList** (`/contacts`) – Lista med sökning, filter, sortering. Knappen "Import" öppnar ImportContactsModal för CSV-import. Kontakter visas i expanderbara rader (expand/collapse). Inline-redigering av namn, företag, email, telefon, LinkedIn, följupp-datum. Varje kontakt kan ha interaktioner; nya interaktioner läggs till via NewInteractionRow. Delete → soft delete (deleted_at sätts).
+- **ContactForm** (`/contacts/new`) – Formulär för att skapa ny kontakt. Redigering sker inline i ContactList.
 - **Wastebin** (`/contacts/wastebin`) – Lista över soft-deletade kontakter. Sökning, expand/collapse. Återställ (restore) eller permanent delete.
 
 ### Säljare (admin)
@@ -139,6 +139,7 @@ Relationer: users → sessions, users → contacts, users → interactions, cont
 | `POST /auth/logout` | - | Invaliderar session (token i header) |
 | `GET /api/me` | Bearer | Returnerar inloggad användare |
 | `GET/POST/PUT/DELETE /api/contacts` | Bearer | CRUD för kontakter |
+| `POST /api/contacts/bulk` | Bearer | Bulk-import av kontakter (CSV) |
 | `GET /api/contacts/wastebin` | Bearer | Soft-deletade kontakter |
 | `POST /api/contacts/:id/restore` | Bearer | Återställ från wastebin |
 | `DELETE /api/contacts/:id/permanent` | Bearer | Permanent radering |
@@ -184,6 +185,7 @@ Alla använder TanStack Query för cache och mutationer.
 
 ## Nyckelfunktioner
 
+- **CSV-import** – Säljare kan importera flera kontakter via CSV med kolumnmappning, förhandsvisning och duplicatkontroll (se `autodocs/import-contacts.md`)
 - **Inline-redigering** – Kontakter och interaktioner redigeras direkt i listan utan separata formulär
 - **Följupp-datum med snabbval** – "+1 vecka", "+2 veckor" etc. för snabb planering
 - **LinkedIn-normalisering** – Automatisk extrahering av användarnamn från full URL
@@ -206,7 +208,7 @@ Alla använder TanStack Query för cache och mutationer.
 
 - **Backend**: Vitest i `backend/tests/` – auth, contacts, interactions, sellers
 - **Frontend**: Vitest för utils och komponenter
-- **E2E**: Playwright i `frontend/e2e/` – contact-add, contact-edit, contact-delete, contact-wastebin, contact-followup-date, contact-add-interaction
+- **E2E**: Playwright i `frontend/e2e/` – contact-add, contact-edit, contact-delete, contact-wastebin, contact-followup-date, contact-add-interaction, contact-import
 
 ## Säkerhet
 
@@ -340,8 +342,8 @@ Lösenord för seed-användare finns i seed-filen (t.ex. admin123, seller123).
 /login                    → Login (publik)
 /                         → ProtectedRoute → Layout
   index                   → Redirect till /contacts
-  /contacts               → ContactList
-  /contacts/new           → ContactForm (create)
+  /contacts               → ContactList (inline-redigering)
+  /contacts/new           → ContactForm (skapa ny)
   /contacts/wastebin      → Wastebin
   /sellers                → AdminRoute → SellerList
   /sellers/new            → AdminRoute → SellerForm (create)
@@ -364,9 +366,9 @@ Lösenord för seed-användare finns i seed-filen (t.ex. admin123, seller123).
 
 ## ContactForm och InteractionForm
 
-ContactForm används för att skapa nya kontakter eller redigera befintliga (om routing stödjer edit). Formuläret innehåller fält för namn, email, telefon, företag, LinkedIn och följupp-datum. `useFormSubmission` eller liknande hook hanterar submit, validering och felmeddelanden. Vid lyckad skapande/uppdatering navigeras användaren tillbaka eller till kontaktlistan.
+ContactForm används endast för att skapa nya kontakter via `/contacts/new`. Formuläret innehåller fält för namn, email, telefon, företag, LinkedIn och följupp-datum. `useFormSubmission` hanterar submit, validering och felmeddelanden. Vid lyckad skapande navigeras användaren tillbaka till kontaktlistan.
 
-InteractionForm (om separat) används för att lägga till eller redigera interaktioner. I ContactList används dock främst NewInteractionRow som ett kompakt formulär direkt i den expanderade kontaktraden.
+Redigering av befintliga kontakter sker inline i ContactList via InlineEditable-komponenter. NewInteractionRow används för att lägga till nya interaktioner direkt i den expanderade kontaktraden. InteractionForm finns för redigering av befintliga interaktioner.
 
 ## InlineEditable-mönster
 
@@ -390,6 +392,7 @@ Frontend använder Tailwind med anpassad dark palette: `dark-400`, `dark-700`, `
 - **autodocs/backend.md** – API-struktur, endpoints, middleware
 - **autodocs/frontend.md** – Komponenter, routing, state
 - **autodocs/databas.md** – Schema, tabeller, relationer
+- **autodocs/import-contacts.md** – CSV-import av kontakter (flöde, validering, API)
 
 ## Sammanfattning
 

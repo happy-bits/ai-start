@@ -41,12 +41,12 @@ flowchart TB
     PR --> AR --> SellerForm
 ```
 
-Routing: `/login` är öppen för alla. Inloggade användare når `/contacts` (ContactList), `/contacts/new` (ContactForm), `/contacts/wastebin` (Wastebin). Admin når `/sellers`, `/sellers/new` och `/sellers/:id/edit` (SellerList, SellerForm).
+Routing: `/login` är öppen för alla. Inloggade når `/contacts` (ContactList med inline-redigering), `/contacts/new` (ContactForm), `/contacts/wastebin` (Wastebin). Admin når `/sellers`, `/sellers/new` och `/sellers/:id/edit` (SellerList, SellerForm).
 
 ## State och API
 
-AuthContext håller `user`, `isLoading`, `login` och `logout`. Den validerar token mot `/api/me`. apiClient lagrar JWT i localStorage och skickar `Authorization: Bearer <token>` på alla API-anrop. TanStack Query används för contacts, interactions, sellers och auth med dedikerade hooks som `useContacts`, `useCreateContact`, `useUpdateContact`, `useDeleteContact`, `useWastebinContacts`, `useRestoreContact`, `usePermanentDeleteContact`, samt motsvarande för interactions och sellers.
+AuthContext håller `user`, `isLoading`, `login` och `logout`. Den validerar token mot `/api/me`. apiClient lagrar JWT i localStorage och skickar `Authorization: Bearer <token>` på alla API-anrop. TanStack Query används för contacts, interactions, sellers och auth med dedikerade hooks som `useContacts`, `useCreateContact`, `useCreateContactsBulk`, `useUpdateContact`, `useDeleteContact`, `useWastebinContacts`, `useRestoreContact`, `usePermanentDeleteContact`, samt motsvarande för interactions och sellers.
 
 ## Komponenter
 
-Layout wrappar sidorna med TopNav och Outlet. InlineEditable hanterar inline-redigering för text, e-post, telefon, datum, tid, select och textarea. InlineEditableLinkedIn normaliserar LinkedIn-URL till användarnamn. InlineEditableDateWithQuickActions ger följupp-datum med snabbval. ContactTable är en expanderbar lista med kontakter, interaktioner och inline-redigering. NewInteractionRow är formuläret för nya interaktioner. Övriga komponenter: EmptyState, Card, Button, SearchInput, LoadingSpinner, Badge, Avatar, BackButton. Navigering definieras i `config/navigation.tsx` med `navItems` (Contacts, Wastebin) och `adminItems` (Sellers).
+Layout wrappar sidorna med TopNav och Outlet. InlineEditable hanterar inline-redigering för text, e-post, telefon, datum, tid, select och textarea. InlineEditableLinkedIn normaliserar LinkedIn-URL till användarnamn. InlineEditableDateWithQuickActions ger följupp-datum med snabbval. ContactTable är en expanderbar lista med kontakter, interaktioner och inline-redigering. ImportContactsModal hanterar CSV-import av kontakter (filval, kolumnmappning, preview, validering). NewInteractionRow är formuläret för nya interaktioner. Övriga komponenter: EmptyState, Card, Button, SearchInput, LoadingSpinner, Badge, Avatar, BackButton. Navigering definieras i `config/navigation.tsx` med `navItems` (Contacts, Wastebin) och `adminItems` (Sellers).
