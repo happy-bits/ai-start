@@ -8,7 +8,7 @@ test('edit a contact', async ({ page }) => {
   */
 
   await page.goto('http://localhost:5173/login');
-  await page.getByRole('button', { name: 'Reset database to initial' }).click();
+  await page.getByRole('button', { name: 'Reset database to initial state' }).click();
   await page.getByRole('button', { name: 'Quick login as Maria (Seller)' }).click();
 
   /*

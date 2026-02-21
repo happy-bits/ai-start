@@ -16,7 +16,7 @@ test('set follow up date', async ({ page }) => {
   }, '2026-02-12');
 
   await page.goto('http://localhost:5173/login');
-  await page.getByRole('button', { name: 'Reset database to initial' }).click();
+  await page.getByRole('button', { name: 'Reset database to initial state' }).click();
   await page.getByRole('button', { name: 'Quick login as Lars (Seller)' }).click();
 
   /*
