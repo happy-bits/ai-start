@@ -26,6 +26,7 @@ import {
 import { sortContacts, sortInteractionsByRecency } from '../../utils';
 import { cn, deleteButtonBase, deleteButtonSize } from '../../utils/styles';
 import NewInteractionRow from '../interactions/NewInteractionRow';
+import ImportContactsModal from './ImportContactsModal';
 
 // Component to render contact list
 function ContactTable({
@@ -361,6 +362,7 @@ export default function ContactList() {
   const deleteContact = useDeleteContact();
   const updateContact = useUpdateContact();
   const [searchTerm, setSearchTerm] = useState('');
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   // Filter contacts globally first
   const filteredContacts = useMemo(() => {
@@ -386,8 +388,12 @@ export default function ContactList() {
           <h1 className="text-2xl font-bold text-white">Contacts</h1>
           <p className="text-dark-400 mt-1">Manage your contact relationships</p>
         </div>
-        <Link to="/contacts/new">
-          <Button aria-label="Add new contact">
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            onClick={() => setImportModalOpen(true)}
+            aria-label="Import contacts from CSV"
+          >
             <svg
               className="w-5 h-5"
               fill="none"
@@ -399,12 +405,31 @@ export default function ContactList() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M12 4v16m8-8H4"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
               />
             </svg>
-            Add Contact
+            Import
           </Button>
-        </Link>
+          <Link to="/contacts/new">
+            <Button aria-label="Add new contact">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add Contact
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Search */}
@@ -484,6 +509,8 @@ export default function ContactList() {
           )}
         </>
       )}
+
+      <ImportContactsModal isOpen={importModalOpen} onClose={() => setImportModalOpen(false)} />
     </div>
   );
 }

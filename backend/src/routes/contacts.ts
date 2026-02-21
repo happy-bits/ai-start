@@ -56,6 +56,37 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
     return c.json({ contacts });
   });
 
+  const bulkCreateSchema = z.object({
+    contacts: z.array(createContactSchema).min(1, 'At least one contact is required'),
+  });
+
+  // POST /contacts/bulk - Create multiple contacts (MUST come before /:id route)
+  app.post('/bulk', zValidator('json', bulkCreateSchema), (c) => {
+    const user = c.get('user');
+    const { contacts: contactsData } = c.req.valid('json');
+
+    const now = new Date().toISOString();
+    const inserted = db
+      .insert(schema.contacts)
+      .values(
+        contactsData.map((data) => ({
+          sellerId: user.id,
+          name: data.name,
+          email: data.email ?? null,
+          phone: data.phone ?? null,
+          company: data.company ?? null,
+          linkedin: normalizeLinkedIn(data.linkedin),
+          followUpDate: data.followUpDate ?? null,
+          createdAt: now,
+          updatedAt: now,
+        })),
+      )
+      .returning()
+      .all();
+
+    return c.json({ contacts: inserted }, 201);
+  });
+
   // GET /contacts/wastebin - List soft-deleted contacts (MUST come before /:id route)
   app.get('/wastebin', (c) => {
     const user = c.get('user');
