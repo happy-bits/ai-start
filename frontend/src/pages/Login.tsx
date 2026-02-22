@@ -95,30 +95,36 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      {/* Background decoration */}
+    <div className="min-h-screen flex items-center justify-center p-4 wild-bg">
+      {/* Floating orbs - wild psychedelic background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-warm-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-warm-600/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[#ff00ff]/20 rounded-full blur-3xl animate-[float_8s_ease-in-out_infinite]" />
+        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-[#00fff5]/20 rounded-full blur-3xl animate-[float_10s_ease-in-out_infinite_reverse]" />
+        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-[#b8ff00]/15 rounded-full blur-3xl animate-[float_12s_ease-in-out_infinite]" />
+        <div className="absolute top-1/3 right-1/3 w-48 h-48 bg-[#ff6b00]/25 rounded-full blur-3xl animate-[float_6s_ease-in-out_infinite_reverse]" />
+        <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-[#bf00ff]/10 rounded-full blur-3xl animate-[spin-slow_20s_linear_infinite]" />
       </div>
 
       <div className="w-full max-w-md relative">
-        {/* Logo and title */}
+        {/* Logo and title - wild neon style */}
         <div className="text-center mb-8">
           <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-warm-400 to-warm-600 mb-4 shadow-lg shadow-warm-500/25"
+            className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-[#ff00ff] via-[#ff6b00] to-[#00fff5] mb-4 shadow-[0_0_30px_rgba(255,0,255,0.5),0_0_60px_rgba(0,255,245,0.3)] animate-[wiggle_3s_ease-in-out_infinite]"
             aria-hidden="true"
           >
-            <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <svg className="w-10 h-10 text-white drop-shadow-lg" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <title>KeepWarm logo</title>
               <path d="M12 2C9 5 7 8 7 11c0 2.5 1.5 4.5 3.5 5.5L9 22h6l-1.5-5.5C15.5 15.5 17 13.5 17 11c0-3-2-6-5-9zm0 4c1.5 2 2.5 4 2.5 5.5 0 1.5-1 2.5-2.5 2.5s-2.5-1-2.5-2.5C9.5 10 10.5 8 12 6z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">KeepWarm</h1>
+          <h1 className="text-4xl font-[family-name:var(--font-family-display)] text-transparent bg-clip-text bg-gradient-to-r from-[#ff00ff] via-[#ff6b00] to-[#00fff5] mb-2 [text-shadow:0_0_30px_rgba(255,0,255,0.5)]">
+            KeepWarm
+          </h1>
+          <p className="text-[#00fff5]/80 text-sm font-medium">Let&apos;s get WILD 🔥</p>
         </div>
 
-        {/* Login card */}
-        <div className="bg-dark-900/80 backdrop-blur-xl border border-dark-700 rounded-2xl p-8 shadow-2xl">
+        {/* Login card - neon border glow */}
+        <div className="bg-dark-900/90 backdrop-blur-xl border-2 border-[#ff00ff]/40 rounded-2xl p-8 shadow-[0_0_40px_rgba(255,0,255,0.2),inset_0_0_40px_rgba(0,255,245,0.05)]">
           <form onSubmit={handleSubmit} className="space-y-6">
             <ErrorMessage error={error} />
 
@@ -155,7 +161,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full py-3 px-4 bg-gradient-to-r from-warm-500 to-warm-600 hover:from-warm-400 hover:to-warm-500 text-white font-semibold rounded-lg shadow-lg shadow-warm-500/25 focus:outline-none focus:ring-2 focus:ring-warm-500 focus:ring-offset-2 focus:ring-offset-dark-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full py-3 px-4 bg-gradient-to-r from-[#ff00ff] via-[#ff6b00] to-[#00fff5] hover:opacity-90 text-white font-bold rounded-lg shadow-[0_0_20px_rgba(255,0,255,0.5),0_0_40px_rgba(0,255,107,0.3)] focus:outline-none focus:ring-2 focus:ring-[#ff00ff] focus:ring-offset-2 focus:ring-offset-dark-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               {loginMutation.isPending ? (
                 <span className="flex items-center justify-center gap-2">

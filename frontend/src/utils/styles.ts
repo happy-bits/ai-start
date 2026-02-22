@@ -89,15 +89,17 @@ export const actionButtonBase = 'text-warm-400 hover:text-warm-300 hover:bg-warm
 // Navigation Styles
 // ============================================================================
 
-/** Active navigation link styles */
-export const navLinkActive = 'bg-warm-500/10 text-warm-400 border border-warm-500/20';
+/** Active navigation link styles - wild neon */
+export const navLinkActive =
+  'bg-[#ff00ff]/15 text-[#ff00ff] border border-[#ff00ff]/40 shadow-[0_0_10px_rgba(255,0,255,0.2)]';
 
 /** Inactive navigation link styles */
-export const navLinkInactive = 'text-dark-400 hover:text-white hover:bg-dark-800';
+export const navLinkInactive =
+  'text-dark-400 hover:text-[#00fff5] hover:bg-dark-800 hover:border-[#00fff5]/20';
 
 /** Base navigation link styles */
 export const navLinkBase =
-  'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all';
+  'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border border-transparent';
 
 // ============================================================================
 // Container/Card Styles

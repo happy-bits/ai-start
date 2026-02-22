@@ -8,12 +8,12 @@ export default function TopNav() {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="w-full bg-dark-900 border-b border-dark-700">
+    <nav className="w-full bg-dark-900/80 backdrop-blur-xl border-b-2 border-[#ff00ff]/30 shadow-[0_0_20px_rgba(255,0,255,0.1)]">
       <div className="px-6 py-4">
         <div className="flex items-center justify-between gap-6">
           {/* Logo and App Name */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-warm-400 to-warm-600 flex items-center justify-center shadow-lg shadow-warm-500/25">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#ff00ff] via-[#ff6b00] to-[#00fff5] flex items-center justify-center shadow-[0_0_15px_rgba(255,0,255,0.4)]">
               <svg
                 className="w-5 h-5 text-white"
                 viewBox="0 0 24 24"

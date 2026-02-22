@@ -2,6 +2,8 @@
 
 @theme {
   --font-family-sans: "Outfit", system-ui, sans-serif;
+  --font-family-display: "Bungee Shade", cursive;
+  --font-family-accent: "Space Grotesk", sans-serif;
 
   /* Warm color palette */
   --color-warm-50: #fffbeb;
@@ -28,12 +30,93 @@
   --color-dark-800: #27272a;
   --color-dark-900: #18181b;
   --color-dark-950: #09090b;
+
+  /* Neon palette for wild styling */
+  --color-neon-cyan: #00fff5;
+  --color-neon-magenta: #ff00ff;
+  --color-neon-lime: #b8ff00;
+  --color-neon-orange: #ff6b00;
+  --color-neon-purple: #bf00ff;
 }
 
 body {
   font-family: var(--font-family-sans);
-  background: linear-gradient(135deg, var(--color-dark-950) 0%, var(--color-dark-900) 100%);
+  background: var(--color-dark-950);
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Wild animated mesh gradient background */
+.wild-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    #09090b 0%,
+    #1a0a2e 25%,
+    #0d1b2a 50%,
+    #1b263b 75%,
+    #09090b 100%
+  );
+  background-size: 400% 400%;
+  animation: mesh-gradient 15s ease infinite;
+}
+
+.wild-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 50% at 20% 40%,
+    rgba(191, 0, 255, 0.15) 0%,
+    transparent 50%
+  );
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+.wild-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 60% 80% at 80% 60%,
+    rgba(0, 255, 245, 0.1) 0%,
+    transparent 50%
+  );
+  animation: pulse-glow 5s ease-in-out infinite reverse;
+}
+
+@keyframes mesh-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(10px, -15px) rotate(5deg); }
+  50% { transform: translate(-5px, -25px) rotate(-3deg); }
+  75% { transform: translate(-15px, -10px) rotate(2deg); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes neon-pulse {
+  0%, 100% { filter: drop-shadow(0 0 5px currentColor) drop-shadow(0 0 20px currentColor); }
+  50% { filter: drop-shadow(0 0 15px currentColor) drop-shadow(0 0 40px currentColor); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
 }
 
 /* Custom scrollbar */

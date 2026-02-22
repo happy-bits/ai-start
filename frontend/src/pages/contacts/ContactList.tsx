@@ -409,17 +409,20 @@ export default function ContactList() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header - wild and crazy */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Contacts</h1>
-          <p className="text-dark-400 mt-1">Manage your contact relationships</p>
+          <h1 className="text-3xl font-bold font-[family-name:var(--font-family-display)] text-transparent bg-clip-text bg-gradient-to-r from-[#ff00ff] via-[#ff6b00] to-[#00fff5]">
+            Contacts
+          </h1>
+          <p className="text-[#00fff5]/70 mt-1 font-medium">Manage your contact relationships 🚀</p>
         </div>
         <div className="flex gap-2">
           <Button
             variant="secondary"
             onClick={() => setImportModalOpen(true)}
             aria-label="Import contacts from CSV"
+            className="border-[#00fff5]/50 hover:border-[#00fff5] hover:shadow-[0_0_15px_rgba(0,255,245,0.3)] transition-all"
           >
             <svg
               className="w-5 h-5"
@@ -438,7 +441,10 @@ export default function ContactList() {
             Import
           </Button>
           <Link to="/contacts/new">
-            <Button aria-label="Add new contact">
+            <Button
+              aria-label="Add new contact"
+              className="bg-gradient-to-r from-[#ff00ff] to-[#00fff5] hover:opacity-90 border-0 shadow-[0_0_20px_rgba(255,0,255,0.4)] hover:shadow-[0_0_30px_rgba(255,0,255,0.5)] transition-all"
+            >
               <svg
                 className="w-5 h-5"
                 fill="none"
@@ -466,8 +472,8 @@ export default function ContactList() {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {/* Filter tabs */}
-      <div role="tablist" aria-label="Contact filter" className="flex gap-1">
+      {/* Filter tabs - neon style */}
+      <div role="tablist" aria-label="Contact filter" className="flex gap-2">
         <button
           type="button"
           role="tab"
@@ -476,10 +482,10 @@ export default function ContactList() {
           id="tab-att-kontakta"
           onClick={() => setFilter(FILTER_ATT_KONTAKTA)}
           className={cn(
-            'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+            'px-4 py-2 text-sm font-medium rounded-lg transition-all',
             filter === FILTER_ATT_KONTAKTA
-              ? 'bg-warm-500/20 text-warm-400 border border-warm-500/40'
-              : 'text-dark-400 hover:text-white border border-dark-700 hover:border-dark-600',
+              ? 'bg-[#ff00ff]/20 text-[#ff00ff] border-2 border-[#ff00ff]/60 shadow-[0_0_15px_rgba(255,0,255,0.3)]'
+              : 'text-dark-400 hover:text-[#00fff5] border-2 border-dark-600 hover:border-[#00fff5]/50',
           )}
         >
           To contact
@@ -492,10 +498,10 @@ export default function ContactList() {
           id="tab-all"
           onClick={() => setFilter(FILTER_ALL)}
           className={cn(
-            'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+            'px-4 py-2 text-sm font-medium rounded-lg transition-all',
             filter === FILTER_ALL
-              ? 'bg-warm-500/20 text-warm-400 border border-warm-500/40'
-              : 'text-dark-400 hover:text-white border border-dark-700 hover:border-dark-600',
+              ? 'bg-[#ff00ff]/20 text-[#ff00ff] border-2 border-[#ff00ff]/60 shadow-[0_0_15px_rgba(255,0,255,0.3)]'
+              : 'text-dark-400 hover:text-[#00fff5] border-2 border-dark-600 hover:border-[#00fff5]/50',
           )}
         >
           All
@@ -518,14 +524,17 @@ export default function ContactList() {
           {sortedContacts.length > 0 ? (
             <>
               <div className="flex items-center gap-2">
-                <h2 id="contacts-heading" className="text-lg font-semibold text-white">
+                <h2 id="contacts-heading" className="text-lg font-semibold text-[#00fff5]">
                   Contacts
                 </h2>
-                <span className="px-2 py-1 text-xs font-medium bg-dark-700 text-dark-300 rounded-full">
+                <span className="px-2 py-1 text-xs font-bold bg-[#ff00ff]/20 text-[#ff00ff] border border-[#ff00ff]/40 rounded-full">
                   {sortedContacts.length}
                 </span>
               </div>
-              <Card padding="none">
+              <Card
+                padding="none"
+                className="border-[#ff00ff]/20 shadow-[0_0_30px_rgba(255,0,255,0.08)]"
+              >
                 <ContactTable
                   contacts={sortedContacts}
                   updateContact={updateContact}
