@@ -37,7 +37,7 @@ async function main() {
     console.log('Backend not running, starting backend...');
     backendProcess = spawn('npm', ['run', 'dev'], {
       cwd: backendDir,
-      stdio: 'inherit',
+      stdio: ['ignore', 'ignore', 'ignore'],
     });
 
     if (!(await waitForBackend())) {

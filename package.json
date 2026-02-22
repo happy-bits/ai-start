@@ -2,6 +2,8 @@
   "name": "keepwarm",
   "private": true,
   "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:seed": "node scripts/dev.mjs --seed",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
@@ -15,6 +17,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.0.3",
     "husky": "^9.1.7",
+    "kill-port": "^2.0.1",
     "lint-staged": "^15.4.3"
   },
   "lint-staged": {
