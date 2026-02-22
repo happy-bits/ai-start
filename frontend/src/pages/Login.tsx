@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { login as loginApi, useLogin } from '../api/auth';
@@ -13,19 +12,10 @@ import { cn, formInputBase, formInputBorderNormal, formLabel } from '../utils/st
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
-// Health check function
-async function checkHealth(): Promise<{ status: string }> {
-  try {
-    const response = await fetch(`${API_BASE}/health`);
-    if (!response.ok) {
-      throw new Error('Backend is not responding');
-    }
-    return response.json();
-  } catch (_error) {
-    // Handle network errors (backend offline, CORS, etc.)
-    throw new Error('Backend is not responding');
-  }
-}
+// In dev, connect directly to backend to avoid Vite proxy SSE issues
+const HEALTH_STREAM_URL = import.meta.env.DEV
+  ? 'http://localhost:3000/health/stream'
+  : `${API_BASE}/health/stream`;
 
 export default function Login() {
   const navigate = useNavigate();
@@ -37,14 +27,19 @@ export default function Login() {
   const [isResetting, setIsResetting] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
 
-  // Check backend health status
-  const { data: healthData, isSuccess } = useQuery<{ status: string }>({
-    queryKey: ['health'],
-    queryFn: checkHealth,
-    refetchInterval: 500, // Check every 0.5 seconds
-    retry: 1,
-    enabled: config.developerTools, // Only check if developer tools are enabled
-  });
+  // Backend health status via SSE - server sends heartbeat every 10s, reconnect every 2s when down
+  const [isBackendOnline, setIsBackendOnline] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!config.developerTools) return;
+    const eventSource = new EventSource(HEALTH_STREAM_URL);
+    eventSource.onopen = () => setIsBackendOnline(true);
+    eventSource.addEventListener('heartbeat', () => setIsBackendOnline(true));
+    eventSource.onerror = () => {
+      setIsBackendOnline(false);
+      // EventSource auto-reconnects (retry: 2000 from server)
+    };
+    return () => eventSource.close();
+  }, []);
 
   const handleResetDatabase = async () => {
     setIsResetting(true);
@@ -182,13 +177,11 @@ export default function Login() {
                 <div className="flex items-center gap-1.5">
                   <div
                     className={`w-2 h-2 rounded-full ${
-                      isSuccess && healthData?.status === 'ok' ? 'bg-green-500' : 'bg-red-500'
+                      isBackendOnline === true ? 'bg-green-500' : 'bg-red-500'
                     }`}
                   />
                   <span className="text-xs text-dark-400">
-                    {isSuccess && healthData?.status === 'ok'
-                      ? 'Backend online'
-                      : 'Backend offline'}
+                    {isBackendOnline === true ? 'Backend online' : 'Backend offline'}
                   </span>
                 </div>
               </div>

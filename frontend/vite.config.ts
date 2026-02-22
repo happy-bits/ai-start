@@ -19,6 +19,7 @@ export default defineConfig({
       '/health': {
         target: 'http://localhost:3000',
         changeOrigin: true,
+        timeout: 0, // Required for SSE streaming - prevents proxy from closing long-lived connections
       },
     },
   },

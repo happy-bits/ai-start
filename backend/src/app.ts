@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
+import { streamSSE } from 'hono/streaming';
 import { ERROR_MESSAGES, ROLES, SUCCESS_MESSAGES } from './constants.js';
 import { resetDatabase } from './db/index.js';
 import type * as schema from './db/schema.js';
@@ -29,6 +30,23 @@ export function createApp(
   // Health check
   app.get('/health', (c) => {
     return c.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  // Health check SSE stream - server sends heartbeat every 10 seconds
+  app.get('/health/stream', (c) => {
+    return streamSSE(c, async (stream) => {
+      const sendHeartbeat = () =>
+        stream.writeSSE({
+          data: JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }),
+          event: 'heartbeat',
+          retry: 1000,
+        });
+      await sendHeartbeat(); // Send immediately on connect
+      while (true) {
+        await stream.sleep(1000);
+        await sendHeartbeat();
+      }
+    });
   });
 
   // Auth routes (login doesn't require auth)
