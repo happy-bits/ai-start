@@ -3,18 +3,18 @@
 @theme {
   --font-family-sans: "Outfit", system-ui, sans-serif;
 
-  /* Blue color palette */
-  --color-warm-50: #eff6ff;
-  --color-warm-100: #dbeafe;
-  --color-warm-200: #bfdbfe;
-  --color-warm-300: #93c5fd;
-  --color-warm-400: #60a5fa;
-  --color-warm-500: #3b82f6;
-  --color-warm-600: #2563eb;
-  --color-warm-700: #1d4ed8;
-  --color-warm-800: #1e40af;
-  --color-warm-900: #1e3a8a;
-  --color-warm-950: #172554;
+  /* Purple-blue (lila-blå) color palette */
+  --color-warm-50: #eef2ff;
+  --color-warm-100: #e0e7ff;
+  --color-warm-200: #c7d2fe;
+  --color-warm-300: #a5b4fc;
+  --color-warm-400: #818cf8;
+  --color-warm-500: #6366f1;
+  --color-warm-600: #4f46e5;
+  --color-warm-700: #4338ca;
+  --color-warm-800: #3730a3;
+  --color-warm-900: #312e81;
+  --color-warm-950: #1e1b4b;
 
   /* Dark theme colors */
   --color-dark-50: #fafafa;
