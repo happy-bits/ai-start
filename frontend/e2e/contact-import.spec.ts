@@ -67,9 +67,11 @@ test('import contacts - happy path', async ({ page }) => {
   VERIFY
 
   Modal closes. New contacts appear in list.
+  Switch to "All" to see imported contacts (they have no follow-up date, so hidden in "To contact").
   */
 
   await expect(page.getByRole('dialog')).not.toBeVisible();
+  await page.getByRole('tab', { name: 'All' }).click();
   await expect(page.getByRole('article', { name: 'Contact: Import Test One' })).toBeVisible();
   await expect(page.getByRole('article', { name: 'Contact: Import Test Two' })).toBeVisible();
   await expect(page.getByText('Contacts32')).toBeVisible();
@@ -127,6 +129,7 @@ test('import contacts - invalid row shows error and no import', async ({ page })
   await importBtn.scrollIntoViewIfNeeded();
   await importBtn.click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
+  await page.getByRole('tab', { name: 'All' }).click();
   await expect(page.getByRole('article', { name: 'Contact: Valid Import' })).toBeVisible();
 });
 
@@ -184,6 +187,7 @@ test('import contacts - duplicate marked in preview', async ({ page }) => {
   await importBtn.scrollIntoViewIfNeeded();
   await importBtn.click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
+  await page.getByRole('tab', { name: 'All' }).click();
   await expect(page.getByRole('article', { name: 'Contact: Fresh Contact' })).toBeVisible();
 });
 

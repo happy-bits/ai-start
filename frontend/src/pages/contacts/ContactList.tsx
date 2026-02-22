@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
 import {
@@ -24,9 +24,20 @@ import {
   SearchInput,
 } from '../../components/ui';
 import { sortContacts, sortInteractionsByRecency } from '../../utils';
+import { getTodayISO } from '../../utils/dates';
 import { cn, deleteButtonBase, deleteButtonSize } from '../../utils/styles';
 import NewInteractionRow from '../interactions/NewInteractionRow';
 import ImportContactsModal from './ImportContactsModal';
+
+const FILTER_ATT_KONTAKTA = 'att-kontakta';
+const FILTER_ALL = 'all';
+
+type ContactFilter = typeof FILTER_ATT_KONTAKTA | typeof FILTER_ALL;
+
+function isContactDueForFollowUp(contact: Contact, today: string): boolean {
+  if (!contact.followUpDate) return false;
+  return contact.followUpDate <= today;
+}
 
 // Component to render contact list
 function ContactTable({
@@ -357,6 +368,7 @@ function ContactTable({
 }
 
 export default function ContactList() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: contacts = [], isLoading } = useContacts();
   const { data: interactions = [] } = useInteractions();
   const deleteContact = useDeleteContact();
@@ -364,8 +376,17 @@ export default function ContactList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [importModalOpen, setImportModalOpen] = useState(false);
 
-  // Filter contacts globally first
-  const filteredContacts = useMemo(() => {
+  const filterParam = searchParams.get('filter');
+  const filter: ContactFilter = filterParam === FILTER_ALL ? FILTER_ALL : FILTER_ATT_KONTAKTA;
+
+  const setFilter = (newFilter: ContactFilter) => {
+    setSearchParams(newFilter === FILTER_ATT_KONTAKTA ? {} : { filter: newFilter });
+  };
+
+  const today = getTodayISO();
+
+  // Filter contacts by search first
+  const searchFilteredContacts = useMemo(() => {
     return contacts.filter(
       (contact) =>
         contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -375,10 +396,16 @@ export default function ContactList() {
     );
   }, [contacts, searchTerm]);
 
-  // Sort all contacts
+  // Filter by "att kontakta" (follow_up_date <= today) or show all
+  const filterFilteredContacts = useMemo(() => {
+    if (filter === FILTER_ALL) return searchFilteredContacts;
+    return searchFilteredContacts.filter((c) => isContactDueForFollowUp(c, today));
+  }, [searchFilteredContacts, filter, today]);
+
+  // Sort contacts
   const sortedContacts = useMemo(() => {
-    return sortContacts(filteredContacts);
-  }, [filteredContacts]);
+    return sortContacts(filterFilteredContacts);
+  }, [filterFilteredContacts]);
 
   return (
     <div className="space-y-6">
@@ -439,6 +466,42 @@ export default function ContactList() {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
+      {/* Filter tabs */}
+      <div role="tablist" aria-label="Contact filter" className="flex gap-1">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={filter === FILTER_ATT_KONTAKTA}
+          aria-controls="contacts-panel"
+          id="tab-att-kontakta"
+          onClick={() => setFilter(FILTER_ATT_KONTAKTA)}
+          className={cn(
+            'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+            filter === FILTER_ATT_KONTAKTA
+              ? 'bg-warm-500/20 text-warm-400 border border-warm-500/40'
+              : 'text-dark-400 hover:text-white border border-dark-700 hover:border-dark-600',
+          )}
+        >
+          To contact
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={filter === FILTER_ALL}
+          aria-controls="contacts-panel"
+          id="tab-all"
+          onClick={() => setFilter(FILTER_ALL)}
+          className={cn(
+            'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+            filter === FILTER_ALL
+              ? 'bg-warm-500/20 text-warm-400 border border-warm-500/40'
+              : 'text-dark-400 hover:text-white border border-dark-700 hover:border-dark-600',
+          )}
+        >
+          All
+        </button>
+      </div>
+
       {isLoading ? (
         <Card padding="none">
           <div className="p-8 flex justify-center">
@@ -446,10 +509,14 @@ export default function ContactList() {
           </div>
         </Card>
       ) : (
-        <>
-          {/* Contacts Section */}
-          {sortedContacts.length > 0 && (
-            <section aria-labelledby="contacts-heading" className="space-y-3">
+        <section
+          id="contacts-panel"
+          role="tabpanel"
+          aria-labelledby="contacts-heading"
+          className="space-y-3"
+        >
+          {sortedContacts.length > 0 ? (
+            <>
               <div className="flex items-center gap-2">
                 <h2 id="contacts-heading" className="text-lg font-semibold text-white">
                   Contacts
@@ -466,48 +533,68 @@ export default function ContactList() {
                   interactions={interactions}
                 />
               </Card>
-            </section>
-          )}
-
-          {/* Empty state when no contacts match search */}
-          {sortedContacts.length === 0 && (
+            </>
+          ) : (
             <Card padding="none">
-              <EmptyState
-                icon={
-                  <svg
-                    className="w-8 h-8 text-dark-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                }
-                title="No contacts found"
-                message={
-                  searchTerm
-                    ? 'Try a different search term'
-                    : 'Get started by adding your first contact'
-                }
-                action={
-                  !searchTerm ? (
-                    <Link to="/contacts/new">
-                      <Button size="sm" aria-label="Add new contact">
-                        Add Contact
-                      </Button>
-                    </Link>
-                  ) : undefined
-                }
-              />
+              {filter === FILTER_ATT_KONTAKTA && !searchTerm && contacts.length > 0 ? (
+                <EmptyState
+                  icon={
+                    <svg
+                      className="w-10 h-10 text-warm-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  }
+                  title="All caught up!"
+                  message="No contacts need follow-up right now. Great job!"
+                />
+              ) : (
+                <EmptyState
+                  icon={
+                    <svg
+                      className="w-8 h-8 text-dark-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                  }
+                  title="No contacts found"
+                  message={
+                    searchTerm
+                      ? 'Try a different search term'
+                      : 'Get started by adding your first contact'
+                  }
+                  action={
+                    !searchTerm ? (
+                      <Link to="/contacts/new">
+                        <Button size="sm" aria-label="Add new contact">
+                          Add Contact
+                        </Button>
+                      </Link>
+                    ) : undefined
+                  }
+                />
+              )}
             </Card>
           )}
-        </>
+        </section>
       )}
 
       <ImportContactsModal isOpen={importModalOpen} onClose={() => setImportModalOpen(false)} />

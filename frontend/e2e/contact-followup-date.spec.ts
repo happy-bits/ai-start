@@ -36,6 +36,12 @@ test('set follow up date', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Company' }).fill('Acme Inc.');
   await page.getByRole('button', { name: 'Create Contact' }).click();
 
+  // New contact has no follow-up date, so "To contact" shows positive empty state
+  await expect(page.getByText('All caught up!')).toBeVisible();
+
+  // Switch to "All" to see the new contact (no follow-up date yet, so hidden in "To contact")
+  await page.getByRole('tab', { name: 'All' }).click();
+
   await expect(page.getByLabel('Contacts', { exact: true })).toMatchAriaSnapshot(`
     - heading "Contacts" [level=2]
     - text: "1"
