@@ -23,6 +23,7 @@ import {
   LoadingSpinner,
   SearchInput,
 } from '../../components/ui';
+import { useAuth } from '../../context/AuthContext';
 import { sortContacts, sortInteractionsByRecency } from '../../utils';
 import { getTodayISO } from '../../utils/dates';
 import { cn, deleteButtonBase, deleteButtonSize } from '../../utils/styles';
@@ -375,6 +376,9 @@ export default function ContactList() {
   const updateContact = useUpdateContact();
   const [searchTerm, setSearchTerm] = useState('');
   const [importModalOpen, setImportModalOpen] = useState(false);
+  const { user } = useAuth();
+
+  const firstName = user?.name?.split(' ')[0];
 
   const filterParam = searchParams.get('filter');
   const filter: ContactFilter = filterParam === FILTER_ALL ? FILTER_ALL : FILTER_ATT_KONTAKTA;
@@ -409,6 +413,18 @@ export default function ContactList() {
 
   return (
     <div className="space-y-6">
+      {/* Welcome message */}
+      <div className="rounded-xl bg-gradient-to-r from-warm-500/10 to-warm-400/5 border border-warm-500/20 px-6 py-4">
+        <h2 className="text-lg font-semibold text-white">
+          Welcome back{firstName ? `, ${firstName}` : ''}!
+        </h2>
+        <p className="text-dark-400 text-sm mt-1">
+          {filter === FILTER_ATT_KONTAKTA && filterFilteredContacts.length > 0
+            ? `You have ${filterFilteredContacts.length} contact${filterFilteredContacts.length === 1 ? '' : 's'} to follow up with today.`
+            : "You're all caught up. Keep those relationships warm!"}
+        </p>
+      </div>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
