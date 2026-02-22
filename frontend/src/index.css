@@ -32,7 +32,14 @@
 
 body {
   font-family: var(--font-family-sans);
-  background: linear-gradient(135deg, var(--color-dark-950) 0%, var(--color-dark-900) 100%);
+  background-color: var(--color-dark-950);
+  background-image:
+    linear-gradient(135deg, rgba(9, 9, 11, 0.75) 0%, rgba(24, 24, 27, 0.7) 100%),
+    url(/keepwarm-background.webp);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   min-height: 100vh;
 }
 
