@@ -9,7 +9,6 @@ import Wastebin from './pages/contacts/Wastebin';
 import Login from './pages/Login';
 import SellerForm from './pages/sellers/SellerForm';
 import SellerList from './pages/sellers/SellerList';
-import StartPage from './pages/StartPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -51,7 +50,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<StartPage />} />
+        <Route index element={<Navigate to="/contacts" replace />} />
         <Route path="contacts" element={<ContactList />} />
         <Route path="contacts/new" element={<ContactForm />} />
         <Route path="contacts/wastebin" element={<Wastebin />} />
