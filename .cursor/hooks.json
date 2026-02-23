@@ -1,6 +1,12 @@
 {
   "version": 1,
   "hooks": {
+    "preToolUse": [
+      {
+        "command": "bun run .cursor/hooks/warn-test-edits/index.ts",
+        "matcher": "Write|StrReplace"
+      }
+    ],
     "beforeShellExecution": [
       {
         "command": "bun run .cursor/hooks/safe-shell/index.ts"
