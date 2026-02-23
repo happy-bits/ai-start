@@ -1,13 +1,5 @@
 # KeepWarm CRM
 
-Starta både backend och frontend från projektroten:
-
-    npm run dev
-
-Backend startar först (port 3000), sedan frontend (port 5173). Med `npm run dev:seed` seedas databasen vid start.
-
----
-
 # Backend
 
 
@@ -72,8 +64,6 @@ Fler sätt:
 
 Kör enstaka tester
 
-    npm run test:e2e:trace -- e2e/inline-editing.spec.ts
-    npm run test:e2e contact-delete.spec.ts
     npm run test:e2e:debug e2e/contact-followup-date.spec.ts
 
 

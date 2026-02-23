@@ -2,8 +2,6 @@
   "name": "keepwarm",
   "private": true,
   "scripts": {
-    "dev": "node scripts/dev.mjs",
-    "dev:seed": "node scripts/dev.mjs --seed",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
