@@ -30,6 +30,9 @@ For each part the user specifies:
 1. Create or update a markdown file in the `autodocs` folder.
 2. Use a clear, kebab-case filename (e.g. `backend-contacts-api.md`, `database-schema.md`).
 3. **Read and follow** `.cursor/skills/autodocs/instructions-for-documentation.md` when writing the content.
+4. **If the document has a header "Instructions for AI"** then read and apply those rules as well.
+5. **Never change "Instructions for AI"**—that section is readonly. Do not modify, remove, or overwrite it.
+6. **Conflict resolution:** If rules in "Instructions for AI" conflict with `instructions-for-documentation.md`, follow "Instructions for AI".
 
 **When updating existing docs:** Re-read the current file and the instructions, then regenerate the content to fix errors and keep it accurate. Do not blindly append.
 
@@ -43,4 +46,6 @@ Avoid slashes (`/`) in node labels—they cause parsing errors. Use e.g. `auth` 
 - [ ] User has specified which parts to document
 - [ ] Each part has its own markdown file in `autodocs/`
 - [ ] Content follows instructions-for-documentation.md
+- [ ] If document has "Instructions for AI", those rules are followed; conflicts resolved in favor of "Instructions for AI"
+- [ ] "Instructions for AI" section is never modified (readonly)
 - [ ] Mermaid labels contain no slashes
