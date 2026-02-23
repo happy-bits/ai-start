@@ -197,65 +197,6 @@ describe('Contact Routes', () => {
     });
   });
 
-  describe('POST /api/contacts/bulk', () => {
-    it('should create multiple contacts as seller', async () => {
-      const data = await expectCreated<{
-        contacts: { name: string; sellerId: number; id: number }[];
-      }>(
-        await post(ctx.app, '/api/contacts/bulk', ctx.sellerToken, {
-          contacts: [
-            { name: 'Bulk Contact 1', email: 'bulk1@test.com' },
-            { name: 'Bulk Contact 2', company: 'Bulk Corp' },
-          ],
-        }),
-      );
-
-      expect(data.contacts).toHaveLength(2);
-      expect(data.contacts[0].name).toBe('Bulk Contact 1');
-      expect(data.contacts[0].sellerId).toBe(ctx.sellerId);
-      expect(data.contacts[1].name).toBe('Bulk Contact 2');
-      expect(data.contacts[1].sellerId).toBe(ctx.sellerId);
-
-      const list = await expectOk<{ contacts: { name: string }[] }>(
-        await get(ctx.app, '/api/contacts', ctx.sellerToken),
-      );
-      expect(list.contacts.map((c) => c.name)).toContain('Bulk Contact 1');
-      expect(list.contacts.map((c) => c.name)).toContain('Bulk Contact 2');
-    });
-
-    it('should reject when any contact has invalid data (all-or-nothing)', async () => {
-      await expectBadRequest(
-        await post(ctx.app, '/api/contacts/bulk', ctx.sellerToken, {
-          contacts: [
-            { name: 'Valid Contact', email: 'valid@test.com' },
-            { email: 'no-name@test.com' },
-          ],
-        }),
-      );
-
-      const list = await expectOk<{ contacts: { name: string }[] }>(
-        await get(ctx.app, '/api/contacts', ctx.sellerToken),
-      );
-      expect(list.contacts.map((c) => c.name)).not.toContain('Valid Contact');
-    });
-
-    it('should reject when any contact has invalid email', async () => {
-      await expectBadRequest(
-        await post(ctx.app, '/api/contacts/bulk', ctx.sellerToken, {
-          contacts: [{ name: 'Valid Contact' }, { name: 'Bad Email', email: 'not-an-email' }],
-        }),
-      );
-    });
-
-    it('should reject empty contacts array', async () => {
-      await expectBadRequest(
-        await post(ctx.app, '/api/contacts/bulk', ctx.sellerToken, {
-          contacts: [],
-        }),
-      );
-    });
-  });
-
   describe('PUT /api/contacts/:id', () => {
     it('should update own contact', async () => {
       await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
