@@ -1,6 +1,15 @@
 #!/usr/bin/env bun
 /// <reference types="node" />
+import { appendFile } from "fs/promises";
 import { readFileSync } from "fs";
+
+const logPath = `${(import.meta as unknown as { dir: string }).dir}/log.txt`;
+
+function log(header: string, data?: unknown) {
+  const json = data !== undefined ? " " + JSON.stringify(data, null, 2) : "";
+  const line = `[${new Date().toISOString()}] ${header}${json}\n`;
+  void appendFile(logPath, line);
+}
 
 /**
  * safe-shell: Modular beforeShellExecution hook
@@ -72,6 +81,8 @@ function main() {
   }
 
   const command = payload.command ?? "";
+  log("beforeShellExecution", { command, cwd: payload.cwd });
+
   let response: HookResponse = { continue: true, permission: "allow" };
 
   for (const rule of RULES) {
@@ -87,6 +98,7 @@ function main() {
     }
   }
 
+  log("response", response);
   console.log(JSON.stringify(response));
 }
 
