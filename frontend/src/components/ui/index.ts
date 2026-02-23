@@ -8,7 +8,6 @@ export { default as ErrorMessage } from './ErrorMessage';
 export { default as InlineEditable } from './InlineEditable';
 export { default as InlineEditableDate } from './InlineEditableDate';
 export { default as InlineEditableDateWithQuickActions } from './InlineEditableDateWithQuickActions';
-export { default as InlineEditableLinkedIn } from './InlineEditableLinkedIn';
 export { default as InlineEditableSelect } from './InlineEditableSelect';
 export { default as InlineEditableTextarea } from './InlineEditableTextarea';
 export { default as InlineEditableTime } from './InlineEditableTime';

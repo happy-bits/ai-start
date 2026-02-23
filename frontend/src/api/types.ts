@@ -18,7 +18,6 @@ export interface Contact {
   email: string | null;
   phone: string | null;
   company: string | null;
-  linkedin: string | null;
   followUpDate: string | null;
   deletedAt: string | null;
   createdAt: string;
@@ -30,7 +29,6 @@ export interface CreateContactData {
   email?: string | null;
   phone?: string | null;
   company?: string | null;
-  linkedin?: string | null;
   followUpDate?: string | null;
 }
 
@@ -39,14 +37,7 @@ export interface UpdateContactData {
   email?: string | null;
   phone?: string | null;
   company?: string | null;
-  linkedin?: string | null;
   followUpDate?: string | null;
-}
-
-/** Build full LinkedIn URL from username (stored as username only) */
-export function linkedinUrl(username: string | null | undefined): string | null {
-  if (!username || !username.trim()) return null;
-  return `https://linkedin.com/in/${username.trim()}`;
 }
 
 // Interaction types

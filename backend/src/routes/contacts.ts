@@ -9,20 +9,11 @@ import * as schema from '../db/schema.js';
 import type { AuthVariables } from '../middleware/auth.js';
 import { buildUpdateValues, checkSellerAccess, parseIdParam, withEntityAccess } from './helpers.js';
 
-/** Extract LinkedIn username from URL or return as-is if already username */
-function normalizeLinkedIn(value: string | null | undefined): string | null {
-  if (!value || !value.trim()) return null;
-  const trimmed = value.trim();
-  const match = trimmed.match(/linkedin\.com\/in\/([^/?]+)/i);
-  return match ? match[1] : trimmed;
-}
-
 const createContactSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
-  linkedin: z.string().optional().nullable(),
   followUpDate: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE).optional().nullable(),
 });
 
@@ -31,7 +22,6 @@ const updateContactSchema = z.object({
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
-  linkedin: z.string().optional().nullable(),
   followUpDate: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE).optional().nullable(),
 });
 
@@ -113,7 +103,6 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
         email: data.email ?? null,
         phone: data.phone ?? null,
         company: data.company ?? null,
-        linkedin: normalizeLinkedIn(data.linkedin),
         followUpDate: data.followUpDate ?? null,
         createdAt: now,
         updatedAt: now,
@@ -135,16 +124,11 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
     if (!result.success) return result.response;
 
     const updates = c.req.valid('json');
-    const normalizedUpdates = {
-      ...updates,
-      linkedin: updates.linkedin !== undefined ? normalizeLinkedIn(updates.linkedin) : undefined,
-    };
-    const updateValues = buildUpdateValues(normalizedUpdates, [
+    const updateValues = buildUpdateValues(updates, [
       'name',
       'email',
       'phone',
       'company',
-      'linkedin',
       'followUpDate',
     ]);
 

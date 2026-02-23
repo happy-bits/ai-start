@@ -174,11 +174,6 @@ function WastebinTable({
                             <div className="text-dark-400 line-through opacity-60">
                               {contact.phone || 'No phone'}
                             </div>
-                            {contact.linkedin && (
-                              <div className="text-dark-400 line-through opacity-60">
-                                linkedin.com/in/{contact.linkedin}
-                              </div>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -237,8 +232,7 @@ export default function Wastebin() {
       (contact) =>
         contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.linkedin?.toLowerCase().includes(searchTerm.toLowerCase()),
+        contact.email?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [contacts, searchTerm]);
 

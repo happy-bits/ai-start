@@ -16,7 +16,6 @@ import {
   InlineEditable,
   InlineEditableDate,
   InlineEditableDateWithQuickActions,
-  InlineEditableLinkedIn,
   InlineEditableSelect,
   InlineEditableTextarea,
   InlineEditableTime,
@@ -234,18 +233,6 @@ function ContactTable({
                               emptyText="Add phone"
                               aria-label={`Phone for ${contact.name}`}
                             />
-                            <InlineEditableLinkedIn
-                              value={contact.linkedin}
-                              onSave={async (value) => {
-                                await updateContact.mutateAsync({
-                                  id: contact.id,
-                                  data: { linkedin: value },
-                                });
-                              }}
-                              placeholder="username"
-                              emptyText="Add LinkedIn"
-                              aria-label={`LinkedIn for ${contact.name}`}
-                            />
                           </div>
                         </div>
                       </div>
@@ -389,8 +376,7 @@ export default function ContactList() {
       (contact) =>
         contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.linkedin?.toLowerCase().includes(searchTerm.toLowerCase()),
+        contact.email?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [contacts, searchTerm]);
 
