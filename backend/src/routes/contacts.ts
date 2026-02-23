@@ -9,11 +9,33 @@ import * as schema from '../db/schema.js';
 import type { AuthVariables } from '../middleware/auth.js';
 import { buildUpdateValues, checkSellerAccess, parseIdParam, withEntityAccess } from './helpers.js';
 
+// Permissive LinkedIn URL: allow with or without protocol, auto-add https:// when saving
+const LINKEDIN_REGEX =
+  /^(https?:\/\/)?([\w.-]+\.)?linkedin\.com\/(in|pub|public-profile\/in|public-profile\/pub)\/[\w-]+/i;
+
+const linkedinSchema = z
+  .string()
+  .optional()
+  .nullable()
+  .transform((val) => {
+    if (val === undefined || val === null || val.trim() === '') return null;
+    const trimmed = val.trim();
+    const withProtocol =
+      trimmed.startsWith('http://') || trimmed.startsWith('https://')
+        ? trimmed
+        : `https://${trimmed}`;
+    return withProtocol;
+  })
+  .refine((val) => val === null || LINKEDIN_REGEX.test(val), {
+    message: 'Invalid LinkedIn URL. Use format: linkedin.com/in/username',
+  });
+
 const createContactSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
+  linkedin: linkedinSchema,
   followUpDate: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE).optional().nullable(),
 });
 
@@ -22,6 +44,7 @@ const updateContactSchema = z.object({
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
+  linkedin: linkedinSchema.optional(),
   followUpDate: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE).optional().nullable(),
 });
 
@@ -103,6 +126,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
         email: data.email ?? null,
         phone: data.phone ?? null,
         company: data.company ?? null,
+        linkedin: data.linkedin ?? null,
         followUpDate: data.followUpDate ?? null,
         createdAt: now,
         updatedAt: now,
@@ -129,6 +153,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
       'email',
       'phone',
       'company',
+      'linkedin',
       'followUpDate',
     ]);
 

@@ -162,6 +162,49 @@ describe('Contact Routes', () => {
         }),
       );
     });
+
+    it('should create contact with LinkedIn URL (with protocol)', async () => {
+      const data = await expectCreated<{
+        contact: { name: string; linkedin: string | null; id: number };
+      }>(
+        await post(ctx.app, '/api/contacts', ctx.sellerToken, {
+          name: 'LinkedIn Contact',
+          linkedin: 'https://www.linkedin.com/in/john-doe',
+        }),
+      );
+
+      const retrieved = await expectOk<{ contact: { name: string; linkedin: string | null } }>(
+        await get(ctx.app, `/api/contacts/${data.contact.id}`, ctx.sellerToken),
+      );
+      expect(retrieved.contact.name).toBe('LinkedIn Contact');
+      expect(retrieved.contact.linkedin).toBe('https://www.linkedin.com/in/john-doe');
+    });
+
+    it('should create contact with LinkedIn URL (without protocol, auto-add https)', async () => {
+      const data = await expectCreated<{
+        contact: { name: string; linkedin: string | null; id: number };
+      }>(
+        await post(ctx.app, '/api/contacts', ctx.sellerToken, {
+          name: 'LinkedIn No Protocol',
+          linkedin: 'linkedin.com/in/jane-smith',
+        }),
+      );
+
+      const retrieved = await expectOk<{ contact: { name: string; linkedin: string | null } }>(
+        await get(ctx.app, `/api/contacts/${data.contact.id}`, ctx.sellerToken),
+      );
+      expect(retrieved.contact.name).toBe('LinkedIn No Protocol');
+      expect(retrieved.contact.linkedin).toBe('https://linkedin.com/in/jane-smith');
+    });
+
+    it('should reject invalid LinkedIn URL', async () => {
+      await expectBadRequest(
+        await post(ctx.app, '/api/contacts', ctx.sellerToken, {
+          name: 'Bad LinkedIn Contact',
+          linkedin: 'not-a-linkedin-url',
+        }),
+      );
+    });
   });
 
   describe('PUT /api/contacts/:id', () => {
@@ -258,6 +301,32 @@ describe('Contact Routes', () => {
           followUpDate: 'invalid-date',
         }),
       );
+    });
+
+    it('should update linkedin', async () => {
+      await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
+        linkedin: 'linkedin.com/in/erik-andersson',
+      });
+
+      const retrieved = await expectOk<{ contact: { linkedin: string | null } }>(
+        await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken),
+      );
+      expect(retrieved.contact.linkedin).toBe('https://linkedin.com/in/erik-andersson');
+    });
+
+    it('should allow setting linkedin to null', async () => {
+      await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
+        linkedin: 'linkedin.com/in/temp',
+      });
+
+      await put(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken, {
+        linkedin: null,
+      });
+
+      const retrieved = await expectOk<{ contact: { linkedin: string | null } }>(
+        await get(ctx.app, `/api/contacts/${ctx.contactId}`, ctx.sellerToken),
+      );
+      expect(retrieved.contact.linkedin).toBeNull();
     });
   });
 

@@ -174,6 +174,11 @@ function WastebinTable({
                             <div className="text-dark-400 line-through opacity-60">
                               {contact.phone || 'No phone'}
                             </div>
+                            {contact.linkedin && (
+                              <div className="text-dark-400 line-through opacity-60">
+                                {contact.linkedin}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

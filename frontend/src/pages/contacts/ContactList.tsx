@@ -233,6 +233,51 @@ function ContactTable({
                               emptyText="Add phone"
                               aria-label={`Phone for ${contact.name}`}
                             />
+                            <div className="flex items-center gap-2">
+                              <InlineEditable
+                                value={contact.linkedin}
+                                onSave={async (value) => {
+                                  await updateContact.mutateAsync({
+                                    id: contact.id,
+                                    data: { linkedin: value },
+                                  });
+                                }}
+                                type="linkedin"
+                                placeholder="linkedin.com/in/username"
+                                emptyText="Add LinkedIn"
+                                aria-label={`LinkedIn for ${contact.name}`}
+                              />
+                              {contact.linkedin && (
+                                <a
+                                  href={
+                                    contact.linkedin.startsWith('http')
+                                      ? contact.linkedin
+                                      : `https://${contact.linkedin}`
+                                  }
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="shrink-0 text-dark-400 hover:text-warm-400 transition-colors"
+                                  aria-label={`Open LinkedIn profile for ${contact.name}`}
+                                >
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    aria-hidden
+                                  >
+                                    <title>Open in new tab</title>
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                    />
+                                  </svg>
+                                </a>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>

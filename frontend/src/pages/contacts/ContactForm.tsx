@@ -21,6 +21,7 @@ export default function ContactForm() {
     email: '',
     phone: '',
     company: '',
+    linkedin: '',
   });
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function ContactForm() {
         email: existingContact.email || '',
         phone: existingContact.phone || '',
         company: existingContact.company || '',
+        linkedin: existingContact.linkedin || '',
       });
     }
   }, [existingContact]);
@@ -62,6 +64,7 @@ export default function ContactForm() {
       email: formData.email.trim() || null,
       phone: formData.phone.trim() || null,
       company: formData.company.trim() || null,
+      linkedin: formData.linkedin.trim() || null,
     };
     handleSubmit(e, data);
   };
@@ -72,6 +75,7 @@ export default function ContactForm() {
       email: 'mikael.petterson@volvo.com',
       phone: '+46 70 123 45 67',
       company: 'Volvo AB',
+      linkedin: 'linkedin.com/in/mikael-pettersson',
     });
   };
 
@@ -146,6 +150,14 @@ export default function ContactForm() {
             value={formData.company}
             onChange={(e) => setFormData({ ...formData, company: e.target.value })}
             placeholder="Acme Inc."
+          />
+
+          <Input
+            label="LinkedIn"
+            type="text"
+            value={formData.linkedin}
+            onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+            placeholder="linkedin.com/in/username"
           />
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark-700">

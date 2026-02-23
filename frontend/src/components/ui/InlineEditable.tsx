@@ -10,10 +10,13 @@ import {
   inlineEditableTextNormal,
 } from '../../utils/styles';
 
+const LINKEDIN_REGEX =
+  /^(https?:\/\/)?([\w.-]+\.)?linkedin\.com\/(in|pub|public-profile\/in|public-profile\/pub)\/[\w-]+/i;
+
 interface InlineEditableProps {
   value: string | null;
   onSave: (value: string | null) => Promise<void>;
-  type?: 'email' | 'tel' | 'text';
+  type?: 'email' | 'tel' | 'text' | 'linkedin';
   placeholder?: string;
   className?: string;
   emptyText?: string;
@@ -51,7 +54,27 @@ export default function InlineEditable({
       }
     }
 
+    if (type === 'linkedin') {
+      const toTest =
+        trimmed.startsWith('http://') || trimmed.startsWith('https://')
+          ? trimmed
+          : `https://${trimmed}`;
+      if (!LINKEDIN_REGEX.test(toTest)) {
+        return 'Invalid LinkedIn URL. Use format: linkedin.com/in/username';
+      }
+    }
+
     return null;
+  };
+
+  const transformValue = (trimmed: string): string | null => {
+    if (trimmed === '') return null;
+    if (type === 'linkedin') {
+      return trimmed.startsWith('http://') || trimmed.startsWith('https://')
+        ? trimmed
+        : `https://${trimmed}`;
+    }
+    return trimmed;
   };
 
   const {
@@ -68,15 +91,17 @@ export default function InlineEditable({
     value,
     onSave,
     validate,
-    transformValue: (trimmed) => (trimmed === '' ? null : trimmed),
+    transformValue,
   });
+
+  const inputType = type === 'linkedin' ? 'text' : type;
 
   if (isEditing) {
     return (
       <div className="min-w-0">
         <input
           ref={inputRef as React.RefObject<HTMLInputElement>}
-          type={type}
+          type={inputType}
           value={editValue}
           onChange={(e) => handleChange(e.target.value)}
           onBlur={handleBlur}
