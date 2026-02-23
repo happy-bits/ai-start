@@ -3,7 +3,7 @@
   "hooks": {
     "beforeShellExecution": [
       {
-        "command": "bun run .cursor/hooks/safe-shell.ts"
+        "command": "bun run .cursor/hooks/safe-shell/index.ts"
       }
       // Previous prompt-based solution:
       // {
