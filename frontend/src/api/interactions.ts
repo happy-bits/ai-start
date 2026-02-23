@@ -9,11 +9,6 @@ export async function getInteractions(contactId?: number): Promise<Interaction[]
   return response.interactions;
 }
 
-export async function getInteraction(id: number): Promise<Interaction> {
-  const response = await apiClient.get<{ interaction: Interaction }>(`/api/interactions/${id}`);
-  return response.interaction;
-}
-
 export async function createInteraction(data: CreateInteractionData): Promise<Interaction> {
   const response = await apiClient.post<{ interaction: Interaction }>('/api/interactions', data);
   return response.interaction;
@@ -39,14 +34,6 @@ export function useInteractions(contactId?: number) {
   return useQuery({
     queryKey: ['interactions', { contactId }],
     queryFn: () => getInteractions(contactId),
-  });
-}
-
-export function useInteraction(id: number) {
-  return useQuery({
-    queryKey: ['interactions', id],
-    queryFn: () => getInteraction(id),
-    enabled: !!id,
   });
 }
 

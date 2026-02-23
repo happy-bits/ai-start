@@ -258,8 +258,10 @@ function ContactTable({
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
                                   className="shrink-0 text-dark-400 hover:text-warm-400 transition-colors"
-                                  aria-label={`Open LinkedIn profile for ${contact.name}`}
                                 >
+                                  <span className="sr-only">
+                                    Open LinkedIn profile for {contact.name}
+                                  </span>
                                   <svg
                                     className="w-4 h-4"
                                     fill="none"

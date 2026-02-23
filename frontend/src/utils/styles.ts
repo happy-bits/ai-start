@@ -9,7 +9,7 @@
 // Form Input Styles
 // ============================================================================
 
-/** Base styles for form inputs (Input, Select, Textarea) */
+/** Base styles for form inputs (Input) */
 export const formInputBase =
   'w-full px-4 py-2.5 bg-dark-800 border rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all';
 
@@ -79,11 +79,7 @@ export const deleteButtonBase =
 /** Delete button sizes */
 export const deleteButtonSize = {
   sm: 'p-1',
-  md: 'p-1.5',
 };
-
-/** Action button base styles (warm/primary actions) */
-export const actionButtonBase = 'text-warm-400 hover:text-warm-300 hover:bg-warm-500/10';
 
 // ============================================================================
 // Navigation Styles
@@ -102,9 +98,6 @@ export const navLinkBase =
 // ============================================================================
 // Container/Card Styles
 // ============================================================================
-
-/** Card container with background and border */
-export const cardContainer = 'bg-dark-800/50 rounded-lg border border-dark-700';
 
 /** Dashed border card container */
 export const cardContainerDashed =
