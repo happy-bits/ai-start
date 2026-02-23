@@ -3,10 +3,14 @@
   "hooks": {
     "beforeShellExecution": [
       {
-        "type": "prompt",
-        "prompt": "Does this command look safe to execute? Only allow read-only operations.",
-        "timeout": 10
+        "command": "bun run .cursor/hooks/safe-shell.ts"
       }
+      // Previous prompt-based solution:
+      // {
+      //   "type": "prompt",
+      //   "prompt": "Does this command look safe to execute? Only allow read-only operations.",
+      //   "timeout": 10
+      // }
     ]
   }
 }
