@@ -111,6 +111,37 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
     return c.json({ contact });
   });
 
+  // POST /contacts/import - Bulk create contacts (MUST come before /:id)
+  const importContactsSchema = z.object({
+    contacts: z.array(createContactSchema).min(1, 'At least one contact is required'),
+  });
+
+  app.post('/import', zValidator('json', importContactsSchema), (c) => {
+    const user = c.get('user');
+    const { contacts: contactsData } = c.req.valid('json');
+
+    const now = new Date().toISOString();
+    const inserted = db
+      .insert(schema.contacts)
+      .values(
+        contactsData.map((data) => ({
+          sellerId: user.id,
+          name: data.name,
+          email: data.email ?? null,
+          phone: data.phone ?? null,
+          company: data.company ?? null,
+          linkedin: data.linkedin ?? null,
+          followUpDate: data.followUpDate ?? null,
+          createdAt: now,
+          updatedAt: now,
+        })),
+      )
+      .returning()
+      .all();
+
+    return c.json({ contacts: inserted, count: inserted.length }, 201);
+  });
+
   // POST /contacts - Create new contact
   app.post('/', zValidator('json', createContactSchema), (c) => {
     const user = c.get('user');

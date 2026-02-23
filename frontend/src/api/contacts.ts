@@ -18,6 +18,13 @@ export async function createContact(data: CreateContactData): Promise<Contact> {
   return response.contact;
 }
 
+export async function importContacts(contacts: CreateContactData[]): Promise<Contact[]> {
+  const response = await apiClient.post<{ contacts: Contact[] }>('/api/contacts/import', {
+    contacts,
+  });
+  return response.contacts;
+}
+
 export async function updateContact(id: number, data: UpdateContactData): Promise<Contact> {
   const response = await apiClient.put<{ contact: Contact }>(`/api/contacts/${id}`, data);
   return response.contact;
@@ -62,6 +69,17 @@ export function useCreateContact() {
 
   return useMutation({
     mutationFn: createContact,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    },
+  });
+}
+
+export function useImportContacts() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: importContacts,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
     },
