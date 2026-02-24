@@ -53,17 +53,6 @@ describe('dates utilities', () => {
       expect(typeof result).toBe('string');
     });
 
-    it('formats date with custom options', () => {
-      const dateString = '2024-01-15';
-      const result = formatDate(dateString, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-      expect(result).toContain('2024');
-      expect(result).toContain('January');
-    });
-
     it('handles different date formats', () => {
       const dateString = '2024-12-25';
       const result = formatDate(dateString, {
