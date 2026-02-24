@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { InteractionType } from '../api/types';
 
 interface InteractionTypeConfig {
-  color: 'warm';
+  color: 'blue';
   icon: ReactNode;
 }
 
@@ -11,7 +11,7 @@ interface InteractionTypeConfig {
  */
 export const interactionTypeConfig: Record<InteractionType, InteractionTypeConfig> = {
   call: {
-    color: 'warm',
+    color: 'blue',
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
         <title>Call</title>
@@ -25,7 +25,7 @@ export const interactionTypeConfig: Record<InteractionType, InteractionTypeConfi
     ),
   },
   meeting: {
-    color: 'warm',
+    color: 'blue',
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
         <title>Meeting</title>
@@ -39,7 +39,7 @@ export const interactionTypeConfig: Record<InteractionType, InteractionTypeConfi
     ),
   },
   email: {
-    color: 'warm',
+    color: 'blue',
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
         <title>Email</title>
@@ -53,7 +53,7 @@ export const interactionTypeConfig: Record<InteractionType, InteractionTypeConfi
     ),
   },
   video_call: {
-    color: 'warm',
+    color: 'blue',
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
         <title>Video call</title>
@@ -67,7 +67,7 @@ export const interactionTypeConfig: Record<InteractionType, InteractionTypeConfi
     ),
   },
   note: {
-    color: 'warm',
+    color: 'blue',
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
         <title>Note</title>

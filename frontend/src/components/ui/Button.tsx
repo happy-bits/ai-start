@@ -22,7 +22,7 @@ export default function Button({
 
   const variants = {
     primary:
-      'bg-gradient-to-r from-warm-500 to-warm-600 hover:from-warm-400 hover:to-warm-500 text-white shadow-lg shadow-warm-500/25 focus:ring-warm-500',
+      'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white shadow-lg shadow-blue-500/25 focus:ring-blue-500',
     secondary:
       'bg-dark-700 hover:bg-dark-600 text-white border border-dark-600 focus:ring-dark-500',
     danger:

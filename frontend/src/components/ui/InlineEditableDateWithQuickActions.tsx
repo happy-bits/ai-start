@@ -56,7 +56,7 @@ export default function InlineEditableDateWithQuickActions({
             type="button"
             key={action.label}
             onClick={() => handleQuickAction(action.offset)}
-            className="px-2 py-1 text-xs font-medium text-dark-400 hover:text-warm-400 hover:bg-warm-500/10 border border-dark-700 hover:border-warm-500/30 rounded transition-colors"
+            className="px-2 py-1 text-xs font-medium text-dark-400 hover:text-blue-400 hover:bg-blue-500/10 border border-dark-700 hover:border-blue-500/30 rounded transition-colors"
             aria-label={`Set follow-up date ${action.label} from now`}
           >
             +{action.label}

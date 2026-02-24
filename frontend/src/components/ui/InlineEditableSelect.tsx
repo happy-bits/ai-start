@@ -8,7 +8,7 @@ interface InlineEditableSelectProps {
   onSave: (value: string) => Promise<void>;
   options: Array<{ value: string; label: string }>;
   className?: string;
-  badgeVariant?: 'default' | 'warm';
+  badgeVariant?: 'default' | 'blue';
   'aria-label'?: string;
 }
 
@@ -17,7 +17,7 @@ export default function InlineEditableSelect({
   onSave,
   options,
   className = '',
-  badgeVariant = 'warm',
+  badgeVariant = 'blue',
   'aria-label': ariaLabel,
 }: InlineEditableSelectProps) {
   const isSavingFromChangeRef = useRef(false);
