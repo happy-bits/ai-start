@@ -98,15 +98,15 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center p-4">
       {/* Background decoration */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-warm-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-warm-600/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
       </div>
 
       <div className="w-full max-w-md relative">
         {/* Logo and title */}
         <div className="text-center mb-8">
           <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-warm-400 to-warm-600 mb-4 shadow-lg shadow-warm-500/25"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 mb-4 shadow-lg shadow-blue-500/25"
             aria-hidden="true"
           >
             <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -155,7 +155,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full py-3 px-4 bg-gradient-to-r from-warm-500 to-warm-600 hover:from-warm-400 hover:to-warm-500 text-white font-semibold rounded-lg shadow-lg shadow-warm-500/25 focus:outline-none focus:ring-2 focus:ring-warm-500 focus:ring-offset-2 focus:ring-offset-dark-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/25 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-dark-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loginMutation.isPending ? (
                 <span className="flex items-center justify-center gap-2">
@@ -190,18 +190,18 @@ export default function Login() {
               <div className="mb-4 space-y-1.5">
                 <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
                   <span className="text-dark-400 font-medium">Admin:</span>{' '}
-                  <span className="text-warm-400 select-all">admin@keepwarm.com</span> /{' '}
-                  <span className="text-warm-400 select-all">admin123</span>
+                  <span className="text-blue-400 select-all">admin@keepwarm.com</span> /{' '}
+                  <span className="text-blue-400 select-all">admin123</span>
                 </div>
                 <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
                   <span className="text-dark-400 font-medium">Maria:</span>{' '}
-                  <span className="text-warm-400 select-all">maria@sellmore.se</span> /{' '}
-                  <span className="text-warm-400 select-all">seller123</span>
+                  <span className="text-blue-400 select-all">maria@sellmore.se</span> /{' '}
+                  <span className="text-blue-400 select-all">seller123</span>
                 </div>
                 <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
                   <span className="text-dark-400 font-medium">Lars:</span>{' '}
-                  <span className="text-warm-400 select-all">lars@hotmail.com</span> /{' '}
-                  <span className="text-warm-400 select-all">seller123</span>
+                  <span className="text-blue-400 select-all">lars@hotmail.com</span> /{' '}
+                  <span className="text-blue-400 select-all">seller123</span>
                 </div>
               </div>
 
@@ -210,7 +210,7 @@ export default function Login() {
                   label="Admin"
                   email="admin@keepwarm.com"
                   password="admin123"
-                  color="warm"
+                  color="blue"
                   onLogin={handleQuickLogin}
                   disabled={loginMutation.isPending || isResetting}
                 />
@@ -219,7 +219,7 @@ export default function Login() {
                   subtitle="Seller"
                   email="maria@sellmore.se"
                   password="seller123"
-                  color="warm"
+                  color="blue"
                   onLogin={handleQuickLogin}
                   disabled={loginMutation.isPending || isResetting}
                 />
@@ -228,7 +228,7 @@ export default function Login() {
                   subtitle="Seller"
                   email="lars@hotmail.com"
                   password="seller123"
-                  color="warm"
+                  color="blue"
                   onLogin={handleQuickLogin}
                   disabled={loginMutation.isPending || isResetting}
                 />
@@ -260,7 +260,7 @@ export default function Login() {
               </button>
 
               {resetSuccess && (
-                <div className="bg-warm-500/10 border border-warm-500/20 text-warm-400 px-4 py-3 rounded-lg text-sm mt-3">
+                <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-3 rounded-lg text-sm mt-3">
                   Database has been reset!
                 </div>
               )}
@@ -286,12 +286,12 @@ function QuickLoginButton({
   subtitle?: string;
   email: string;
   password: string;
-  color: 'warm';
+  color: 'blue';
   onLogin: (email: string, password: string) => void;
   disabled: boolean;
 }) {
   const colorClasses = {
-    warm: 'bg-warm-500/10 border-warm-500/30 hover:bg-warm-500/20 hover:border-warm-500/50 text-warm-400',
+    blue: 'bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/50 text-blue-400',
   };
 
   return (

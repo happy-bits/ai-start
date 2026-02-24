@@ -258,7 +258,7 @@ function ContactTable({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="shrink-0 text-dark-400 hover:text-warm-400 transition-colors"
+                                  className="shrink-0 text-dark-400 hover:text-blue-400 transition-colors"
                                 >
                                   <span className="sr-only">
                                     Open LinkedIn profile for {contact.name}
@@ -316,7 +316,7 @@ function ContactTable({
                                   });
                                 }}
                                 options={INTERACTION_TYPE_OPTIONS}
-                                badgeVariant="warm"
+                                badgeVariant="blue"
                                 aria-label="Interaction type"
                               />
                             </div>
@@ -511,7 +511,7 @@ export default function ContactList() {
           className={cn(
             'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
             filter === FILTER_ATT_KONTAKTA
-              ? 'bg-warm-500/20 text-warm-400 border border-warm-500/40'
+              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40'
               : 'text-dark-400 hover:text-white border border-dark-700 hover:border-dark-600',
           )}
         >
@@ -527,7 +527,7 @@ export default function ContactList() {
           className={cn(
             'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
             filter === FILTER_ALL
-              ? 'bg-warm-500/20 text-warm-400 border border-warm-500/40'
+              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40'
               : 'text-dark-400 hover:text-white border border-dark-700 hover:border-dark-600',
           )}
         >
@@ -573,7 +573,7 @@ export default function ContactList() {
                 <EmptyState
                   icon={
                     <svg
-                      className="w-10 h-10 text-warm-400"
+                      className="w-10 h-10 text-blue-400"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

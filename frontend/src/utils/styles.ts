@@ -11,7 +11,7 @@
 
 /** Base styles for form inputs (Input) */
 export const formInputBase =
-  'w-full px-4 py-2.5 bg-dark-800 border rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all';
+  'w-full px-4 py-2.5 bg-dark-800 border rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all';
 
 /** Border color for form inputs in normal state */
 export const formInputBorderNormal = 'border-dark-600';
@@ -50,7 +50,7 @@ export const errorMessageContainer =
 
 /** Base styles for InlineEditable inputs when editing */
 export const inlineEditableInputBase =
-  'px-2 py-1 bg-dark-800 border border-warm-500 rounded text-sm text-white focus:outline-none focus:ring-2 focus:ring-warm-500/50 transition-all';
+  'px-2 py-1 bg-dark-800 border border-blue-500 rounded text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all';
 
 /** Base styles for InlineEditable display mode */
 export const inlineEditableDisplayBase =
@@ -86,7 +86,7 @@ export const deleteButtonSize = {
 // ============================================================================
 
 /** Active navigation link styles */
-export const navLinkActive = 'bg-warm-500/10 text-warm-400 border border-warm-500/20';
+export const navLinkActive = 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
 
 /** Inactive navigation link styles */
 export const navLinkInactive = 'text-dark-400 hover:text-white hover:bg-dark-800';
@@ -101,7 +101,7 @@ export const navLinkBase =
 
 /** Dashed border card container */
 export const cardContainerDashed =
-  'bg-dark-800/30 rounded-lg border border-dashed border-dark-600 hover:border-warm-500/30 transition-colors';
+  'bg-dark-800/30 rounded-lg border border-dashed border-dark-600 hover:border-blue-500/30 transition-colors';
 
 // ============================================================================
 // Icon Container Styles
@@ -109,7 +109,7 @@ export const cardContainerDashed =
 
 /** Icon container for interaction types */
 export const iconContainer =
-  'w-10 h-10 shrink-0 rounded-lg flex items-center justify-center bg-warm-500/10 text-warm-400';
+  'w-10 h-10 shrink-0 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-400';
 
 // ============================================================================
 // Utility Functions

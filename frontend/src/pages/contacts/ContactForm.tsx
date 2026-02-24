@@ -112,7 +112,7 @@ export default function ContactForm() {
               <button
                 type="button"
                 onClick={fillSampleData}
-                className="text-xs text-dark-400 hover:text-warm-400 transition-colors"
+                className="text-xs text-dark-400 hover:text-blue-400 transition-colors"
               >
                 Fill sample data
               </button>

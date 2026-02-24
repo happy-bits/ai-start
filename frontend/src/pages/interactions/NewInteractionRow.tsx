@@ -78,7 +78,7 @@ export default function NewInteractionRow({
             value={type}
             onSave={handleTypeChange}
             options={INTERACTION_TYPE_OPTIONS}
-            badgeVariant="warm"
+            badgeVariant="blue"
           />
         </div>
         <div className="flex-1 min-w-0">

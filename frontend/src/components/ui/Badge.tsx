@@ -3,14 +3,14 @@ import { cn } from '../../utils/styles';
 
 interface BadgeProps {
   children: ReactNode;
-  variant?: 'default' | 'warm';
+  variant?: 'default' | 'blue';
   className?: string;
 }
 
 export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
   const variants = {
     default: 'bg-dark-700 text-dark-300',
-    warm: 'bg-warm-500/10 text-warm-400 border border-warm-500/20',
+    blue: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
   };
 
   return (
