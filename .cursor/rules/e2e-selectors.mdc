@@ -1,12 +1,7 @@
 ---
-description: E2E test selector best practices
-globs:
-  - "**/e2e/**/*.spec.ts"
-  - "**/e2e/**/*.test.ts"
-  - "**/*.e2e.ts"
+globs: **/e2e/**/*.spec.ts
 alwaysApply: false
 ---
-
 # E2E Test Selector Guidelines
 
 When writing e2e tests, always prefer semantic selectors over HTML element selectors.
