@@ -3,7 +3,7 @@ import { createApp } from './app.js';
 import { db, resetDatabase, runMigrations } from './db/index.js';
 import { seedDatabase } from './db/seed.js';
 
-const PORT = parseInt(process.env.PORT || '3000', 10);
+const PORT = parseInt(process.env.PORT || '3001', 10);
 
 // Run migrations on startup
 runMigrations();

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Runs frontend e2e tests. Starts backend on port 3000 if not already running.
+ * Runs frontend e2e tests. Starts backend on port 3001 if not already running.
  */
 import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
@@ -11,7 +11,7 @@ const rootDir = join(__dirname, '..');
 const backendDir = join(rootDir, 'backend');
 const frontendDir = join(rootDir, 'frontend');
 
-const HEALTH_URL = 'http://localhost:3000/health';
+const HEALTH_URL = 'http://localhost:3001/health';
 
 async function isBackendRunning() {
   try {

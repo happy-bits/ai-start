@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Starts backend then frontend for development.
- * Kills processes on ports 3000 and 5173 first (continues silently if none).
+ * Kills processes on ports 3001 and 5173 first (continues silently if none).
  * Supports --seed to seed the database.
  */
 import { spawn } from 'node:child_process';
@@ -13,7 +13,7 @@ const rootDir = join(__dirname, '..');
 const backendDir = join(rootDir, 'backend');
 const frontendDir = join(rootDir, 'frontend');
 
-const BACKEND_PORT = 3000;
+const BACKEND_PORT = 3001;
 const FRONTEND_PORT = 5173;
 const HEALTH_URL = `http://localhost:${BACKEND_PORT}/health`;
 

@@ -3,7 +3,7 @@
 
 ## Översikt
 
-Backend är en REST API byggd med Hono, Node.js och SQLite via Drizzle ORM. Servern kör på port 3000 (konfigurerbar via `PORT`). Autentisering sker via sessionstokens i `Authorization: Bearer <token>`. Teknisk stack inkluderar Hono som webbramverk, Drizzle ORM för databasåtkomst, @node-rs/argon2 för lösenordshashing, Zod för validering och @hono/zod-validator för integration med Hono.
+Backend är en REST API byggd med Hono, Node.js och SQLite via Drizzle ORM. Servern kör på port 3001 (konfigurerbar via `PORT`). Autentisering sker via sessionstokens i `Authorization: Bearer <token>`. Teknisk stack inkluderar Hono som webbramverk, Drizzle ORM för databasåtkomst, @node-rs/argon2 för lösenordshashing, Zod för validering och @hono/zod-validator för integration med Hono.
 
 ## API-struktur
 

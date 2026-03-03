@@ -14,7 +14,7 @@ const API_BASE = import.meta.env.VITE_API_URL || '';
 
 // In dev, connect directly to backend to avoid Vite proxy SSE issues
 const HEALTH_STREAM_URL = import.meta.env.DEV
-  ? 'http://localhost:3000/health/stream'
+  ? 'http://localhost:3001/health/stream'
   : `${API_BASE}/health/stream`;
 
 export default function Login() {

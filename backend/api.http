@@ -10,7 +10,7 @@
 #
 # Start server: SEED_DB=true npm run dev
 
-@baseUrl = http://localhost:3000
+@baseUrl = http://localhost:3001
 @token = {{login.response.body.token}}
 
 ###############################################################################

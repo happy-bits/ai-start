@@ -4,7 +4,7 @@ Starta både backend och frontend från projektroten:
 
     npm run dev
 
-Backend startar först (port 3000), sedan frontend (port 5173). Med `npm run dev:seed` seedas databasen vid start.
+Backend startar först (port 3001), sedan frontend (port 5173). Med `npm run dev:seed` seedas databasen vid start.
 
 ---
 

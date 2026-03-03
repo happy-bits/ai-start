@@ -195,7 +195,7 @@ Alla använder TanStack Query för cache och mutationer.
 
 ## Start och körning
 
-- **Backend**: `cd backend && npm run dev` – port 3000. `SEED_DB=true` seedar vid start.
+- **Backend**: `cd backend && npm run dev` – port 3001. `SEED_DB=true` seedar vid start.
 - **Frontend**: `cd frontend && npm run dev` – Vite på port 5173.
 - **Tester**: `npm test` i root – backend unit, frontend unit, e2e.
 
