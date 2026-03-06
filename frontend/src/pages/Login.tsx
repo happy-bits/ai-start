@@ -197,9 +197,14 @@ export default function Login() {
                   <span className="text-warm-400 select-all">lars@hotmail.com</span> /{' '}
                   <span className="text-warm-400 select-all">seller123</span>
                 </div>
+                <div className="bg-dark-800/50 rounded px-2.5 py-1.5 text-xs">
+                  <span className="text-dark-400 font-medium">Oscar:</span>{' '}
+                  <span className="text-warm-400 select-all">oscar@keepwarm.com</span> /{' '}
+                  <span className="text-warm-400 select-all">seller123</span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <QuickLoginButton
                   label="Admin"
                   email="admin@keepwarm.com"
@@ -221,6 +226,15 @@ export default function Login() {
                   label="Lars"
                   subtitle="Seller"
                   email="lars@hotmail.com"
+                  password="seller123"
+                  color="warm"
+                  onLogin={handleQuickLogin}
+                  disabled={loginMutation.isPending || isResetting}
+                />
+                <QuickLoginButton
+                  label="Oscar"
+                  subtitle="Seller"
+                  email="oscar@keepwarm.com"
                   password="seller123"
                   color="warm"
                   onLogin={handleQuickLogin}

@@ -57,7 +57,20 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
     .returning()
     .get();
 
-  console.log('Created users:', { adminUser, seller1, seller2 });
+  const seller3 = db
+    .insert(schema.users)
+    .values({
+      email: 'oscar@keepwarm.com',
+      passwordHash: sellerPassword,
+      name: 'Oscar',
+      role: ROLES.SELLER,
+      createdAt: SEED_DATE,
+      updatedAt: SEED_DATE,
+    })
+    .returning()
+    .get();
+
+  console.log('Created users:', { adminUser, seller1, seller2, seller3 });
 
   // Helper function to generate deterministic number of interactions (0-5) based on index
   function getInteractionCount(index: number): number {
@@ -282,7 +295,7 @@ export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
 
   return {
     admin: adminUser,
-    sellers: [seller1, seller2],
+    sellers: [seller1, seller2, seller3],
     contacts: mariaContacts,
   };
 }
