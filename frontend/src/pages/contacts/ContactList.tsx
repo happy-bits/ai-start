@@ -419,7 +419,7 @@ export default function ContactList() {
           <Button
             variant="secondary"
             onClick={() => setImportModalOpen(true)}
-            aria-label="Import contacts from CSV"
+            aria-label="Import contacts from JSON"
           >
             <svg
               className="w-5 h-5"

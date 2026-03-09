@@ -4,7 +4,13 @@ import { and, eq, isNull, not } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { Hono } from 'hono';
 import { z } from 'zod';
-import { DATE_FORMAT_MESSAGE, DATE_FORMAT_REGEX, ERROR_MESSAGES, ROLES } from '../constants.js';
+import {
+  DATE_FORMAT_MESSAGE,
+  DATE_FORMAT_REGEX,
+  ERROR_MESSAGES,
+  INTERACTION_TYPE_VALUES,
+  ROLES,
+} from '../constants.js';
 import * as schema from '../db/schema.js';
 import type { AuthVariables } from '../middleware/auth.js';
 import { buildUpdateValues, checkSellerAccess, parseIdParam, withEntityAccess } from './helpers.js';
@@ -24,6 +30,17 @@ const createContactSchema = z.object({
   company: z.string().optional().nullable(),
   linkedin: z.string().optional().nullable(),
   followUpDate: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE).optional().nullable(),
+  interactions: z
+    .array(
+      z.object({
+        type: z.enum(INTERACTION_TYPE_VALUES),
+        date: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE),
+        time: z.string().optional().nullable(),
+        notes: z.string().optional().nullable(),
+      }),
+    )
+    .optional()
+    .default([]),
 });
 
 const updateContactSchema = z.object({
@@ -60,31 +77,80 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
     contacts: z.array(createContactSchema).min(1, 'At least one contact is required'),
   });
 
-  // POST /contacts/bulk - Create multiple contacts (MUST come before /:id route)
+  // POST /contacts/bulk - Create multiple contacts with optional interactions (MUST come before /:id route)
   app.post('/bulk', zValidator('json', bulkCreateSchema), (c) => {
     const user = c.get('user');
     const { contacts: contactsData } = c.req.valid('json');
 
     const now = new Date().toISOString();
-    const inserted = db
-      .insert(schema.contacts)
-      .values(
-        contactsData.map((data) => ({
-          sellerId: user.id,
-          name: data.name,
-          email: data.email ?? null,
-          phone: data.phone ?? null,
-          company: data.company ?? null,
-          linkedin: normalizeLinkedIn(data.linkedin),
-          followUpDate: data.followUpDate ?? null,
-          createdAt: now,
-          updatedAt: now,
-        })),
-      )
-      .returning()
-      .all();
 
-    return c.json({ contacts: inserted }, 201);
+    // Use transaction to ensure atomicity: all contacts and interactions created together or none
+    const result = db.transaction((tx) => {
+      // Insert all contacts first
+      const insertedContacts = tx
+        .insert(schema.contacts)
+        .values(
+          contactsData.map((data) => ({
+            sellerId: user.id,
+            name: data.name,
+            email: data.email ?? null,
+            phone: data.phone ?? null,
+            company: data.company ?? null,
+            linkedin: normalizeLinkedIn(data.linkedin),
+            followUpDate: data.followUpDate ?? null,
+            createdAt: now,
+            updatedAt: now,
+          })),
+        )
+        .returning()
+        .all();
+
+      // Collect all interactions to insert
+      const interactionsToInsert: Array<{
+        contactId: number;
+        sellerId: number;
+        type: string;
+        date: string;
+        time: string | null;
+        notes: string | null;
+        createdAt: string;
+        updatedAt: string;
+      }> = [];
+
+      // Map interactions to their corresponding contact IDs
+      contactsData.forEach((contactData, index) => {
+        const contactId = insertedContacts[index].id;
+        const interactions = contactData.interactions ?? [];
+        interactions.forEach((interaction) => {
+          interactionsToInsert.push({
+            contactId,
+            sellerId: user.id,
+            type: interaction.type,
+            date: interaction.date,
+            time: interaction.time ?? null,
+            notes: interaction.notes ?? null,
+            createdAt: now,
+            updatedAt: now,
+          });
+        });
+      });
+
+      // Insert all interactions if any
+      const insertedInteractions =
+        interactionsToInsert.length > 0
+          ? tx.insert(schema.interactions).values(interactionsToInsert).returning().all()
+          : [];
+
+      return { contacts: insertedContacts, interactions: insertedInteractions };
+    });
+
+    return c.json(
+      {
+        contacts: result.contacts,
+        interactions: result.interactions,
+      },
+      201,
+    );
   });
 
   // GET /contacts/wastebin - List soft-deleted contacts (MUST come before /:id route)

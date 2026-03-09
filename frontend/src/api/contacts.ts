@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './client';
-import type { Contact, CreateContactData, UpdateContactData } from './types';
+import type { Contact, CreateContactData, InteractionType, UpdateContactData } from './types';
 
 // API functions
 export async function getContacts(): Promise<Contact[]> {
@@ -18,10 +18,24 @@ export async function createContact(data: CreateContactData): Promise<Contact> {
   return response.contact;
 }
 
-export async function createContactsBulk(contacts: CreateContactData[]): Promise<Contact[]> {
-  const response = await apiClient.post<{ contacts: Contact[] }>('/api/contacts/bulk', {
-    contacts,
-  });
+export interface BulkContactInteraction {
+  type: InteractionType; // Must be valid when sent to API
+  date: string;
+  time?: string | null;
+  notes?: string | null;
+}
+
+export interface BulkContactData extends CreateContactData {
+  interactions?: BulkContactInteraction[];
+}
+
+export async function createContactsBulk(contacts: BulkContactData[]): Promise<Contact[]> {
+  const response = await apiClient.post<{ contacts: Contact[]; interactions?: unknown[] }>(
+    '/api/contacts/bulk',
+    {
+      contacts,
+    },
+  );
   return response.contacts;
 }
 
@@ -82,6 +96,7 @@ export function useCreateContactsBulk() {
     mutationFn: createContactsBulk,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      queryClient.invalidateQueries({ queryKey: ['interactions'] });
     },
   });
 }

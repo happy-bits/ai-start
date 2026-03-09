@@ -254,6 +254,171 @@ describe('Contact Routes', () => {
         }),
       );
     });
+
+    it('should create contacts with interactions', async () => {
+      const data = await expectCreated<{
+        contacts: { name: string; sellerId: number; id: number }[];
+        interactions: Array<{ type: string; date: string; contactId: number }>;
+      }>(
+        await post(ctx.app, '/api/contacts/bulk', ctx.sellerToken, {
+          contacts: [
+            {
+              name: 'Contact with Interactions',
+              email: 'with-interactions@test.com',
+              interactions: [
+                {
+                  type: 'call',
+                  date: '2026-03-05',
+                  time: '14:30',
+                  notes: 'Test call',
+                },
+                {
+                  type: 'meeting',
+                  date: '2026-03-10',
+                  notes: 'Test meeting',
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      expect(data.contacts).toHaveLength(1);
+      expect(data.interactions).toHaveLength(2);
+      expect(data.interactions[0].type).toBe('call');
+      expect(data.interactions[0].date).toBe('2026-03-05');
+      expect(data.interactions[0].contactId).toBe(data.contacts[0].id);
+      expect(data.interactions[1].type).toBe('meeting');
+      expect(data.interactions[1].date).toBe('2026-03-10');
+
+      // Verify interactions are accessible via API
+      const interactions = await expectOk<{
+        interactions: Array<{ type: string; date: string; contactId: number }>;
+      }>(await get(ctx.app, `/api/interactions?contactId=${data.contacts[0].id}`, ctx.sellerToken));
+      expect(interactions.interactions).toHaveLength(2);
+    });
+
+    it('should reject when interaction has invalid date format', async () => {
+      await expectBadRequest(
+        await post(ctx.app, '/api/contacts/bulk', ctx.sellerToken, {
+          contacts: [
+            {
+              name: 'Valid Contact',
+              email: 'valid@test.com',
+              interactions: [
+                {
+                  type: 'call',
+                  date: '2026/03/05', // Invalid format
+                  notes: 'Test',
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      // Verify no contact was created
+      const list = await expectOk<{ contacts: { name: string }[] }>(
+        await get(ctx.app, '/api/contacts', ctx.sellerToken),
+      );
+      expect(list.contacts.map((c) => c.name)).not.toContain('Valid Contact');
+    });
+
+    it('should reject when interaction has invalid type', async () => {
+      await expectBadRequest(
+        await post(ctx.app, '/api/contacts/bulk', ctx.sellerToken, {
+          contacts: [
+            {
+              name: 'Valid Contact',
+              email: 'valid@test.com',
+              interactions: [
+                {
+                  // biome-ignore lint/suspicious/noExplicitAny: testing invalid interaction type
+                  type: 'invalid_type' as any,
+                  date: '2026-03-05',
+                },
+              ],
+            },
+          ],
+        }),
+      );
+    });
+
+    it('should reject when interaction is missing required date', async () => {
+      await expectBadRequest(
+        await post(ctx.app, '/api/contacts/bulk', ctx.sellerToken, {
+          contacts: [
+            {
+              name: 'Valid Contact',
+              email: 'valid@test.com',
+              interactions: [
+                {
+                  type: 'call',
+                  // Missing date
+                  // biome-ignore lint/suspicious/noExplicitAny: testing missing required date
+                } as any,
+              ],
+            },
+          ],
+        }),
+      );
+    });
+
+    it('should create contacts without interactions when interactions array is empty', async () => {
+      const data = await expectCreated<{
+        contacts: { name: string; id: number }[];
+        interactions: unknown[];
+      }>(
+        await post(ctx.app, '/api/contacts/bulk', ctx.sellerToken, {
+          contacts: [
+            {
+              name: 'Contact without Interactions',
+              email: 'no-interactions@test.com',
+              interactions: [],
+            },
+          ],
+        }),
+      );
+
+      expect(data.contacts).toHaveLength(1);
+      expect(data.interactions).toHaveLength(0);
+    });
+
+    it('should create multiple contacts with mixed interactions', async () => {
+      const data = await expectCreated<{
+        contacts: { name: string; id: number }[];
+        interactions: Array<{ contactId: number; type: string }>;
+      }>(
+        await post(ctx.app, '/api/contacts/bulk', ctx.sellerToken, {
+          contacts: [
+            {
+              name: 'Contact 1',
+              email: 'contact1@test.com',
+              interactions: [{ type: 'call', date: '2026-03-05' }],
+            },
+            {
+              name: 'Contact 2',
+              email: 'contact2@test.com',
+              // No interactions
+            },
+            {
+              name: 'Contact 3',
+              email: 'contact3@test.com',
+              interactions: [
+                { type: 'email', date: '2026-03-06' },
+                { type: 'meeting', date: '2026-03-07' },
+              ],
+            },
+          ],
+        }),
+      );
+
+      expect(data.contacts).toHaveLength(3);
+      expect(data.interactions).toHaveLength(3);
+      expect(data.interactions[0].contactId).toBe(data.contacts[0].id);
+      expect(data.interactions[1].contactId).toBe(data.contacts[2].id);
+      expect(data.interactions[2].contactId).toBe(data.contacts[2].id);
+    });
   });
 
   describe('PUT /api/contacts/:id', () => {
