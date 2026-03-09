@@ -30,6 +30,8 @@ const VALID_INTERACTION_TYPES: InteractionType[] = [
   'sms',
 ];
 
+const VALID_NEXT_CONTACT_CHANNELS: NextContactChannel[] = ['call', 'sms', 'email', 'linkedin'];
+
 interface ImportContactData extends Omit<BulkContactData, 'interactions'> {
   interactions?: ImportInteraction[];
 }
@@ -48,6 +50,10 @@ function validateContact(row: CreateContactData): string | null {
   }
   if (row.followUpDate?.trim() && !DATE_REGEX.test(row.followUpDate.trim())) {
     return 'Date must be YYYY-MM-DD';
+  }
+  const channel = row.nextContactChannel?.toString().trim();
+  if (channel && !VALID_NEXT_CONTACT_CHANNELS.includes(channel as NextContactChannel)) {
+    return `Invalid nextContactChannel value "${channel}". Allowed values: call, sms, email, linkedin.`;
   }
   return null;
 }
