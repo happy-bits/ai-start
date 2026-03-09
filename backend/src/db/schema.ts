@@ -42,6 +42,7 @@ export const contacts = sqliteTable('contacts', {
   company: text('company'),
   linkedin: text('linkedin'),
   followUpDate: text('follow_up_date'),
+  nextContactChannel: text('next_contact_channel'),
   deletedAt: text('deleted_at'),
   createdAt: text('created_at')
     .notNull()

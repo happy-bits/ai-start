@@ -2,8 +2,22 @@ import { type FormEvent, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { useContact, useCreateContact, useUpdateContact } from '../../api/contacts';
-import type { Contact, CreateContactData, UpdateContactData } from '../../api/types';
-import { BackButton, Button, Card, ErrorMessage, Input, LoadingSpinner } from '../../components/ui';
+import type {
+  Contact,
+  CreateContactData,
+  NextContactChannel,
+  UpdateContactData,
+} from '../../api/types';
+import { NEXT_CONTACT_CHANNEL_OPTIONS } from '../../api/types';
+import {
+  BackButton,
+  Button,
+  Card,
+  ErrorMessage,
+  Input,
+  LoadingSpinner,
+  Select,
+} from '../../components/ui';
 import { config } from '../../config';
 import { useFormSubmission } from '../../hooks/useFormSubmission';
 
@@ -16,12 +30,20 @@ export default function ContactForm() {
   const createContact = useCreateContact();
   const updateContact = useUpdateContact();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    linkedin: string;
+    company: string;
+    nextContactChannel: '' | NextContactChannel;
+  }>({
     name: '',
     email: '',
     phone: '',
     linkedin: '',
     company: '',
+    nextContactChannel: '',
   });
 
   useEffect(() => {
@@ -32,6 +54,7 @@ export default function ContactForm() {
         phone: existingContact.phone || '',
         linkedin: existingContact.linkedin || '',
         company: existingContact.company || '',
+        nextContactChannel: existingContact.nextContactChannel || '',
       });
     }
   }, [existingContact]);
@@ -65,6 +88,7 @@ export default function ContactForm() {
       phone: formData.phone.trim() || null,
       linkedin: formData.linkedin.trim() || null,
       company: formData.company.trim() || null,
+      nextContactChannel: (formData.nextContactChannel || null) as NextContactChannel | null,
     };
     handleSubmit(e, data);
   };
@@ -157,6 +181,18 @@ export default function ContactForm() {
             value={formData.company}
             onChange={(e) => setFormData({ ...formData, company: e.target.value })}
             placeholder="Acme Inc."
+          />
+
+          <Select
+            label="How to contact next time (optional)"
+            value={formData.nextContactChannel}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                nextContactChannel: e.target.value as '' | NextContactChannel,
+              })
+            }
+            options={NEXT_CONTACT_CHANNEL_OPTIONS}
           />
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark-700">

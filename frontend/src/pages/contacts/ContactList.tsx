@@ -7,9 +7,10 @@ import {
   useInteractions,
   useUpdateInteraction,
 } from '../../api/interactions';
-import type { Contact, Interaction, InteractionType } from '../../api/types';
-import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
+import type { Contact, Interaction, InteractionType, NextContactChannel } from '../../api/types';
+import { INTERACTION_TYPE_OPTIONS, NEXT_CONTACT_CHANNEL_OPTIONS } from '../../api/types';
 import {
+  Badge,
   Button,
   Card,
   EmptyState,
@@ -129,6 +130,19 @@ function ContactTable({
                         </div>
                       )}
                       {!contact.followUpDate && <div className="shrink-0 w-24"></div>}
+
+                      {/* Next contact channel */}
+                      <div className="shrink-0 min-w-[110px]">
+                        {contact.nextContactChannel && (
+                          <Badge variant="warm">
+                            {
+                              NEXT_CONTACT_CHANNEL_OPTIONS.find(
+                                (opt) => opt.value === contact.nextContactChannel,
+                              )?.label
+                            }
+                          </Badge>
+                        )}
+                      </div>
 
                       {/* Name */}
                       <div className="shrink-0 text-sm text-white font-medium min-w-[120px]">
@@ -254,16 +268,32 @@ function ContactTable({
 
                     {/* Follow-up Date */}
                     <div>
-                      <InlineEditableDateWithQuickActions
-                        value={contact.followUpDate}
-                        onSave={async (value) => {
-                          await updateContact.mutateAsync({
-                            id: contact.id,
-                            data: { followUpDate: value },
-                          });
-                        }}
-                        emptyText="Add follow-up date"
-                      />
+                      <div className="flex flex-wrap items-center gap-3">
+                        <InlineEditableDateWithQuickActions
+                          value={contact.followUpDate}
+                          onSave={async (value) => {
+                            await updateContact.mutateAsync({
+                              id: contact.id,
+                              data: { followUpDate: value },
+                            });
+                          }}
+                          emptyText="Add follow-up date"
+                        />
+                        <InlineEditableSelect
+                          value={contact.nextContactChannel || ''}
+                          onSave={async (value) => {
+                            await updateContact.mutateAsync({
+                              id: contact.id,
+                              data: {
+                                nextContactChannel: (value || null) as NextContactChannel | null,
+                              },
+                            });
+                          }}
+                          options={NEXT_CONTACT_CHANNEL_OPTIONS}
+                          badgeVariant="warm"
+                          aria-label="Preferred next contact channel"
+                        />
+                      </div>
                     </div>
 
                     {/* Interactions */}

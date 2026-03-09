@@ -11,6 +11,8 @@ export interface User {
 }
 
 // Contact types
+export type NextContactChannel = 'call' | 'sms' | 'email' | 'linkedin';
+
 export interface Contact {
   id: number;
   sellerId: number;
@@ -20,6 +22,7 @@ export interface Contact {
   company: string | null;
   linkedin: string | null;
   followUpDate: string | null;
+  nextContactChannel: NextContactChannel | null;
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -32,6 +35,7 @@ export interface CreateContactData {
   company?: string | null;
   linkedin?: string | null;
   followUpDate?: string | null;
+  nextContactChannel?: NextContactChannel | null;
 }
 
 export interface UpdateContactData {
@@ -41,6 +45,7 @@ export interface UpdateContactData {
   company?: string | null;
   linkedin?: string | null;
   followUpDate?: string | null;
+  nextContactChannel?: NextContactChannel | null;
 }
 
 /** Build full LinkedIn URL from username (stored as username only) */
@@ -72,6 +77,19 @@ export const INTERACTION_TYPE_OPTIONS: InteractionTypeOption[] = [
   { value: 'note', label: 'Note' },
   { value: 'linkedin', label: 'LinkedIn' },
   { value: 'sms', label: 'SMS' },
+];
+
+export interface NextContactChannelOption {
+  value: '' | NextContactChannel;
+  label: string;
+}
+
+export const NEXT_CONTACT_CHANNEL_OPTIONS: NextContactChannelOption[] = [
+  { value: '', label: 'Choose channel' },
+  { value: 'call', label: 'Call' },
+  { value: 'sms', label: 'SMS' },
+  { value: 'email', label: 'Email' },
+  { value: 'linkedin', label: 'LinkedIn' },
 ];
 
 export interface Interaction {

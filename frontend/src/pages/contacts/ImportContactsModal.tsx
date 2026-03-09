@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { type BulkContactData, useContacts, useCreateContactsBulk } from '../../api/contacts';
-import type { Contact, CreateContactData, InteractionType } from '../../api/types';
+import type {
+  Contact,
+  CreateContactData,
+  InteractionType,
+  NextContactChannel,
+} from '../../api/types';
 import { INTERACTION_TYPE_OPTIONS } from '../../api/types';
 import { Button, Card, ErrorMessage, LoadingSpinner } from '../../components/ui';
 
@@ -130,6 +135,7 @@ export default function ImportContactsModal({ isOpen, onClose }: ImportContactsM
         company: c.company ?? null,
         linkedin: c.linkedin ?? null,
         followUpDate: c.followUpDate ?? null,
+        nextContactChannel: (c.nextContactChannel || null) as NextContactChannel | null,
         interactions: c.interactions
           ?.filter((interaction) =>
             VALID_INTERACTION_TYPES.includes(interaction.type as InteractionType),

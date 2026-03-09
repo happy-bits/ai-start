@@ -9,6 +9,7 @@ import {
   DATE_FORMAT_REGEX,
   ERROR_MESSAGES,
   INTERACTION_TYPE_VALUES,
+  NEXT_CONTACT_CHANNEL_VALUES,
   ROLES,
 } from '../constants.js';
 import * as schema from '../db/schema.js';
@@ -30,6 +31,7 @@ const createContactSchema = z.object({
   company: z.string().optional().nullable(),
   linkedin: z.string().optional().nullable(),
   followUpDate: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE).optional().nullable(),
+  nextContactChannel: z.enum(NEXT_CONTACT_CHANNEL_VALUES).optional().nullable(),
   interactions: z
     .array(
       z.object({
@@ -50,6 +52,7 @@ const updateContactSchema = z.object({
   company: z.string().optional().nullable(),
   linkedin: z.string().optional().nullable(),
   followUpDate: z.string().regex(DATE_FORMAT_REGEX, DATE_FORMAT_MESSAGE).optional().nullable(),
+  nextContactChannel: z.enum(NEXT_CONTACT_CHANNEL_VALUES).optional().nullable(),
 });
 
 export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
@@ -98,6 +101,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
             company: data.company ?? null,
             linkedin: normalizeLinkedIn(data.linkedin),
             followUpDate: data.followUpDate ?? null,
+            nextContactChannel: data.nextContactChannel ?? null,
             createdAt: now,
             updatedAt: now,
           })),
@@ -212,6 +216,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
         company: data.company ?? null,
         linkedin: normalizeLinkedIn(data.linkedin),
         followUpDate: data.followUpDate ?? null,
+        nextContactChannel: data.nextContactChannel ?? null,
         createdAt: now,
         updatedAt: now,
       })
@@ -243,6 +248,7 @@ export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
       'company',
       'linkedin',
       'followUpDate',
+      'nextContactChannel',
     ]);
 
     const contact = db

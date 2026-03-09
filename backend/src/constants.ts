@@ -15,6 +15,9 @@ export const INTERACTION_TYPE_VALUES = [
   'sms',
 ] as const;
 
+// Next contact channel options (how to contact next time)
+export const NEXT_CONTACT_CHANNEL_VALUES = ['call', 'sms', 'email', 'linkedin'] as const;
+
 // Session configuration
 export const SESSION_CONFIG = {
   DEFAULT_EXPIRY_HOURS: 24,

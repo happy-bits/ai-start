@@ -6,6 +6,7 @@
       "phone": "+46 70 123 45 67",
       "company": "Acme AB",
       "linkedin": "anna-andersson",
+      "nextContactChannel": "sms",
       "followUpDate": "2026-03-15",
       "interactions": [
         {
@@ -55,12 +56,14 @@
       "phone": "+46 72 987 65 43",
       "company": "Test Company AB",
       "linkedin": "erik-johansson",
+      "nextContactChannel": "call",
       "followUpDate": "2026-03-20"
     },
     {
       "name": "Maria Svensson",
       "email": "maria@example.com",
       "company": "Beta Inc",
+      "nextContactChannel": "email",
       "interactions": [
         {
           "type": "video_call",
@@ -79,6 +82,7 @@
       "name": "Kontakt utan e-post",
       "phone": "+46 73 111 22 33",
       "company": "Gamma Corp",
+      "nextContactChannel": "linkedin",
       "followUpDate": "2026-03-25"
     }
   ]
