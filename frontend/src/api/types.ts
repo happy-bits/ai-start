@@ -50,7 +50,14 @@ export function linkedinUrl(username: string | null | undefined): string | null 
 }
 
 // Interaction types
-export type InteractionType = 'call' | 'meeting' | 'email' | 'video_call' | 'note';
+export type InteractionType =
+  | 'call'
+  | 'meeting'
+  | 'email'
+  | 'video_call'
+  | 'note'
+  | 'linkedin'
+  | 'sms';
 
 export interface InteractionTypeOption {
   value: InteractionType;
@@ -63,6 +70,8 @@ export const INTERACTION_TYPE_OPTIONS: InteractionTypeOption[] = [
   { value: 'email', label: 'Email' },
   { value: 'video_call', label: 'Video Call' },
   { value: 'note', label: 'Note' },
+  { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'sms', label: 'SMS' },
 ];
 
 export interface Interaction {

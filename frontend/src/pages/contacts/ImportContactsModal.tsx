@@ -21,6 +21,8 @@ const VALID_INTERACTION_TYPES: InteractionType[] = [
   'email',
   'video_call',
   'note',
+  'linkedin',
+  'sms',
 ];
 
 interface ImportContactData extends Omit<BulkContactData, 'interactions'> {

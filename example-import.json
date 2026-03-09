@@ -1,0 +1,85 @@
+{
+  "contacts": [
+    {
+      "name": "Anna Andersson",
+      "email": "anna.andersson@example.com",
+      "phone": "+46 70 123 45 67",
+      "company": "Acme AB",
+      "linkedin": "anna-andersson",
+      "followUpDate": "2026-03-15",
+      "interactions": [
+        {
+          "type": "call",
+          "date": "2026-03-05",
+          "time": "14:30",
+          "notes": "Diskuterade projektet och nästa steg"
+        },
+        {
+          "type": "meeting",
+          "date": "2026-03-10",
+          "time": "10:00",
+          "notes": "Följupp-möte för att gå igenom offerten"
+        },
+        {
+          "type": "email",
+          "date": "2026-03-12",
+          "notes": "Skickade över dokumentation"
+        },
+        {
+          "type": "video_call",
+          "date": "2026-03-13",
+          "time": "16:00",
+          "notes": "Teknisk genomgång via Teams"
+        },
+        {
+          "type": "note",
+          "date": "2026-03-14",
+          "notes": "Kund är mycket intresserad, följ upp snart"
+        },
+        {
+          "type": "linkedin",
+          "date": "2026-03-15",
+          "notes": "Skickade kontaktförfrågan på LinkedIn"
+        },
+        {
+          "type": "sms",
+          "date": "2026-03-16",
+          "time": "09:00",
+          "notes": "Skickade SMS med påminnelse om möte"
+        }
+      ]
+    },
+    {
+      "name": "Erik Johansson",
+      "email": "erik.johansson@testcompany.se",
+      "phone": "+46 72 987 65 43",
+      "company": "Test Company AB",
+      "linkedin": "erik-johansson",
+      "followUpDate": "2026-03-20"
+    },
+    {
+      "name": "Maria Svensson",
+      "email": "maria@example.com",
+      "company": "Beta Inc",
+      "interactions": [
+        {
+          "type": "video_call",
+          "date": "2026-03-08",
+          "time": "15:00",
+          "notes": "Demo av produkten"
+        },
+        {
+          "type": "note",
+          "date": "2026-03-09",
+          "notes": "Kund är intresserad, följ upp nästa vecka"
+        }
+      ]
+    },
+    {
+      "name": "Kontakt utan e-post",
+      "phone": "+46 73 111 22 33",
+      "company": "Gamma Corp",
+      "followUpDate": "2026-03-25"
+    }
+  ]
+}
