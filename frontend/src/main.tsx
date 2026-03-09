@@ -18,6 +18,13 @@ const queryClient = new QueryClient({
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Root element not found');
+
+if (import.meta.env.VITE_PROD_DB === 'true') {
+  document.body.classList.add('prod-db');
+} else {
+  document.body.classList.remove('prod-db');
+}
+
 createRoot(root).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

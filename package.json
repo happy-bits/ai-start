@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:seed": "node scripts/dev.mjs --seed",
+    "prod": "DB_PATH=data/keepwarm-prod VITE_PROD_DB=true node scripts/dev.mjs",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
