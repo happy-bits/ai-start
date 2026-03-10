@@ -11,7 +11,7 @@ export interface User {
 }
 
 // Contact types
-export type NextContactChannel = 'call' | 'sms' | 'email' | 'linkedin';
+export type NextContactChannel = 'call' | 'email' | 'linkedin' | 'slack' | 'sms';
 
 export interface Contact {
   id: number;
@@ -87,9 +87,10 @@ export interface NextContactChannelOption {
 export const NEXT_CONTACT_CHANNEL_OPTIONS: NextContactChannelOption[] = [
   { value: '', label: 'Choose channel' },
   { value: 'call', label: 'Call' },
-  { value: 'sms', label: 'SMS' },
   { value: 'email', label: 'Email' },
   { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'slack', label: 'Slack' },
+  { value: 'sms', label: 'SMS' },
 ];
 
 export interface Interaction {

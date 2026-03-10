@@ -16,7 +16,7 @@ export const INTERACTION_TYPE_VALUES = [
 ] as const;
 
 // Next contact channel options (how to contact next time)
-export const NEXT_CONTACT_CHANNEL_VALUES = ['call', 'sms', 'email', 'linkedin'] as const;
+export const NEXT_CONTACT_CHANNEL_VALUES = ['call', 'email', 'linkedin', 'slack', 'sms'] as const;
 
 // Session configuration
 export const SESSION_CONFIG = {
