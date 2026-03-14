@@ -48,6 +48,30 @@ export async function deleteContact(id: number): Promise<void> {
   await apiClient.delete(`/api/contacts/${id}`);
 }
 
+export async function exportContactsAsCsv(): Promise<void> {
+  const API_BASE = import.meta.env.VITE_API_URL || '';
+  const token = apiClient.getToken();
+  const response = await fetch(`${API_BASE}/api/contacts/export`, {
+    method: 'GET',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: 'Export failed' }));
+    throw new Error(errorData.error ?? 'Export failed');
+  }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `keepwarm-kontakter-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export async function getWastebinContacts(): Promise<Contact[]> {
   const response = await apiClient.get<{ contacts: Contact[] }>('/api/contacts/wastebin');
   return response.contacts;

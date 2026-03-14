@@ -45,6 +45,34 @@ describe('Contact Routes', () => {
     });
   });
 
+  describe('GET /api/contacts/export', () => {
+    it('should export own contacts as CSV for seller', async () => {
+      const res = await get(ctx.app, '/api/contacts/export', ctx.sellerToken);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('Content-Type')).toContain('text/csv');
+      const csv = await res.text();
+      expect(csv).toContain('name;email;phone;company;linkedin;followUpDate;nextContactChannel');
+      expect(csv).toContain('Test Contact');
+      expect(csv).toContain('contact@test.com');
+    });
+
+    it('should export all contacts as admin', async () => {
+      const res = await get(ctx.app, '/api/contacts/export', ctx.adminToken);
+      expect(res.status).toBe(200);
+      const csv = await res.text();
+      expect(csv).toContain('Test Contact');
+      expect(csv).toContain('Other Contact');
+    });
+
+    it('should export only own contacts for seller2', async () => {
+      const res = await get(ctx.app, '/api/contacts/export', ctx.seller2Token);
+      expect(res.status).toBe(200);
+      const csv = await res.text();
+      expect(csv).toContain('Other Contact');
+      expect(csv).not.toContain('Test Contact');
+    });
+  });
+
   describe('GET /api/contacts/:id', () => {
     it('should get own contact details', async () => {
       const data = await expectOk<{ contact: { name: string; email: string } }>(

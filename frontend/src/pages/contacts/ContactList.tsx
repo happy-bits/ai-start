@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
-import { useContacts, useDeleteContact, useUpdateContact } from '../../api/contacts';
+import {
+  exportContactsAsCsv,
+  useContacts,
+  useDeleteContact,
+  useUpdateContact,
+} from '../../api/contacts';
 import {
   useDeleteInteraction,
   useInteractions,
@@ -29,6 +34,59 @@ import { getTodayISO } from '../../utils/dates';
 import { cn, deleteButtonBase, deleteButtonSize } from '../../utils/styles';
 import NewInteractionRow from '../interactions/NewInteractionRow';
 import ImportContactsModal from './ImportContactsModal';
+
+function ExportContactsButton() {
+  const [isExporting, setIsExporting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    setError(null);
+    try {
+      await exportContactsAsCsv();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Export failed');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-1">
+      <Button
+        variant="secondary"
+        onClick={handleExport}
+        disabled={isExporting}
+        aria-label="Export contacts to CSV"
+      >
+        {isExporting ? (
+          <LoadingSpinner size="sm" />
+        ) : (
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+            />
+          </svg>
+        )}
+        Export
+      </Button>
+      {error && (
+        <span className="text-xs text-red-400" role="alert">
+          {error}
+        </span>
+      )}
+    </div>
+  );
+}
 
 const FILTER_ATT_KONTAKTA = 'att-kontakta';
 const FILTER_ALL = 'all';
@@ -467,6 +525,7 @@ export default function ContactList() {
             </svg>
             Import
           </Button>
+          <ExportContactsButton />
           <Link to="/contacts/new">
             <Button aria-label="Add new contact">
               <svg

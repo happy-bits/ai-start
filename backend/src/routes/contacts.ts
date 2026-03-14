@@ -58,6 +58,54 @@ const updateContactSchema = z.object({
 export function createContactRoutes(db: BetterSQLite3Database<typeof schema>) {
   const app = new Hono<{ Variables: AuthVariables }>();
 
+  // GET /contacts/export - Export contacts as CSV (semicolon, UTF-8 BOM) for Google Spreadsheet
+  app.get('/export', (c) => {
+    const user = c.get('user');
+
+    let conditions = isNull(schema.contacts.deletedAt);
+
+    if (user.role === ROLES.SELLER) {
+      conditions = and(
+        eq(schema.contacts.sellerId, user.id),
+        isNull(schema.contacts.deletedAt),
+      ) as typeof conditions;
+    }
+
+    const contacts = db.select().from(schema.contacts).where(conditions).all();
+
+    const columns = [
+      'name',
+      'email',
+      'phone',
+      'company',
+      'linkedin',
+      'followUpDate',
+      'nextContactChannel',
+    ] as const;
+
+    const escapeCsvField = (value: string | null | undefined): string => {
+      if (value === null || value === undefined) return '';
+      const s = String(value);
+      if (/[;"\n\r]/.test(s)) {
+        return `"${s.replace(/"/g, '""')}"`;
+      }
+      return s;
+    };
+
+    const header = columns.join(';');
+    const rows = contacts.map((contact) =>
+      columns.map((col) => escapeCsvField(contact[col])).join(';'),
+    );
+    const csv = [header, ...rows].join('\r\n');
+    const bom = '\uFEFF';
+    const body = bom + csv;
+
+    const filename = `keepwarm-kontakter-${new Date().toISOString().slice(0, 10)}.csv`;
+    c.header('Content-Type', 'text/csv; charset=utf-8');
+    c.header('Content-Disposition', `attachment; filename="${filename}"`);
+    return c.body(body);
+  });
+
   // GET /contacts - List contacts (sellers see their own, admins see all) - excludes soft-deleted
   app.get('/', (c) => {
     const user = c.get('user');
